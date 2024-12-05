@@ -92,6 +92,7 @@ export async function getDocument(slug: string) {
         return null;
     }
 }
+
 export async function getRawDocument(slug: string) {
     try {
         const contentPath = getDocumentPathMemoized(slug);

@@ -1,0 +1,26 @@
+{
+    "name": "example-server",
+    "version": "1.0.0",
+    "description": "Example server to test RC frontend prior to p2p implementation.",
+    "main": "main.js",
+    "scripts": {
+        "start": "node main.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/bitxenia/rc.git"
+    },
+    "keywords": [
+        "rc"
+    ],
+    "author": "bitxenia",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/bitxenia/rc/issues"
+    },
+    "homepage": "https://github.com/bitxenia/rc#readme",
+    "dependencies": {
+        "express": "^4.21.1"
+    }
+}
