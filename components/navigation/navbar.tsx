@@ -47,7 +47,6 @@ export function Navbar() {
                             rel="noopener noreferrer"
                             aria-label="Create a new article"
                         >
-                            <LuPlus className="w-[1.1rem] h-[1.1rem]" />
                             Create
                         </Link>
                     </div>
