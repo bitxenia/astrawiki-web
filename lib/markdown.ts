@@ -93,17 +93,17 @@ export async function getDocument(slug: string) {
     }
 }
 
-export async function getRawDocument(slug: string) {
-    try {
-        const contentPath = getDocumentPathMemoized(slug);
-        const rawMdx = await fs.readFile(contentPath, "utf-8");
-
-        return rawMdx;
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
-}
+// export async function getRawDocument(slug: string) {
+//     try {
+//         const contentPath = getDocumentPathMemoized(slug);
+//         const rawMdx = await fs.readFile(contentPath, "utf-8");
+//
+//         return rawMdx;
+//     } catch (err) {
+//         console.error(err);
+//         return null;
+//     }
+// }
 
 const headingsRegex = /^(#{2,4})\s(.+)$/gm;
 

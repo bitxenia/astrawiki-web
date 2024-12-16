@@ -1,7 +1,7 @@
 import axios, { HttpStatusCode } from "axios";
 import { Article, Patch, Ecosystem } from "./ecosystem";
 
-const URL = "localhost:3001"
+const URL = "http://localhost:3001"
 
 type ArticleResponse = {
     patches: Patch[]
@@ -28,14 +28,18 @@ export default class ExampleServer implements Ecosystem {
 
     async createArticle(name: string): Promise<null> {
         if (name.length === 0) {
+            console.log("Name cannot be empty")
             return Promise.reject("Name cannot be empty");
         }
 
+        console.log(`Name: ${name}`);
         const { status } = await axios.post(`${URL}/articles/`, { name });
         if (status === HttpStatusCode.Conflict) {
+            console.log("Article already exists")
             return Promise.reject("Article already exists");
         }
 
+        console.log("Article posted succesfully");
         return Promise.resolve(null);
     }
 

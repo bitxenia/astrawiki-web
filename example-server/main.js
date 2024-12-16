@@ -29,6 +29,7 @@ app.get('/articles/:name', async (req, res) => {
 app.post('/articles', async (req, res) => {
     const { name } = req.body;
     if (!name) {
+        console.log("Name is required");
         return res.status(400).json({ error: "Name is required" });
     }
 
@@ -36,7 +37,8 @@ app.post('/articles', async (req, res) => {
 
     try {
         await access(patchesPath);
-        return res.status(409).json({ error: "Article with this name already exists" })
+        console.log("Article with this name already exists");
+        return res.status(409).json({ error: "Article with this name already exists" });
     } catch (err) {
         if (err.code != "ENOENT") {
             console.log(err);
@@ -46,7 +48,8 @@ app.post('/articles', async (req, res) => {
 
     try {
         await writeFile(patchesPath, "[]", "utf-8");
-        res.status(201).json({ message: "Emty article created successfully" });
+        console.log("Empty article created successfully");
+        res.status(201).json({ message: "Empty article created successfully" });
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: "Internal Server Error" });
