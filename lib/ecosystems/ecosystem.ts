@@ -1,30 +1,25 @@
-export type Change = string; //TODO
+export type Patch = {
+    date: string;
+    patch: string;
+};
 
 export type Article = {
     name: string;
-    changelog: Change[];
+    patches: Patch[];
 }
 
 export interface Ecosystem {
-    /* Fetches an article given it's name, or null if the article doesn't
-     * exist.
+    /* Fetches an article given it's name.
     */
-    fetchArticle(name: string): Promise<Article | null>;
+    fetchArticle(name: string): Promise<Article>;
 
     /*
-     * Adds empty article to repository, returns true if it was successful, false
-     * otherwise. An article name must be unique.
+     * Creates empty article to repository. An article name must be unique.
     */
-    addArticle(name: string): Promise<boolean>;
+    createArticle(name: string): Promise<null>;
 
     /*
-     * Edits an article in a git style, where only the changes are passed to 
-     * the method.
+     * Edits an article by passing the delta/diff/patch as an argument.
     */
-    editArticle(name: string, changes: Change[]): Promise<boolean>;
-
-    /*
-     * Returns all the changes done to an article.
-    */
-    viewHistory(name: string): string[][];
+    editArticle(name: string, patch: Patch): Promise<null>;
 }
