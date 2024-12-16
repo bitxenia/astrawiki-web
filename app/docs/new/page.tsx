@@ -4,7 +4,7 @@ import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import { EcosystemContext } from "@/lib/contexts";
-import { Ecosystem } from "@/lib/ecosystems/ecosystem";
+import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
 import { useContext, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -16,7 +16,14 @@ export default function Pages() {
     const [markdown, setMarkdown] = useState("");
 
     const publishArticle = async (name: string) => {
-        await ecosystem.createArticle(name).catch(err => console.log(err));
+        await ecosystem.createArticle(name).catch(err => console.log("Create article: ", err));
+        const date = new Date();
+        const patch: Patch = {
+            date: `${date.toISOString()}`,
+            patch: markdown,
+        };
+        alert("Article created successfully!");
+        await ecosystem.editArticle(name, patch).catch(err => console.log("Edit article: ", err));
         alert("Article published successfully!");
     };
 

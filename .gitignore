@@ -37,3 +37,4 @@ next-env.d.ts
 
 # example server
 /example-server/node_modules
+/example-server/content
