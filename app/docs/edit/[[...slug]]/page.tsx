@@ -8,6 +8,7 @@ import { ArticleContext, ArticleContextProps, EcosystemContext } from "@/lib/con
 import { getPatchFromTwoTexts } from "@/lib/diff";
 import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
 import { getRawArticle } from "@/lib/markdown";
+import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -17,6 +18,7 @@ type PageProps = {
 };
 
 export default function Pages({ params: { slug = [] } }: PageProps) {
+    const router = useRouter();
     const path = ["New"];
     const pathName = slug.join("/");
 
@@ -50,9 +52,18 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
 
     const saveChanges = async () => {
         const patch = getPatchFromTwoTexts(article as string, newArticle);
+        if (patch.patch.length == 0) {
+            alert("No changes were made");
+            return
+        }
         await ecosystem.editArticle(pathName, patch);
         setArticle(newArticle);
         alert("Edited successfully!");
+        router.push(`/docs/${pathName}`);
+    }
+
+    const cancel = async () => {
+        router.push(`/docs/${pathName}`);
     }
 
     return (
@@ -79,7 +90,9 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
                                 onClick={saveChanges} >
                                 Save changes
                             </button>
-                            <button className={buttonVariants({ variant: "secondary", size: "default" })}>
+                            <button
+                                className={buttonVariants({ variant: "secondary", size: "default" })}
+                                onClick={cancel} >
                                 Cancel
                             </button>
                         </div>

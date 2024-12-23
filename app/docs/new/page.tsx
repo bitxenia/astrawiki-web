@@ -3,15 +3,18 @@
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { EcosystemContext } from "@/lib/contexts";
+import { ArticleContext, ArticleContextProps, EcosystemContext } from "@/lib/contexts";
 import { getPatchFromTwoTexts } from "@/lib/diff";
 import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
+import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 export default function Pages() {
+    const router = useRouter();
     const ecosystem = useContext<Ecosystem>(EcosystemContext)
+    const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
     const path = ["New"];
     const [title, setTitle] = useState("");
     const [markdown, setMarkdown] = useState("");
@@ -22,6 +25,8 @@ export default function Pages() {
         console.log("Article created successfully!");
         await ecosystem.editArticle(name, patch).catch(err => console.log("Edit article: ", err));
         alert("Article published successfully!");
+        setArticle(markdown);
+        router.push(`/docs/${title}`);
     };
 
     return (
