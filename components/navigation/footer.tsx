@@ -20,7 +20,7 @@ export function Footer() {
           <div className="text-center hidden md:block">
             <Link 
               className="font-semibold" 
-              href="https://www.rubixstudios.com.au"
+              href="https://github.com/bitxenia"
               target="_blank"
               rel="noopener noreferrer"
             >
