@@ -1,6 +1,6 @@
 import { BaseMdxFrontmatter, parseMdx } from "../markdown";
 import web3 from "../web3";
-import { Article, Change, Ecosystem } from "./ecosystem";
+import { Article, Ecosystem, Patch } from "./ecosystem";
 
 // TODO: move this to a separate file
 const articuloFactoryContractAddress =
@@ -149,7 +149,7 @@ const articuloContractABI = [
 ];
 
 class EthEcosystem implements Ecosystem {
-  async fetchArticle(name: string): Promise<Article | null> {
+  async fetchArticle(name: string): Promise<Article> {
     const factoryInstance = new web3.eth.Contract(
       articuloFactoryContractABI,
       articuloFactoryContractAddress
@@ -158,7 +158,7 @@ class EthEcosystem implements Ecosystem {
       .tituloToAddress(name)
       .call();
     if (!articuloAddress) {
-      return Promise.resolve(null);
+      return Promise.reject("Article not found");
     }
 
     console.log(`Articulo address: ${articuloAddress}`);
@@ -172,17 +172,14 @@ class EthEcosystem implements Ecosystem {
     console.log(`Parsed content: ${JSON.stringify(parsedMdx)}`);
     const articulo: Article = {
       name,
-      changelog: [contenido],
+      patches: [{ date: "", patch: contenido }],
     };
     return articulo;
   }
-  addArticle(name: string): Promise<boolean> {
+  createArticle(name: string): Promise<null> {
     throw new Error("Method not implemented.");
   }
-  editArticle(name: string, changes: Change[]): Promise<boolean> {
-    throw new Error("Method not implemented.");
-  }
-  viewHistory(name: string): string[][] {
+  editArticle(name: string, patch: Patch): Promise<null> {
     throw new Error("Method not implemented.");
   }
 }

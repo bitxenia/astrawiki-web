@@ -79,14 +79,17 @@ export async function getDocument(slug: string, ecosystem: Ecosystem) {
     //     lastUpdated = stats.mtime.toISOString();
     // }
 
-    const parsedMdx = await parseMdx<BaseMdxFrontmatter>(rawMdx);
-    const tocs = await getTable(slug);
+    const article = await ecosystem.fetchArticle(slug);
+    const rawMdx = article.patches[0];
+    const parsedMdx = await parseMdx<BaseMdxFrontmatter>(rawMdx.patch);
+    // const tocs = await getTable(slug);
 
     return {
-      frontmatter: parsedMdx.frontmatter,
+      frontmatter: {
+        title: article.name,
+        description: parsedMdx.frontmatter.description,
+      },
       content: parsedMdx.content,
-      tocs,
-      lastUpdated,
     };
   } catch (err) {
     console.error(err);
