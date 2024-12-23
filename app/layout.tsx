@@ -11,7 +11,7 @@ import "./globals.css";
 import { useState } from "react";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import ExampleServer from "@/lib/ecosystems/example-server";
-import { EcosystemContext } from '@/lib/contexts';
+import { ArticleContext, EcosystemContext } from '@/lib/contexts';
 
 // const baseUrl = Settings.metadataBase;
 
@@ -52,6 +52,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     const [ecosystem, _setEcosystem] = useState<Ecosystem>(new ExampleServer());
+    const [article, setArticle] = useState<any>(null);
 
     return (
         <html lang="en" suppressHydrationWarning>
@@ -69,10 +70,12 @@ export default function RootLayout({
                     disableTransitionOnChange
                 >
                     <EcosystemContext.Provider value={ecosystem}>
+                    <ArticleContext.Provider value={{article, setArticle}}>
                         <Navbar />
                         <main className="px-5 sm:px-8 h-auto">
                             {children}
                         </main>
+                    </ArticleContext.Provider>
                     </EcosystemContext.Provider>
                     <Footer />
                 </ThemeProvider>

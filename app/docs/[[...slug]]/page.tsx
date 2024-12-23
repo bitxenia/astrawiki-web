@@ -1,6 +1,6 @@
+"use client";
 import { notFound } from "next/navigation";
-import { getDocument } from "@/lib/markdown";
-import { PageRoutes } from "@/lib/pageroutes";
+import { getRawArticle, parseMarkdown } from "@/lib/markdown";
 import { Settings } from "@/lib/meta";
 
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
@@ -9,45 +9,70 @@ import Toc from "@/components/navigation/toc";
 import Feedback from "@/components/navigation/feedback";
 import { BackToTop } from "@/components/navigation/backtotop";
 import { Typography } from "@/components/ui/typography";
-import { useContext } from "react";
+import { ReactElement, useContext, useEffect, useState } from "react";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
-import { EcosystemContext } from "@/lib/contexts";
-import EthEcosystem from "@/lib/ecosystems/eth-ecosystem";
+import {
+  ArticleContext,
+  ArticleContextProps,
+  EcosystemContext,
+} from "@/lib/contexts";
+import { BarLoader } from "react-spinners";
 
 type PageProps = {
   params: { slug: string[] };
 };
 
-export default async function Pages({ params: { slug = [] } }: PageProps) {
+export default function Pages({ params: { slug = [] } }: PageProps) {
+  const [parsedMarkdown, setParsedMarkdown] = useState<ReactElement<
+    any,
+    any
+  > | null>(null);
+  const [error, setError] = useState<boolean>(false);
+  const ecosystem = useContext<Ecosystem>(EcosystemContext);
+  const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
+
   const pathName = slug.join("/");
-  const ecosystem = new EthEcosystem(); // useContext<Ecosystem>(EcosystemContext);
-  const res = await getDocument(pathName, ecosystem);
+  useEffect(() => {
+    async function fetchDocument() {
+      try {
+        const rawArticle = await getRawArticle(pathName, ecosystem);
+        const res = await parseMarkdown(pathName, rawArticle);
+        if (!res) {
+          setError(true);
+        } else {
+          setParsedMarkdown(res);
+          setArticle(rawArticle);
+        }
+      } catch {
+        setError(true);
+      }
+    }
+    fetchDocument();
+  }, [pathName, ecosystem, setArticle]);
 
-  if (!res) notFound();
-
-  const frontmatter = res?.frontmatter;
-  const content = res?.content;
-  const tocs: { href: string; level: number; text: string }[] = [];
+  if (error) notFound();
 
   return (
     <div className="flex items-start gap-14">
       <div className="flex-[3] pt-10">
         <PageBreadcrumb paths={slug} />
-        <Typography>
-          <h1 className="text-3xl -mt-2">{frontmatter.title}</h1>
-          <p className="-mt-4 text-base text-muted-foreground text-[16.5px]">
-            {frontmatter.description}
-          </p>
-          <div>{content}</div>
-          <Pagination pathname={pathName} />
-        </Typography>
+        {parsedMarkdown && (
+          <Typography>
+            <h1 className="text-3xl -mt-2">{pathName}</h1>
+            <div>{parsedMarkdown}</div>
+            <Pagination pathname={pathName} />
+          </Typography>
+        )}
+        {!parsedMarkdown && (
+          <div className="flex justify-center items-center min-h-screen">
+            <BarLoader />
+          </div>
+        )}
       </div>
-      {Settings.rightbar && (
+      {parsedMarkdown && Settings.rightbar && (
         <div className="hidden xl:flex xl:flex-col sticky top-16 gap-3 py-8 min-w-[230px] h-[94.5vh] toc">
-          {Settings.toc && <Toc tocs={tocs} />}
-          {Settings.feedback && (
-            <Feedback slug={pathName} title={frontmatter.title} />
-          )}
+          {Settings.toc && <Toc tocs={[]} />}
+          {Settings.feedback && <Feedback slug={pathName} title={pathName} />}
           {Settings.totop && (
             <BackToTop className="mt-6 self-start text-sm text-neutral-800 dark:text-neutral-300/85" />
           )}
@@ -55,28 +80,4 @@ export default async function Pages({ params: { slug = [] } }: PageProps) {
       )}
     </div>
   );
-}
-
-export async function generateMetadata({ params: { slug = [] } }: PageProps) {
-  const pathName = slug.join("/");
-  const res = await getDocument(pathName);
-
-  if (!res) return null;
-
-  const { frontmatter, lastUpdated } = res;
-
-  return {
-    title: `${frontmatter.title} - ${Settings.title}`,
-    description: frontmatter.description,
-    keywords: frontmatter.keywords,
-    ...(lastUpdated && {
-      lastModified: new Date(lastUpdated).toISOString(),
-    }),
-  };
-}
-
-export function generateStaticParams() {
-  return PageRoutes.filter((item) => item.href).map((item) => ({
-    slug: item.href.split("/").slice(1),
-  }));
 }

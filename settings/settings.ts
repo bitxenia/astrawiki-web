@@ -1,18 +1,18 @@
-export const url = "https://rubix-documents.vercel.app";
+export const url = "https://github.com/bitxenia/rc";
 export const siteicon = "/icon.png";
 
 export const gtm = "GTM-XXXXXXX";
 export const gtmconnected = true;
 
 export const sitename = "Bitxenia Knowledge Repository";
-export const description = "This comprehensive documentation template, crafted with Next.js and available as open-source, delivers a sleek and responsive design, tailored to meet all your project documentation requirements.";
-export const keywords = ["Next.js", "documentation", "Rubix Studios", "open source", "SEO"];
+export const description = "Repository of articles of varied topics, made with p2p in mind for a descentralized and community-driven experience.";
+export const keywords = ["p2p", "ipfs", "blockchain", "freenet", "community driven"];
 export const urlimage = "/images/og-image.png";
 export const imagealt = "Rubix Studios Documentation";
-export const twitterhandle = "@RubixStudios";
+export const twitterhandle = "@bitxenia";
 
-export const companyname = "Rubix Studios";
-export const companylink = "https://www.rubixstudios.com.au";
+export const companyname = "Bitxenia";
+export const companylink = "https://github.com/bitxenia";
 
 export const branding = true;
 export const rightsidebar = true;

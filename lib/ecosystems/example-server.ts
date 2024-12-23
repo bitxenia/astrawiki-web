@@ -4,7 +4,7 @@ import { Article, Patch, Ecosystem } from "./ecosystem";
 const URL = "http://localhost:3001"
 
 type ArticleResponse = {
-    patches: Patch[]
+    patches: string
 }
 
 export default class ExampleServer implements Ecosystem {
@@ -21,7 +21,7 @@ export default class ExampleServer implements Ecosystem {
         }
         const newArticle: Article = {
             name,
-            patches: data.patches,
+            patches: JSON.parse(data.patches),
         }
         return Promise.resolve(newArticle);
     }

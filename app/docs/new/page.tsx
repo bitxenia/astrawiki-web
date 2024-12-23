@@ -3,16 +3,22 @@
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { EcosystemContext } from "@/lib/contexts";
-// import { getPatchFromTwoTexts } from "@/lib/diff";
+import {
+  ArticleContext,
+  ArticleContextProps,
+  EcosystemContext,
+} from "@/lib/contexts";
+import { getPatchFromTwoTexts } from "@/lib/diff";
 import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
-import EthEcosystem from "@/lib/ecosystems/eth-ecosystem";
+import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 export default function Pages() {
-  const ecosystem = new EthEcosystem(); // useContext<Ecosystem>(EcosystemContext);
+  const router = useRouter();
+  const ecosystem = useContext<Ecosystem>(EcosystemContext);
+  const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
   const path = ["New"];
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
@@ -21,12 +27,14 @@ export default function Pages() {
     await ecosystem
       .createArticle(name)
       .catch((err) => console.log("Create article: ", err));
-    // let patch = getPatchFromTwoTexts("", markdown);
+    let patch = getPatchFromTwoTexts("", markdown);
     console.log("Article created successfully!");
     await ecosystem
-      .editArticle(name, { date: new Date().toISOString(), patch: markdown })
+      .editArticle(name, patch)
       .catch((err) => console.log("Edit article: ", err));
     alert("Article published successfully!");
+    setArticle(markdown);
+    router.push(`/docs/${title}`);
   };
 
   return (
