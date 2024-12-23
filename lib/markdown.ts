@@ -16,6 +16,7 @@ import { Settings } from "@/lib/meta";
 import { GitHubLink } from "@/settings/navigation";
 import { Ecosystem } from "./ecosystems/ecosystem";
 import { getTextFromPatches } from "./diff";
+import { ReactElement } from "react";
 
 async function parseMdx<Frontmatter>(rawMdx: string) {
     return await compileMDX<Frontmatter>({
@@ -60,6 +61,36 @@ const getDocumentPathMemoized = (() => {
         return cache.get(slug)!;
     };
 })();
+
+/**
+ * Fetches article from the given ecosystem and builds from patches.
+ * @param name Name of the article, case sensitive.
+ * @param ecosystem Ecosystem to fetch the article from.
+ * @returns article as raw markdown (without frontmatter).
+ */
+export async function getRawArticle(name: string, ecosystem: Ecosystem): Promise<string> {
+        const article = await ecosystem.fetchArticle(name);
+        return getTextFromPatches(article.patches);
+}
+
+// 
+/**
+ * Adds frontmatter and parses article into MDX.
+ * @param title Title of the article.
+ * @param rawMd raw markdown (without frontmatter).
+ */
+export async function parseMarkdown(title: string, rawMd: string): Promise<{ frontmatter: BaseMdxFrontmatter; content: ReactElement<any, any>; tocs: any[]; }> {
+        const rawFrontmatter = `---\ntitle: ${title}\n---\n`;
+        const parsedMdx = await parseMdx<BaseMdxFrontmatter>(rawFrontmatter.concat(rawMd));
+        // const tocs = await getTable(slug);
+        const tocs: any[] = [];
+
+        return {
+            frontmatter: parsedMdx.frontmatter,
+            content: parsedMdx.content,
+            tocs,
+        };
+}
 
 export async function getDocument(slug: string, ecosystem: Ecosystem) {
     try {

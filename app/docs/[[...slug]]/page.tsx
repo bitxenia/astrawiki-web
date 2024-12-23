@@ -1,6 +1,6 @@
 "use client"
 import { notFound } from "next/navigation";
-import { getDocument } from "@/lib/markdown";
+import { getDocument, getRawArticle, parseMarkdown } from "@/lib/markdown";
 import { Settings } from "@/lib/meta";
 
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
@@ -11,7 +11,7 @@ import { BackToTop } from "@/components/navigation/backtotop";
 import { Typography } from "@/components/ui/typography";
 import { useContext, useEffect, useState } from "react";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
-import { EcosystemContext } from "@/lib/contexts";
+import { ArticleContext, EcosystemContext } from "@/lib/contexts";
 
 type PageProps = {
     params: { slug: string[] };
@@ -21,23 +21,26 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
     const [document, setDocument] = useState<any>(null);
     const [error, setError] = useState<boolean>(false);
     const ecosystem = useContext<Ecosystem>(EcosystemContext)
+    const { setArticle } = useContext<any>(ArticleContext);
 
     const pathName = slug.join("/");
     useEffect(() => {
         async function fetchDocument() {
             try {
-                const res = await getDocument(pathName, ecosystem);
+                const rawArticle = await getRawArticle(pathName, ecosystem);
+                const res = await parseMarkdown(pathName, rawArticle);
                 if (!res) {
                     setError(true);
                 } else {
                     setDocument(res);
+                    setArticle(rawArticle);
                 }
             } catch {
                 setError(true);
             }
         }
         fetchDocument();
-    }, [pathName, ecosystem]);
+    }, [pathName, ecosystem, setArticle]);
 
     if (error) notFound();
 
