@@ -14,6 +14,7 @@ import { PageRoutes } from "@/lib/pageroutes";
 import { components } from "@/lib/components";
 import { Settings } from "@/lib/meta";
 import { GitHubLink } from "@/settings/navigation";
+import { Ecosystem } from "./ecosystems/ecosystem";
 
 export async function parseMdx<Frontmatter>(rawMdx: string) {
   return await compileMDX<Frontmatter>({
@@ -59,26 +60,24 @@ const getDocumentPathMemoized = (() => {
   };
 })();
 
-export async function getDocument(slug: string) {
+export async function getDocument(slug: string, ecosystem: Ecosystem) {
   try {
-    const contentPath = getDocumentPathMemoized(slug);
-    let rawMdx = "";
-    let lastUpdated: string | null = null;
-
-    if (Settings.gitload) {
-      const response = await fetch(contentPath);
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch content from GitHub: ${response.statusText}`
-        );
-      }
-      rawMdx = await response.text();
-      lastUpdated = response.headers.get("Last-Modified") ?? null;
-    } else {
-      rawMdx = await fs.readFile(contentPath, "utf-8");
-      const stats = await fs.stat(contentPath);
-      lastUpdated = stats.mtime.toISOString();
-    }
+    // const contentPath = getDocumentPathMemoized(slug);
+    // let rawMdx = "";
+    // let lastUpdated: string | null = null;
+    //
+    // if (Settings.gitload) {
+    //     const response = await fetch(contentPath);
+    //     if (!response.ok) {
+    //         throw new Error(`Failed to fetch content from GitHub: ${response.statusText}`);
+    //     }
+    //     rawMdx = await response.text();
+    //     lastUpdated = response.headers.get('Last-Modified') ?? null;
+    // } else {
+    //     rawMdx = await fs.readFile(contentPath, "utf-8");
+    //     const stats = await fs.stat(contentPath);
+    //     lastUpdated = stats.mtime.toISOString();
+    // }
 
     const parsedMdx = await parseMdx<BaseMdxFrontmatter>(rawMdx);
     const tocs = await getTable(slug);
@@ -95,17 +94,17 @@ export async function getDocument(slug: string) {
   }
 }
 
-export async function getRawDocument(slug: string) {
-  try {
-    const contentPath = getDocumentPathMemoized(slug);
-    const rawMdx = await fs.readFile(contentPath, "utf-8");
-
-    return rawMdx;
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
-}
+// export async function getRawDocument(slug: string) {
+//     try {
+//         const contentPath = getDocumentPathMemoized(slug);
+//         const rawMdx = await fs.readFile(contentPath, "utf-8");
+//
+//         return rawMdx;
+//     } catch (err) {
+//         console.error(err);
+//         return null;
+//     }
+// }
 
 const headingsRegex = /^(#{2,4})\s(.+)$/gm;
 

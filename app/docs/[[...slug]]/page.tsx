@@ -9,7 +9,9 @@ import Toc from "@/components/navigation/toc";
 import Feedback from "@/components/navigation/feedback";
 import { BackToTop } from "@/components/navigation/backtotop";
 import { Typography } from "@/components/ui/typography";
-import EthEcosystem from "@/lib/ecosystems/eth-ecosystem";
+import { useContext } from "react";
+import { Ecosystem } from "@/lib/ecosystems/ecosystem";
+import { EcosystemContext } from "@/lib/contexts";
 
 type PageProps = {
   params: { slug: string[] };
@@ -17,9 +19,8 @@ type PageProps = {
 
 export default async function Pages({ params: { slug = [] } }: PageProps) {
   const pathName = slug.join("/");
-  // const res = await getDocument(pathName);
-  const ecosystem = new EthEcosystem();
-  const res = await ecosystem.fetchArticle(pathName);
+  const ecosystem = useContext<Ecosystem>(EcosystemContext);
+  const res = await getDocument(pathName, ecosystem);
 
   if (!res) notFound();
 
