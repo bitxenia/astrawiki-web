@@ -1,6 +1,6 @@
+"use client"
 import { notFound } from "next/navigation";
 import { getDocument } from "@/lib/markdown";
-import { PageRoutes } from "@/lib/pageroutes";
 import { Settings } from "@/lib/meta";
 
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
@@ -9,7 +9,7 @@ import Toc from "@/components/navigation/toc";
 import Feedback from "@/components/navigation/feedback";
 import { BackToTop } from "@/components/navigation/backtotop";
 import { Typography } from "@/components/ui/typography";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import { EcosystemContext } from "@/lib/contexts";
 
@@ -17,14 +17,35 @@ type PageProps = {
     params: { slug: string[] };
 };
 
-export default async function Pages({ params: { slug = [] } }: PageProps) {
-    const pathName = slug.join("/");
+export default function Pages({ params: { slug = [] } }: PageProps) {
+    const [document, setDocument] = useState<any>(null);
+    const [error, setError] = useState<boolean>(false);
     const ecosystem = useContext<Ecosystem>(EcosystemContext)
-    const res = await getDocument(pathName, ecosystem);
 
-    if (!res) notFound();
+    const pathName = slug.join("/");
+    useEffect(() => {
+        async function fetchDocument() {
+            try {
+                const res = await getDocument(pathName, ecosystem);
+                if (!res) {
+                    setError(true);
+                } else {
+                    setDocument(res);
+                }
+            } catch {
+                setError(true);
+            }
+        }
+        fetchDocument();
+    }, [pathName, ecosystem]);
 
-    const { frontmatter, content, tocs } = res;
+    if (error) notFound();
+
+    if (!document) {
+        return <p> Loading... </p>;
+    }
+
+    const { frontmatter, content, tocs } = document;
 
     return (
         <div className="flex items-start gap-14">
@@ -50,28 +71,3 @@ export default async function Pages({ params: { slug = [] } }: PageProps) {
     );
 }
 
-export async function generateMetadata({ params: { slug = [] } }: PageProps) {
-    const pathName = slug.join("/");
-    const res = await getDocument(pathName);
-
-    if (!res) return null;
-
-    const { frontmatter, lastUpdated } = res;
-
-    return {
-        title: `${frontmatter.title} - ${Settings.title}`,
-        description: frontmatter.description,
-        keywords: frontmatter.keywords,
-        ...(lastUpdated && {
-            lastModified: new Date(lastUpdated).toISOString(),
-        }),
-    };
-}
-
-export function generateStaticParams() {
-    return PageRoutes
-        .filter((item) => item.href)
-        .map((item) => ({
-            slug: item.href.split("/").slice(1),
-        }));
-}

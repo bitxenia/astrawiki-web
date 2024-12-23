@@ -1,5 +1,5 @@
 import path from "path";
-import { createReadStream, promises as fs } from "fs";
+// import { createReadStream, promises as fs } from "fs";
 
 import { compileMDX } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
@@ -15,6 +15,7 @@ import { components } from '@/lib/components';
 import { Settings } from "@/lib/meta";
 import { GitHubLink } from "@/settings/navigation";
 import { Ecosystem } from "./ecosystems/ecosystem";
+import { getTextFromPatches } from "./diff";
 
 async function parseMdx<Frontmatter>(rawMdx: string) {
     return await compileMDX<Frontmatter>({
@@ -78,15 +79,19 @@ export async function getDocument(slug: string, ecosystem: Ecosystem) {
         //     const stats = await fs.stat(contentPath);
         //     lastUpdated = stats.mtime.toISOString();
         // }
+        const article = await ecosystem.fetchArticle(slug);
+        const frontmatter = `---\ntitle: ${slug}\n---\n`;
+        const rawMdx = frontmatter.concat(getTextFromPatches(article.patches));
 
         const parsedMdx = await parseMdx<BaseMdxFrontmatter>(rawMdx);
-        const tocs = await getTable(slug);
+        // const tocs = await getTable(slug);
+        const tocs: any[] = [];
 
         return {
             frontmatter: parsedMdx.frontmatter,
             content: parsedMdx.content,
             tocs,
-            lastUpdated,
+            lastUpdated: null,
         };
     } catch (err) {
         console.error(err);
@@ -106,54 +111,54 @@ export async function getDocument(slug: string, ecosystem: Ecosystem) {
 //     }
 // }
 
-const headingsRegex = /^(#{2,4})\s(.+)$/gm;
+// const headingsRegex = /^(#{2,4})\s(.+)$/gm;
 
-export async function getTable(slug: string): Promise<Array<{ level: number; text: string; href: string }>> {
-    const extractedHeadings: Array<{ level: number; text: string; href: string }> = [];
-    let rawMdx = "";
+// export async function getTable(slug: string): Promise<Array<{ level: number; text: string; href: string }>> {
+//     const extractedHeadings: Array<{ level: number; text: string; href: string }> = [];
+//     let rawMdx = "";
+//
+//     if (Settings.gitload) {
+//         const contentPath = `${GitHubLink.href}/raw/main/contents/docs/${slug}/index.mdx`;
+//         try {
+//             const response = await fetch(contentPath);
+//             if (!response.ok) {
+//                 throw new Error(`Failed to fetch content from GitHub: ${response.statusText}`);
+//             }
+//             rawMdx = await response.text();
+//         } catch (error) {
+//             console.error("Error fetching content from GitHub:", error);
+//             return [];
+//         }
+//     } else {
+//         const contentPath = path.join(process.cwd(), "/contents/docs/", `${slug}/index.mdx`);
+//         try {
+//             const stream = createReadStream(contentPath, { encoding: 'utf-8' });
+//             for await (const chunk of stream) {
+//                 rawMdx += chunk;
+//             }
+//         } catch (error) {
+//             console.error("Error reading local file:", error);
+//             return [];
+//         }
+//     }
+//
+//     let match;
+//     while ((match = headingsRegex.exec(rawMdx)) !== null) {
+//         const level = match[1].length;
+//         const text = match[2].trim();
+//         extractedHeadings.push({
+//             level: level,
+//             text: text,
+//             href: `#${innerslug(text)}`,
+//         });
+//     }
+//
+//     return extractedHeadings;
+// }
 
-    if (Settings.gitload) {
-        const contentPath = `${GitHubLink.href}/raw/main/contents/docs/${slug}/index.mdx`;
-        try {
-            const response = await fetch(contentPath);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch content from GitHub: ${response.statusText}`);
-            }
-            rawMdx = await response.text();
-        } catch (error) {
-            console.error("Error fetching content from GitHub:", error);
-            return [];
-        }
-    } else {
-        const contentPath = path.join(process.cwd(), "/contents/docs/", `${slug}/index.mdx`);
-        try {
-            const stream = createReadStream(contentPath, { encoding: 'utf-8' });
-            for await (const chunk of stream) {
-                rawMdx += chunk;
-            }
-        } catch (error) {
-            console.error("Error reading local file:", error);
-            return [];
-        }
-    }
-
-    let match;
-    while ((match = headingsRegex.exec(rawMdx)) !== null) {
-        const level = match[1].length;
-        const text = match[2].trim();
-        extractedHeadings.push({
-            level: level,
-            text: text,
-            href: `#${innerslug(text)}`,
-        });
-    }
-
-    return extractedHeadings;
-}
-
-function innerslug(text: string) {
-    return text.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-}
+// function innerslug(text: string) {
+//     return text.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+// }
 
 const pathIndexMap = new Map(PageRoutes.map((route, index) => [route.href, index]));
 
