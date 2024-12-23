@@ -195,8 +195,28 @@ description: ""
     return null;
   }
 
-  editArticle(name: string, patch: Patch): Promise<null> {
-    throw new Error("Method not implemented.");
+  async editArticle(name: string, patch: Patch): Promise<null> {
+    const factoryInstance = new web3.eth.Contract(
+      articuloFactoryContractABI,
+      articuloFactoryContractAddress
+    );
+    const articuloAddress: string = await factoryInstance.methods
+      .tituloToAddress(name)
+      .call();
+    if (!articuloAddress) {
+      return Promise.reject("Article not found");
+    }
+
+    const articuloInstance = new web3.eth.Contract(
+      articuloContractABI,
+      articuloAddress
+    );
+    const accounts = await web3.eth.getAccounts();
+    await articuloInstance.methods
+      .setContenido(patch.patch)
+      .send({ from: accounts[0] });
+    console.log("Article edited successfully!");
+    return null;
   }
 }
 
