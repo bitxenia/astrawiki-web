@@ -176,9 +176,25 @@ class EthEcosystem implements Ecosystem {
     };
     return articulo;
   }
-  createArticle(name: string): Promise<null> {
-    throw new Error("Method not implemented.");
+
+  async createArticle(name: string): Promise<null> {
+    const factoryInstance = new web3.eth.Contract(
+      articuloFactoryContractABI,
+      articuloFactoryContractAddress
+    );
+    const contenido = `---
+title: ${name}
+description: ""
+---
+`;
+    const accounts = await web3.eth.getAccounts();
+    await factoryInstance.methods.crearArticulo(name, contenido).send({
+      from: accounts[0],
+    });
+    console.log("Article created successfully!");
+    return null;
   }
+
   editArticle(name: string, patch: Patch): Promise<null> {
     throw new Error("Method not implemented.");
   }

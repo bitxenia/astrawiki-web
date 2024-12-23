@@ -1,5 +1,4 @@
 import path from "path";
-import { createReadStream, promises as fs } from "fs";
 
 import { compileMDX } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
@@ -111,6 +110,7 @@ export async function getDocument(slug: string, ecosystem: Ecosystem) {
 
 const headingsRegex = /^(#{2,4})\s(.+)$/gm;
 
+/*
 export async function getTable(
   slug: string
 ): Promise<Array<{ level: number; text: string; href: string }>> {
@@ -165,6 +165,7 @@ export async function getTable(
 
   return extractedHeadings;
 }
+  */
 
 function innerslug(text: string) {
   return text
