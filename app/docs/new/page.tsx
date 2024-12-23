@@ -4,6 +4,7 @@ import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import { EcosystemContext } from "@/lib/contexts";
+import { getPatchFromTwoTexts } from "@/lib/diff";
 import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
 import { useContext, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -17,12 +18,8 @@ export default function Pages() {
 
     const publishArticle = async (name: string) => {
         await ecosystem.createArticle(name).catch(err => console.log("Create article: ", err));
-        const date = new Date();
-        const patch: Patch = {
-            date: `${date.toISOString()}`,
-            patch: markdown,
-        };
-        alert("Article created successfully!");
+        let patch = getPatchFromTwoTexts("", markdown);
+        console.log("Article created successfully!");
         await ecosystem.editArticle(name, patch).catch(err => console.log("Edit article: ", err));
         alert("Article published successfully!");
     };
