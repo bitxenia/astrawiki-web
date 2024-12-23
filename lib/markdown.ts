@@ -75,21 +75,16 @@ export async function getRawArticle(name: string, ecosystem: Ecosystem): Promise
 
 // 
 /**
- * Adds frontmatter and parses article into MDX.
+ * Parses article into MDX.
  * @param title Title of the article.
  * @param rawMd raw markdown (without frontmatter).
+ * @returns parsed markdown.
  */
-export async function parseMarkdown(title: string, rawMd: string): Promise<{ frontmatter: BaseMdxFrontmatter; content: ReactElement<any, any>; tocs: any[]; }> {
+export async function parseMarkdown(title: string, rawMd: string): Promise<ReactElement<any, any>> {
         const rawFrontmatter = `---\ntitle: ${title}\n---\n`;
         const parsedMdx = await parseMdx<BaseMdxFrontmatter>(rawFrontmatter.concat(rawMd));
         // const tocs = await getTable(slug);
-        const tocs: any[] = [];
-
-        return {
-            frontmatter: parsedMdx.frontmatter,
-            content: parsedMdx.content,
-            tocs,
-        };
+        return parsedMdx.content;
 }
 
 export async function getDocument(slug: string, ecosystem: Ecosystem) {

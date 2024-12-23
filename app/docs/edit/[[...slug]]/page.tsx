@@ -6,11 +6,12 @@ import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import { ArticleContext, ArticleContextProps, EcosystemContext } from "@/lib/contexts";
 import { getPatchFromTwoTexts } from "@/lib/diff";
-import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
+import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import { getRawArticle } from "@/lib/markdown";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { BarLoader } from "react-spinners";
 import remarkGfm from "remark-gfm";
 
 type PageProps = {
@@ -19,10 +20,10 @@ type PageProps = {
 
 export default function Pages({ params: { slug = [] } }: PageProps) {
     const router = useRouter();
-    const path = ["New"];
+    const path = ["Edit"];
     const pathName = slug.join("/");
 
-    const [newArticle, setNewArticle] = useState<any>(null);
+    const [newArticle, setNewArticle] = useState<string | null>(null);
     const [error, setError] = useState<boolean>(false);
     const ecosystem = useContext<Ecosystem>(EcosystemContext);
     const { article, setArticle } = useContext<ArticleContextProps>(ArticleContext);
@@ -46,12 +47,8 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
 
     if (error) notFound();
 
-    if (!newArticle) {
-        return <p> Loading... </p>;
-    }
-
     const saveChanges = async () => {
-        const patch = getPatchFromTwoTexts(article as string, newArticle);
+        const patch = getPatchFromTwoTexts(article as string, newArticle as string);
         if (patch.patch.length == 0) {
             alert("No changes were made");
             return
@@ -70,7 +67,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
         <div className="flex items-start gap-14">
             <div className="flex-[3] pt-10">
                 <PageBreadcrumb paths={path} />
-                <Typography>
+                {article && newArticle && <Typography>
                     <div className="space-y-4">
                         <h1 className="text-3xl -mt-2">{pathName}</h1>
                         <div className="markdown-editor flex flex-col gap-6">
@@ -97,7 +94,10 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
                             </button>
                         </div>
                     </div>
-                </Typography>
+                </Typography>}
+                {!newArticle && <div className="flex justify-center items-center min-h-screen">
+                    <BarLoader />
+                </div>}
             </div>
         </div>
     );
