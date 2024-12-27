@@ -43,11 +43,26 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
   return (
     <div className="flex items-start gap-14">
       <ul>
-        {patches.map((p: Patch) => (
-          <li>
-            <Link href={"/docs/" + slug.toString() + "/" + p.date}>{p.date}</Link>
-          </li>
-        ))}
+        {patches
+          .sort((a: Patch, b: Patch) => {
+            if (a.date > b.date) return -1;
+            if (a.date < b.date) return 1;
+            return 0;
+          })
+          .map((p: Patch, i: number) => (
+            <li className="py-2">
+              <Link
+                href={
+                  "/docs/" +
+                  slug.toString() +
+                  "/" +
+                  (patches.length - i).toString()
+                }
+              >
+                {patches.length - i} - {p.date}
+              </Link>
+            </li>
+          ))}
       </ul>
     </div>
   );

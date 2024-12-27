@@ -68,23 +68,37 @@ const getDocumentPathMemoized = (() => {
  * @param ecosystem Ecosystem to fetch the article from.
  * @returns article as raw markdown (without frontmatter).
  */
-export async function getRawArticle(name: string, ecosystem: Ecosystem): Promise<string> {
-        const article = await ecosystem.fetchArticle(name);
-        return getTextFromPatches(article.patches);
+export async function getRawArticle(
+  name: string,
+  ecosystem: Ecosystem,
+  articleVersion: number | null
+): Promise<string> {
+  const article = await ecosystem.fetchArticle(name);
+
+  if (articleVersion === null || articleVersion > article.patches.length) {
+    return getTextFromPatches(article.patches);
+  }
+
+  return getTextFromPatches(article.patches.slice(0, articleVersion));
 }
 
-// 
+//
 /**
  * Parses article into MDX.
  * @param title Title of the article.
  * @param rawMd raw markdown (without frontmatter).
  * @returns parsed markdown.
  */
-export async function parseMarkdown(title: string, rawMd: string): Promise<ReactElement<any, any>> {
-        const rawFrontmatter = `---\ntitle: ${title}\n---\n`;
-        const parsedMdx = await parseMdx<BaseMdxFrontmatter>(rawFrontmatter.concat(rawMd));
-        // const tocs = await getTable(slug);
-        return parsedMdx.content;
+export async function parseMarkdown(
+  title: string,
+  rawMd: string
+): Promise<ReactElement<any, any>> {
+  const rawFrontmatter = `---\ntitle: ${title}\n---\n`;
+  const parsedMdx = await parseMdx<BaseMdxFrontmatter>(
+    rawFrontmatter.concat(rawMd)
+  );
+  // const tocs = await getTable(slug);
+  return parsedMdx.content;
 }
 
 export async function getDocument(slug: string, ecosystem: Ecosystem) {
@@ -127,7 +141,6 @@ export async function getDocument(slug: string, ecosystem: Ecosystem) {
 
 export async function getPatches(slug: string, ecosystem: Ecosystem) {
   const article = await ecosystem.fetchArticle(slug);
-  // const frontmatter = `---\ntitle: ${slug}\n---\n`;
 
   return {
     patches: article.patches,

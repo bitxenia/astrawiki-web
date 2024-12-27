@@ -17,6 +17,7 @@ import {
   EcosystemContext,
 } from "@/lib/contexts";
 import { BarLoader } from "react-spinners";
+import Link from "next/link";
 
 type PageProps = {
   params: { slug: string[] };
@@ -31,11 +32,20 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
   const ecosystem = useContext<Ecosystem>(EcosystemContext);
   const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
 
-  const pathName = slug.join("/");
+  const pathName = slug[0];
+  let articleVersion: number | null = null;
+  if (slug.length > 1) {
+    articleVersion = +slug[1];
+  }
+
   useEffect(() => {
     async function fetchDocument() {
       try {
-        const rawArticle = await getRawArticle(pathName, ecosystem);
+        const rawArticle = await getRawArticle(
+          pathName,
+          ecosystem,
+          articleVersion
+        );
         const res = await parseMarkdown(pathName, rawArticle);
         if (!res) {
           setError(true);
@@ -56,6 +66,9 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
     <div className="flex items-start gap-14">
       <div className="flex-[3] pt-10">
         <PageBreadcrumb paths={slug} />
+        <div>
+          <Link href={"/docs/history/" + slug[0]}>History</Link>
+        </div>
         {parsedMarkdown && (
           <Typography>
             <h1 className="text-3xl -mt-2">{pathName}</h1>
