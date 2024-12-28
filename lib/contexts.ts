@@ -1,8 +1,8 @@
 import { createContext } from "react";
 import { Ecosystem } from "./ecosystems/ecosystem";
-import ExampleServer from "./ecosystems/example-server";
+import IPFSEcosystem from "./ecosystems/ipfs-ecosystem";
 
-export const EcosystemContext = createContext<Ecosystem>(new ExampleServer());
+export const EcosystemContext = createContext<Ecosystem>(new IPFSEcosystem());
 
 export type ArticleContextProps = {
     article: string | null;

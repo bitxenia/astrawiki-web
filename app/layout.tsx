@@ -8,10 +8,11 @@ import { GeistMono } from "geist/font/mono";
 import { Footer } from "@/components/navigation/footer";
 import { Settings } from "@/lib/meta";
 import "./globals.css";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import ExampleServer from "@/lib/ecosystems/example-server";
 import { ArticleContext, EcosystemContext } from '@/lib/contexts';
+import IPFSEcosystem from '@/lib/ecosystems/ipfs-ecosystem';
 
 // const baseUrl = Settings.metadataBase;
 
@@ -51,7 +52,7 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const [ecosystem, _setEcosystem] = useState<Ecosystem>(new ExampleServer());
+    const ecosystem = useContext<Ecosystem>(EcosystemContext);
     const [article, setArticle] = useState<any>(null);
 
     return (
