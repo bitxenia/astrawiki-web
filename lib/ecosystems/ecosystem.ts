@@ -2,7 +2,7 @@ import { patch_obj } from "diff-match-patch";
 
 export type Patch = {
   date: string;
-  patch: string;
+  patch: (new () => patch_obj)[];
 };
 
 export type Article = {
