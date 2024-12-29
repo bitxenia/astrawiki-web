@@ -29,6 +29,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
 
   const [newArticle, setNewArticle] = useState<string | null>(null);
   const [error, setError] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
   const ecosystem = useContext<Ecosystem>(EcosystemContext);
   const { article, setArticle } =
     useContext<ArticleContextProps>(ArticleContext);
@@ -58,7 +59,9 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
       alert("No changes were made");
       return;
     }
+    setIsLoading(true);
     await ecosystem.editArticle(pathName, patch);
+    setIsLoading(false);
     setArticle(newArticle);
     alert("Edited successfully!");
     router.push(`/docs/${pathName}`);
@@ -74,7 +77,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
         <PageBreadcrumb paths={path} />
         {article && newArticle && (
           <Typography>
-            <div className="space-y-4">
+            <div className="space-y-4 mb-4">
               <h1 className="text-3xl -mt-2">{pathName}</h1>
               <div className="markdown-editor flex flex-col gap-6">
                 <textarea
@@ -96,6 +99,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
                     size: "default",
                   })}
                   onClick={saveChanges}
+                  disabled={isLoading}
                 >
                   Save changes
                 </button>

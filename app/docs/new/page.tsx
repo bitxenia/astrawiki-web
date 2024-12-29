@@ -22,8 +22,10 @@ export default function Pages() {
   const path = ["New"];
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const publishArticle = async (name: string) => {
+    setIsLoading(true);
     await ecosystem
       .createArticle(name)
       .catch((err) => console.log("Create article: ", err));
@@ -33,6 +35,7 @@ export default function Pages() {
       .editArticle(name, patch)
       .catch((err) => console.log("Edit article: ", err));
     alert("Article published successfully!");
+    setIsLoading(false);
     setArticle(markdown);
     router.push(`/docs/${title}`);
   };
@@ -42,7 +45,7 @@ export default function Pages() {
       <div className="flex-[3] pt-10">
         <PageBreadcrumb paths={path} />
         <Typography>
-          <div className="space-y-4">
+          <div className="space-y-4 mb-4">
             <input
               type="text"
               placeholder="Write a name for your article..."
@@ -70,6 +73,7 @@ export default function Pages() {
                   size: "default",
                 })}
                 onClick={() => publishArticle(title)}
+                disabled={isLoading}
               >
                 Publish
               </button>
