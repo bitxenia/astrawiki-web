@@ -18,7 +18,7 @@ import { Ecosystem } from "./ecosystems/ecosystem";
 import { getTextFromPatches } from "./diff";
 import { ReactElement } from "react";
 
-export async function parseMdx<Frontmatter>(rawMdx: string) {
+async function parseMdx<Frontmatter>(rawMdx: string) {
   return await compileMDX<Frontmatter>({
     source: rawMdx,
     options: {
@@ -40,7 +40,7 @@ export async function parseMdx<Frontmatter>(rawMdx: string) {
   });
 }
 
-export type BaseMdxFrontmatter = {
+type BaseMdxFrontmatter = {
   title: string;
   description: string;
   keywords: string;
