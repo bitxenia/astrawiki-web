@@ -1,9 +1,8 @@
-import { createHelia, Helia } from "helia";
+import { createHelia } from "helia";
 import { type OrbitDB, createOrbitDB } from "@orbitdb/core";
 import { LevelBlockstore } from "blockstore-level";
 import { bitswap } from "@helia/block-brokers";
 import { Libp2pOptions } from "./libp2p";
-import { CID } from "multiformats/cid";
 
 /**
  * Starts an OrbitDB node.

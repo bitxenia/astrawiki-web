@@ -5,7 +5,7 @@ import { CID } from "multiformats/cid";
 // TODO: Move this to a better place? JP
 const DB_ADDRESS = "/orbitdb/zdpuB15HaJTQrnu2f64FQVPpFmyoByf4yW6ULNbeF5hdLeEqt";
 
-export const getArticlesDb = async (orbitdb: OrbitDB) => {
+export const getArticleDb = async (orbitdb: OrbitDB) => {
   await connect_to_providers(orbitdb.ipfs);
   let db = await replicate_database(orbitdb);
 
@@ -22,6 +22,9 @@ const connect_to_providers = async (helia: any) => {
     cidObj
   )) {
     console.log(`Found provider: ${provider.id}`);
+
+    // multiaddrs found
+    console.log("Multiaddrs:", provider.multiaddrs.toString());
 
     // Connect to the provider
     try {
