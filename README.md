@@ -46,4 +46,13 @@ TODO: standarize change declaration.
 
 ## Ethereum Ecosystem
 
-There is a directory with the solidity contracts used for this ecosystem. It needs to be provided with a Sepolia API key in the `.env` file (see `.env.example`).
+There is a directory with the solidity contracts used for this ecosystem. It needs to be provided with a Sepolia API key in the `.env` file (see `.env.example`) as well as the deployer wallet's private key.
+
+To compile and deploy the smart contracts run the following:
+
+```bash
+npm run compile-contracts
+npm run deploy-contracts
+```
+
+this will create the bytecode and ABI, once deployed it will also save the contract address in a file for later use in the application.

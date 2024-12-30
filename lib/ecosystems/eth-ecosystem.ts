@@ -1,8 +1,8 @@
 import web3 from "../web3";
 import { Article, Ecosystem, Patch } from "./ecosystem";
-import articuloFactoryContractABI from "../../contracts/articuloFactoryContractABI.json";
-import articuloContractABI from "../../contracts/articuloContractABI.json";
-import { articuloFactoryContractAddress } from "./utils/eth-ecosystem-utils";
+import articuloFactoryContractABI from "../../contracts/out/ArticuloFactory.json";
+import articuloContractABI from "../../contracts/out/Articulo.json";
+import articuloFactoryContractAddress from "../../contracts/out/deployedAddress.json";
 
 class EthEcosystem implements Ecosystem {
   factoryInstance: any;
