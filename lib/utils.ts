@@ -239,14 +239,14 @@ function extractSnippet(content: string, query: string): string {
   return snippet;
 }
 
-export function advanceSearch(query: string) {
+export function advanceSearch(query: string, data: any[]) {
   const lowerQuery = query.toLowerCase().trim();
 
   const queryWords = lowerQuery.split(/\s+/).filter(word => word.length >= 3);
 
   if (queryWords.length === 0) return [];
 
-  const chunks = chunkArray(searchData, 100);
+  const chunks = chunkArray(data, 100);
 
   const results = chunks.flatMap((chunk) =>
     chunk.map((doc) => {

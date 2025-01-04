@@ -24,4 +24,6 @@ export interface Ecosystem {
      * Edits an article by passing the delta/diff/patch as an argument.
     */
     editArticle(name: string, patch: Patch): Promise<null>;
+
+    getArticleList(): Promise<string[]>;
 }
