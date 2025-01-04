@@ -12,6 +12,7 @@ import { useState } from "react";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import ExampleServer from "@/lib/ecosystems/example-server";
 import { ArticleContext, EcosystemContext } from '@/lib/contexts';
+import { usePathname } from 'next/navigation';
 
 // const baseUrl = Settings.metadataBase;
 
@@ -54,6 +55,9 @@ export default function RootLayout({
     const [ecosystem, _setEcosystem] = useState<Ecosystem>(new ExampleServer());
     const [article, setArticle] = useState<any>(null);
 
+    const hideNavbarRoutes = ['/'];
+    const hideNavbar = hideNavbarRoutes.includes(usePathname());
+
     return (
         <html lang="en" suppressHydrationWarning>
             {Settings.gtmconnected && (
@@ -71,7 +75,7 @@ export default function RootLayout({
                 >
                     <EcosystemContext.Provider value={ecosystem}>
                     <ArticleContext.Provider value={{article, setArticle}}>
-                        <Navbar />
+                        {!hideNavbar && <Navbar />}
                         <main className="px-5 sm:px-8 h-auto">
                             {children}
                         </main>
