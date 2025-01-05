@@ -90,7 +90,6 @@ app.patch("/articles/:name", async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 app.get('/articles', async (_req, res) => {
     const contentPath = path.join(__dirname, "content");
     const articles = (await readdir(contentPath)).map((filename) => filename.replace('.json', ''));
@@ -100,10 +99,6 @@ app.get('/articles', async (_req, res) => {
 
 app.get('/', async (req, res) => {
     return res.status(200).json({ message: "Server is up" });
-=======
-app.get("/", async (req, res) => {
-  return res.status(200).json({ message: "Server is up" });
->>>>>>> main
 });
 
 app.listen(port, () => {
