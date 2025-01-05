@@ -9,7 +9,7 @@ import Anchor from "@/components/navigation/anchor";
 import { Navigations, GitHubLink } from "@/settings/navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { SheetClose } from "@/components/ui/sheet";
-import EcosystemPicker from "./ecosystem_picker";
+import EcosystemPicker from "./ecosystem-picker";
 
 export function Navbar() {
     return (
@@ -23,6 +23,7 @@ export function Navbar() {
                         </div>
                         <div className="hidden md:flex items-center gap-5 text-sm font-medium text-muted-foreground">
                             <NavMenu />
+                            <EcosystemPicker />
                         </div>
                     </div>
                 </div>
