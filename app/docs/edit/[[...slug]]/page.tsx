@@ -4,9 +4,8 @@ import notFound from "@/app/not-found";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { ArticleContext, ArticleContextProps, EcosystemContext } from "@/lib/contexts";
+import { ArticleContext, ArticleContextProps, EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 import { getPatchFromTwoTexts } from "@/lib/diff";
-import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import { getRawArticle } from "@/lib/markdown";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
@@ -25,19 +24,25 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
 
     const [newArticle, setNewArticle] = useState<string | null>(null);
     const [error, setError] = useState<boolean>(false);
-    const ecosystem = useContext<Ecosystem>(EcosystemContext);
+    const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext);
     const { article, setArticle } = useContext<ArticleContextProps>(ArticleContext);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
         if (!article) {
             async function fetchDocument() {
-                try {
-                    const rawArticle = await getRawArticle(pathName, ecosystem);
-                    setArticle(rawArticle);
-                    setNewArticle(rawArticle);
-                } catch {
-                    setError(true);
+                if (ecosystem) {
+                    setIsLoading(true);
+                    try {
+                        const rawArticle = await getRawArticle(pathName, ecosystem, null);
+                        setArticle(rawArticle);
+                        setNewArticle(rawArticle);
+                    } catch {
+                        setError(true);
+                    }
+                    setIsLoading(false);
                 }
+
             }
             fetchDocument();
         } else {
@@ -53,7 +58,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
             alert("No changes were made");
             return
         }
-        await ecosystem.editArticle(pathName, patch);
+        await ecosystem?.editArticle(pathName, patch);
         setArticle(newArticle);
         alert("Edited successfully!");
         router.push(`/docs/${pathName}`);
@@ -63,18 +68,35 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
         router.push(`/docs/${pathName}`);
     }
 
+    if (!ecosystem) {
+        return (
+            <text>
+                Choose an ecosystem.
+            </text>
+        )
+    } else if (isLoading) {
+        return (
+            <div>
+                <text>
+                    Loading...
+                </text>
+                <BarLoader />
+            </div>
+        )
+    }
+
     return (
         <div className="flex items-start gap-14">
             <div className="flex-[3] pt-10">
                 <PageBreadcrumb paths={path} />
-                {article && newArticle && <Typography>
+                <Typography>
                     <div className="space-y-4">
                         <h1 className="text-3xl -mt-2">{pathName}</h1>
                         <div className="markdown-editor flex flex-col gap-6">
                             <textarea
                                 className="p-4 border rounded-md w-full h-40"
                                 placeholder="Write article here..."
-                                value={newArticle}
+                                value={newArticle || ""}
                                 onChange={(e) => setNewArticle(e.target.value)}
                             />
                             <div className="markdown-preview p-4 border rounded-md">
@@ -94,10 +116,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
                             </button>
                         </div>
                     </div>
-                </Typography>}
-                {!newArticle && <div className="flex justify-center items-center min-h-screen">
-                    <BarLoader />
-                </div>}
+                </Typography>
             </div>
         </div>
     );

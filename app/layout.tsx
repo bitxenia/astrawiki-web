@@ -52,7 +52,7 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const [ecosystem, _setEcosystem] = useState<Ecosystem>(new ExampleServer());
+    const [ecosystem, setEcosystem] = useState<Ecosystem | null>(null);
     const [article, setArticle] = useState<any>(null);
 
     const hideNavbarRoutes = ['/'];
@@ -73,13 +73,13 @@ export default function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <EcosystemContext.Provider value={ecosystem}>
-                    <ArticleContext.Provider value={{article, setArticle}}>
-                        {!hideNavbar && <Navbar />}
-                        <main className="px-5 sm:px-8 h-auto">
-                            {children}
-                        </main>
-                    </ArticleContext.Provider>
+                    <EcosystemContext.Provider value={{ ecosystem, setEcosystem }}>
+                        <ArticleContext.Provider value={{ article, setArticle }}>
+                            {!hideNavbar && <Navbar />}
+                            <main className="px-5 sm:px-8 h-auto">
+                                {children}
+                            </main>
+                        </ArticleContext.Provider>
                     </EcosystemContext.Provider>
                     <Footer />
                 </ThemeProvider>

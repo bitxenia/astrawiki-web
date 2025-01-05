@@ -10,6 +10,8 @@ import { Navigations, GitHubLink } from "@/settings/navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { SheetClose } from "@/components/ui/sheet";
 import EcosystemPicker from "./ecosystem-picker";
+import { useContext } from "react";
+import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 
 export function Navbar() {
     return (
