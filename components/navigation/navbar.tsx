@@ -42,7 +42,6 @@ export function Navbar() {
                             </Link>
                         )}
                         <ModeToggle />
-                        <EcosystemPicker />
                         <Link
                             href={"/docs/new/"}
                             className={buttonVariants({ variant: "default", size: "sm" })}

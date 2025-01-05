@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import cors from "cors";
-import { readFile, writeFile, access } from "node:fs/promises";
+import { readFile, writeFile, access, readdir } from "node:fs/promises";
 import { setTimeout } from "timers/promises";
 const __dirname = import.meta.dirname;
 
