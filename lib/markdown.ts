@@ -73,6 +73,7 @@ export async function getRawArticle(
   ecosystem: Ecosystem,
   articleVersion: number | null
 ): Promise<string> {
+  console.log("Getting article " + name);
   const article = await ecosystem.fetchArticle(name);
 
   if (articleVersion === null || articleVersion > article.patches.length) {

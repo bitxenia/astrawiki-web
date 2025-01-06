@@ -15,6 +15,8 @@ import {
   ArticleContext,
   ArticleContextProps,
   EcosystemContext,
+  RawArticleContext,
+  RawArticleContextProps,
 } from "@/lib/contexts";
 import { BarLoader } from "react-spinners";
 import Link from "next/link";
@@ -31,6 +33,8 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
   const [error, setError] = useState<boolean>(false);
   const ecosystem = useContext<Ecosystem>(EcosystemContext);
   const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
+  const { rawArticle, setRawArticle } =
+    useContext<RawArticleContextProps>(RawArticleContext);
 
   const pathName = slug[0];
   let articleVersion: number | null = null;
@@ -41,12 +45,27 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
   useEffect(() => {
     async function fetchDocument() {
       try {
-        const rawArticle = await getRawArticle(
-          pathName,
-          ecosystem,
-          articleVersion
-        );
-        const res = await parseMarkdown(pathName, rawArticle);
+        let res;
+
+        if (!rawArticle) {
+          const newRawArticle = await getRawArticle(
+            pathName,
+            ecosystem,
+            articleVersion
+          );
+
+          res = await parseMarkdown(pathName, newRawArticle);
+        } else {
+          res = await parseMarkdown(pathName, rawArticle);
+        }
+        // const rawArticle = await getRawArticle(
+        //   pathName,
+        //   ecosystem,
+        //   articleVersion
+        // );
+
+        // setRawArticle(rawArticle);
+
         if (!res) {
           setError(true);
         } else {
@@ -58,7 +77,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
       }
     }
     fetchDocument();
-  }, [pathName, ecosystem, setArticle]);
+  }, [pathName, ecosystem, setArticle, setRawArticle]);
 
   if (error) notFound();
 

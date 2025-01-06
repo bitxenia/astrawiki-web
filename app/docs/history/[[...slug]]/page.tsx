@@ -50,7 +50,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
             return 0;
           })
           .map((p: Patch, i: number) => (
-            <li className="py-2">
+            <li className="py-2" key={i}>
               <Link
                 href={
                   "/docs/" +
