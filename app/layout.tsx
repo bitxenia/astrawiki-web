@@ -16,6 +16,7 @@ import {
   EcosystemContext,
   RawArticleContext,
 } from "@/lib/contexts";
+import { usePathname } from "next/navigation";
 
 // const baseUrl = Settings.metadataBase;
 
@@ -59,6 +60,9 @@ export default function RootLayout({
   const [article, setArticle] = useState<any>(null);
   const [rawArticle, setRawArticle] = useState<any>(null);
 
+  const hideNavbarRoutes = ["/"];
+  const hideNavbar = hideNavbarRoutes.includes(usePathname());
+
   return (
     <html lang="en" suppressHydrationWarning>
       {Settings.gtmconnected && <GoogleTagManager gtmId={Settings.gtm} />}
@@ -74,12 +78,9 @@ export default function RootLayout({
         >
           <EcosystemContext.Provider value={ecosystem}>
             <ArticleContext.Provider value={{ article, setArticle }}>
-              <Navbar />
+              {!hideNavbar && <Navbar />}
               <main className="px-5 sm:px-8 h-auto">{children}</main>
             </ArticleContext.Provider>
-            <RawArticleContext.Provider
-              value={{ rawArticle, setRawArticle }}
-            ></RawArticleContext.Provider>
           </EcosystemContext.Provider>
           <Footer />
         </ThemeProvider>

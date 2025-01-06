@@ -1,7 +1,8 @@
 import express from "express";
 import path from "path";
 import cors from "cors";
-import { readFile, writeFile, access } from "node:fs/promises";
+import { readFile, writeFile, access, readdir } from "node:fs/promises";
+import { setTimeout } from "timers/promises";
 const __dirname = import.meta.dirname;
 
 const app = express();
@@ -89,8 +90,15 @@ app.patch("/articles/:name", async (req, res) => {
   }
 });
 
-app.get("/", async (req, res) => {
-  return res.status(200).json({ message: "Server is up" });
+app.get('/articles', async (_req, res) => {
+    const contentPath = path.join(__dirname, "content");
+    const articles = (await readdir(contentPath)).map((filename) => filename.replace('.json', ''));
+    await setTimeout(5000);
+    return res.status(200).json(articles);
+});
+
+app.get('/', async (req, res) => {
+    return res.status(200).json({ message: "Server is up" });
 });
 
 app.listen(port, () => {

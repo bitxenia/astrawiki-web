@@ -55,4 +55,9 @@ export default class ExampleServer implements Ecosystem {
         }
         return Promise.resolve(null);
     }
+
+    async getArticleList(): Promise<string[]> {
+        const { data } = await axios.get<string[]>(`${URL}/articles`)
+        return Promise.resolve(data);
+    }
 }

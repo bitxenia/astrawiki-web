@@ -9,6 +9,7 @@ import Anchor from "@/components/navigation/anchor";
 import { Navigations, GitHubLink } from "@/settings/navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { SheetClose } from "@/components/ui/sheet";
+import EcosystemPicker from "./ecosystem_picker";
 
 export function Navbar() {
     return (
