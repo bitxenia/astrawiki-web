@@ -1,12 +1,12 @@
 import { Article, Ecosystem, Patch } from "./ecosystem";
 import { startOrbitDB } from "./utils/start_orbitdb";
-import { getArticleDb } from "./utils/get_article_db";
+import { ArticleDB } from "./utils/articledb";
 import { getArticleContent } from "./utils/get_article_content";
 import { type OrbitDB, IPFSAccessController } from "@orbitdb/core";
 
 class IPFSEcosystem implements Ecosystem {
   orbitdb: OrbitDB;
-  articleDb: any;
+  articledb: any;
   initialized: boolean | undefined;
 
   // TODO: This should be called in the constructor, But we need to
@@ -18,7 +18,8 @@ class IPFSEcosystem implements Ecosystem {
     }
     this.initialized = true;
     this.orbitdb = await startOrbitDB();
-    this.articleDb = await getArticleDb(this.orbitdb);
+    this.articledb = new ArticleDB(this.orbitdb);
+    this.articledb = await this.articledb.init();
   }
 
   async fetchArticle(name: string): Promise<Article> {
@@ -28,7 +29,7 @@ class IPFSEcosystem implements Ecosystem {
     // Article protocol:
     // <article-name>::<orbitdb_article_address>
     console.log(`Fetching article ${name}`);
-    for await (const record of this.articleDb.iterator()) {
+    for await (const record of this.articledb.iterator()) {
       let { articleName, articleAddress } = record.payload.value.split("::");
       if (articleName === name) {
         let patches = await getArticleContent(this.orbitdb, articleAddress);
@@ -63,7 +64,7 @@ class IPFSEcosystem implements Ecosystem {
     });
 
     let articleContentAddress = newArticleContentDb.address.toString();
-    await this.articleDb.add(name + "::" + articleContentAddress);
+    await this.articledb.add(name + "::" + articleContentAddress);
     console.log(`Article ${name} created`);
 
     return null;
