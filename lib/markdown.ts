@@ -71,7 +71,7 @@ const getDocumentPathMemoized = (() => {
 export async function getRawArticle(
   name: string,
   ecosystem: Ecosystem,
-  articleVersion: number | null
+  articleVersion: number | null = null
 ): Promise<string> {
   console.log("Getting article " + name);
   const article = await ecosystem.fetchArticle(name);
