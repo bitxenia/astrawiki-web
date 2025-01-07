@@ -1,5 +1,9 @@
 "use client";
-import { EcosystemContext } from "@/lib/contexts";
+import {
+  EcosystemContext,
+  RawArticleContext,
+  RawArticleContextProps,
+} from "@/lib/contexts";
 import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
 import { getDocument, getPatches } from "@/lib/markdown";
 import Link from "next/link";

@@ -14,7 +14,7 @@ import { PageRoutes } from "@/lib/pageroutes";
 import { components } from "@/lib/components";
 import { Settings } from "@/lib/meta";
 import { GitHubLink } from "@/settings/navigation";
-import { Ecosystem } from "./ecosystems/ecosystem";
+import { Article, Ecosystem } from "./ecosystems/ecosystem";
 import { getTextFromPatches } from "./diff";
 import { ReactElement } from "react";
 
@@ -62,6 +62,23 @@ const getDocumentPathMemoized = (() => {
   };
 })();
 
+const getRawArticleMemoized = (() => {
+  const cache = new Map<string, Article>();
+
+  return async (articleName: string, ecosystem: Ecosystem) => {
+    console.log(
+      `Looking for ${articleName} in cache: ${cache.keys().toArray()}`
+    );
+    if (!cache.has(articleName)) {
+      console.log(`Fetching article ${articleName}`);
+      const article = await ecosystem.fetchArticle(articleName);
+      cache.set(articleName, article);
+    }
+
+    return cache.get(articleName)!;
+  };
+})();
+
 /**
  * Fetches article from the given ecosystem and builds from patches.
  * @param name Name of the article, case sensitive.
@@ -73,8 +90,13 @@ export async function getRawArticle(
   ecosystem: Ecosystem,
   articleVersion: number | null = null
 ): Promise<string> {
-  console.log("Getting article " + name);
-  const article = await ecosystem.fetchArticle(name);
+  console.log(`Getting article ${name} with version ${articleVersion}`);
+
+  const article = await getRawArticleMemoized(name, ecosystem);
+
+  console.log(
+    `Article is ${article.name} with patches ${article.patches.length}`
+  );
 
   if (articleVersion === null || articleVersion > article.patches.length) {
     return getTextFromPatches(article.patches);
@@ -140,8 +162,10 @@ export async function getDocument(slug: string, ecosystem: Ecosystem) {
   }
 }
 
-export async function getPatches(slug: string, ecosystem: Ecosystem) {
-  const article = await ecosystem.fetchArticle(slug);
+export async function getPatches(name: string, ecosystem: Ecosystem) {
+  console.log(`Getting patches for ${name}`);
+  const article = await getRawArticleMemoized(name, ecosystem);
+  // const article = await ecosystem.fetchArticle(name);
 
   return {
     patches: article.patches,

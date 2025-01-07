@@ -33,8 +33,6 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
   const [error, setError] = useState<boolean>(false);
   const ecosystem = useContext<Ecosystem>(EcosystemContext);
   const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
-  const { rawArticle, setRawArticle } =
-    useContext<RawArticleContextProps>(RawArticleContext);
 
   const pathName = slug[0];
   let articleVersion: number | null = null;
@@ -45,26 +43,13 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
   useEffect(() => {
     async function fetchDocument() {
       try {
-        let res;
+        const rawArticle = await getRawArticle(
+          pathName,
+          ecosystem,
+          articleVersion
+        );
 
-        if (!rawArticle) {
-          const newRawArticle = await getRawArticle(
-            pathName,
-            ecosystem,
-            articleVersion
-          );
-
-          res = await parseMarkdown(pathName, newRawArticle);
-        } else {
-          res = await parseMarkdown(pathName, rawArticle);
-        }
-        // const rawArticle = await getRawArticle(
-        //   pathName,
-        //   ecosystem,
-        //   articleVersion
-        // );
-
-        // setRawArticle(rawArticle);
+        const res = await parseMarkdown(pathName, rawArticle);
 
         if (!res) {
           setError(true);
@@ -72,12 +57,13 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
           setParsedMarkdown(res);
           setArticle(rawArticle);
         }
-      } catch {
+      } catch (e) {
+        console.log(e);
         setError(true);
       }
     }
     fetchDocument();
-  }, [pathName, ecosystem, setArticle, setRawArticle]);
+  }, [pathName, ecosystem, setArticle]);
 
   if (error) notFound();
 
