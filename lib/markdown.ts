@@ -65,17 +65,18 @@ const getDocumentPathMemoized = (() => {
 const getRawArticleMemoized = (() => {
   const cache = new Map<string, Article>();
 
-  return async (articleName: string, ecosystem: Ecosystem) => {
-    console.log(
-      `Looking for ${articleName} in cache: ${cache.keys().toArray()}`
-    );
-    if (!cache.has(articleName)) {
-      console.log(`Fetching article ${articleName}`);
-      const article = await ecosystem.fetchArticle(articleName);
+  return async (
+    articleName: string,
+    ecosystem: Ecosystem
+  ): Promise<Article> => {
+    let article = cache.get(articleName);
+
+    if (!article) {
+      article = await ecosystem.fetchArticle(articleName);
       cache.set(articleName, article);
     }
 
-    return cache.get(articleName)!;
+    return article;
   };
 })();
 
@@ -90,13 +91,7 @@ export async function getRawArticle(
   ecosystem: Ecosystem,
   articleVersion: number | null = null
 ): Promise<string> {
-  console.log(`Getting article ${name} with version ${articleVersion}`);
-
   const article = await getRawArticleMemoized(name, ecosystem);
-
-  console.log(
-    `Article is ${article.name} with patches ${article.patches.length}`
-  );
 
   if (articleVersion === null || articleVersion > article.patches.length) {
     return getTextFromPatches(article.patches);
@@ -163,13 +158,9 @@ export async function getDocument(slug: string, ecosystem: Ecosystem) {
 }
 
 export async function getPatches(name: string, ecosystem: Ecosystem) {
-  console.log(`Getting patches for ${name}`);
   const article = await getRawArticleMemoized(name, ecosystem);
-  // const article = await ecosystem.fetchArticle(name);
 
-  return {
-    patches: article.patches,
-  };
+  return article.patches;
 }
 
 // export async function getRawDocument(slug: string) {

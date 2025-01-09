@@ -15,7 +15,7 @@ type PageProps = {
 };
 
 export default function Pages({ params: { slug = [] } }: PageProps) {
-  const [document, setDocument] = useState<any>(null);
+  const [patches, setPatches] = useState<Patch[]>([]);
   const [error, setError] = useState<boolean>(false);
   const ecosystem = useContext<Ecosystem>(EcosystemContext);
 
@@ -27,7 +27,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
         if (!res) {
           setError(true);
         } else {
-          setDocument(res);
+          setPatches(res);
         }
       } catch {
         setError(true);
@@ -38,22 +38,21 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
 
   if (error) notFound();
 
-  if (!document) {
+  if (patches.length === 0) {
     return <p> Loading... </p>;
   }
-
-  const { patches } = document;
 
   return (
     <div className="flex items-start gap-14">
       <ul>
         {patches
-          .sort((a: Patch, b: Patch) => {
-            if (a.date > b.date) return -1;
-            if (a.date < b.date) return 1;
+          .map((p: Patch) => p.date)
+          .sort((a: string, b: string) => {
+            if (a > b) return -1;
+            if (a < b) return 1;
             return 0;
           })
-          .map((p: Patch, i: number) => (
+          .map((d: string, i: number) => (
             <li className="py-2" key={i}>
               <Link
                 href={
@@ -63,7 +62,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
                   (patches.length - i).toString()
                 }
               >
-                {patches.length - i} - {p.date}
+                {patches.length - i} - {d}
               </Link>
             </li>
           ))}
