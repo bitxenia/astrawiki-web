@@ -14,9 +14,10 @@ import { PageRoutes } from "@/lib/pageroutes";
 import { components } from "@/lib/components";
 import { Settings } from "@/lib/meta";
 import { GitHubLink } from "@/settings/navigation";
-import { Ecosystem } from "./ecosystems/ecosystem";
+import { Article, Ecosystem } from "./ecosystems/ecosystem";
 import { getTextFromPatches } from "./diff";
 import { ReactElement } from "react";
+import { MemoizedArticles } from "./memoizedarticles";
 
 async function parseMdx<Frontmatter>(rawMdx: string) {
   return await compileMDX<Frontmatter>({
@@ -63,17 +64,22 @@ const getDocumentPathMemoized = (() => {
 })();
 
 /**
+ * Initializes the cache
+ */
+const cache = new MemoizedArticles();
+
+/**
  * Fetches article from the given ecosystem and builds from patches.
- * @param name Name of the article, case sensitive.
+ * @param articleName Name of the article, case sensitive.
  * @param ecosystem Ecosystem to fetch the article from.
  * @returns article as raw markdown (without frontmatter).
  */
 export async function getRawArticle(
-  name: string,
+  articleName: string,
   ecosystem: Ecosystem,
-  articleVersion: number | null
+  articleVersion: number | null = null
 ): Promise<string> {
-  const article = await ecosystem.fetchArticle(name);
+  const article = await cache.get(articleName, ecosystem);
 
   if (articleVersion === null || articleVersion > article.patches.length) {
     return getTextFromPatches(article.patches);
@@ -139,12 +145,14 @@ export async function getDocument(slug: string, ecosystem: Ecosystem) {
   }
 }
 
-export async function getPatches(slug: string, ecosystem: Ecosystem) {
-  const article = await ecosystem.fetchArticle(slug);
+export async function getPatches(articleName: string, ecosystem: Ecosystem) {
+  const article = await cache.get(articleName, ecosystem);
 
-  return {
-    patches: article.patches,
-  };
+  return article.patches;
+}
+
+export async function invalidateCache(articleName: string) {
+  cache.invalidate(articleName);
 }
 
 // export async function getRawDocument(slug: string) {

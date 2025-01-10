@@ -1,6 +1,6 @@
-"use client"
+"use client";
 // import type { Metadata } from "next";
-import { GoogleTagManager } from '@next/third-parties/google';
+import { GoogleTagManager } from "@next/third-parties/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navigation/navbar";
 import { GeistSans } from "geist/font/sans";
@@ -11,8 +11,12 @@ import "./globals.css";
 import { useState } from "react";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import ExampleServer from "@/lib/ecosystems/example-server";
-import { ArticleContext, EcosystemContext } from '@/lib/contexts';
-import { usePathname } from 'next/navigation';
+import {
+  ArticleContext,
+  EcosystemContext,
+  RawArticleContext,
+} from "@/lib/contexts";
+import { usePathname } from "next/navigation";
 
 // const baseUrl = Settings.metadataBase;
 
@@ -48,42 +52,39 @@ import { usePathname } from 'next/navigation';
 // };
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    const [ecosystem, _setEcosystem] = useState<Ecosystem>(new ExampleServer());
-    const [article, setArticle] = useState<any>(null);
+  const [ecosystem, _setEcosystem] = useState<Ecosystem>(new ExampleServer());
+  const [article, setArticle] = useState<any>(null);
+  const [rawArticle, setRawArticle] = useState<any>(null);
 
-    const hideNavbarRoutes = ['/'];
-    const hideNavbar = hideNavbarRoutes.includes(usePathname());
+  const hideNavbarRoutes = ["/"];
+  const hideNavbar = hideNavbarRoutes.includes(usePathname());
 
-    return (
-        <html lang="en" suppressHydrationWarning>
-            {Settings.gtmconnected && (
-                <GoogleTagManager gtmId={Settings.gtm} />
-            )}
-            <body
-                className={`${GeistSans.variable} ${GeistMono.variable} font-regular`}
-                suppressHydrationWarning
-            >
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <EcosystemContext.Provider value={ecosystem}>
-                    <ArticleContext.Provider value={{article, setArticle}}>
-                        {!hideNavbar && <Navbar />}
-                        <main className="px-5 sm:px-8 h-auto">
-                            {children}
-                        </main>
-                    </ArticleContext.Provider>
-                    </EcosystemContext.Provider>
-                    <Footer />
-                </ThemeProvider>
-            </body>
-        </html>
-    );
+  return (
+    <html lang="en" suppressHydrationWarning>
+      {Settings.gtmconnected && <GoogleTagManager gtmId={Settings.gtm} />}
+      <body
+        className={`${GeistSans.variable} ${GeistMono.variable} font-regular`}
+        suppressHydrationWarning
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <EcosystemContext.Provider value={ecosystem}>
+            <ArticleContext.Provider value={{ article, setArticle }}>
+              {!hideNavbar && <Navbar />}
+              <main className="px-5 sm:px-8 h-auto">{children}</main>
+            </ArticleContext.Provider>
+          </EcosystemContext.Provider>
+          <Footer />
+        </ThemeProvider>
+      </body>
+    </html>
+  );
 }
