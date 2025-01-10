@@ -17,6 +17,7 @@ import { GitHubLink } from "@/settings/navigation";
 import { Article, Ecosystem } from "./ecosystems/ecosystem";
 import { getTextFromPatches } from "./diff";
 import { ReactElement } from "react";
+import { MemoizedArticles } from "./memoizedarticles";
 
 async function parseMdx<Frontmatter>(rawMdx: string) {
   return await compileMDX<Frontmatter>({
@@ -62,36 +63,23 @@ const getDocumentPathMemoized = (() => {
   };
 })();
 
-const getRawArticleMemoized = (() => {
-  const cache = new Map<string, Article>();
-
-  return async (
-    articleName: string,
-    ecosystem: Ecosystem
-  ): Promise<Article> => {
-    let article = cache.get(articleName);
-
-    if (!article) {
-      article = await ecosystem.fetchArticle(articleName);
-      cache.set(articleName, article);
-    }
-
-    return article;
-  };
-})();
+/**
+ * Initializes the cache
+ */
+const cache = new MemoizedArticles();
 
 /**
  * Fetches article from the given ecosystem and builds from patches.
- * @param name Name of the article, case sensitive.
+ * @param articleName Name of the article, case sensitive.
  * @param ecosystem Ecosystem to fetch the article from.
  * @returns article as raw markdown (without frontmatter).
  */
 export async function getRawArticle(
-  name: string,
+  articleName: string,
   ecosystem: Ecosystem,
   articleVersion: number | null = null
 ): Promise<string> {
-  const article = await getRawArticleMemoized(name, ecosystem);
+  const article = await cache.get(articleName, ecosystem);
 
   if (articleVersion === null || articleVersion > article.patches.length) {
     return getTextFromPatches(article.patches);
@@ -157,10 +145,14 @@ export async function getDocument(slug: string, ecosystem: Ecosystem) {
   }
 }
 
-export async function getPatches(name: string, ecosystem: Ecosystem) {
-  const article = await getRawArticleMemoized(name, ecosystem);
+export async function getPatches(articleName: string, ecosystem: Ecosystem) {
+  const article = await cache.get(articleName, ecosystem);
 
   return article.patches;
+}
+
+export async function invalidateCache(articleName: string) {
+  cache.invalidate(articleName);
 }
 
 // export async function getRawDocument(slug: string) {
