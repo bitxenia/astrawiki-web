@@ -1,25 +1,20 @@
 "use client";
-import {
-  EcosystemContext,
-  RawArticleContext,
-  RawArticleContextProps,
-} from "@/lib/contexts";
+import { EcosystemContext } from "@/lib/contexts";
 import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
-import { getDocument, getPatches } from "@/lib/markdown";
+import { getPatches } from "@/lib/markdown";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 
-type PageProps = {
-  params: { slug: string[] };
-};
-
-export default function Pages({ params: { slug = [] } }: PageProps) {
+export default function Pages() {
   const [patches, setPatches] = useState<Patch[]>([]);
   const [error, setError] = useState<boolean>(false);
   const ecosystem = useContext<Ecosystem>(EcosystemContext);
 
-  const pathName = slug.join("/");
+  const searchParams = useSearchParams();
+
+  const pathName = searchParams.get("name")!;
+
   useEffect(() => {
     async function fetchDocument() {
       try {
@@ -55,12 +50,10 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
           .map((d: string, i: number) => (
             <li className="py-2" key={i}>
               <Link
-                href={
-                  "/docs/" +
-                  slug.toString() +
-                  "/" +
-                  (patches.length - i).toString()
-                }
+                href={`
+                  /articles?name=${pathName}&version=${(
+                  patches.length - i
+                ).toString()}`}
               >
                 {patches.length - i} - {d}
               </Link>

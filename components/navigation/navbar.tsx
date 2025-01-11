@@ -38,7 +38,7 @@ export function Navbar() {
             )}
             <ModeToggle />
             <Link
-              href={"/docs/new/"}
+              href={"/articles/new/"}
               className={buttonVariants({ variant: "default", size: "sm" })}
               rel="noopener noreferrer"
               aria-label="Create a new article"

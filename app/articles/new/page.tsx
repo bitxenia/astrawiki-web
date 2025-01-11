@@ -26,7 +26,7 @@ export default function Pages() {
         await ecosystem.editArticle(name, patch).catch(err => console.log("Edit article: ", err));
         alert("Article published successfully!");
         setArticle(markdown);
-        router.push(`/docs/${title}`);
+        router.push(`/articles?name=${title}`);
     };
 
     return (

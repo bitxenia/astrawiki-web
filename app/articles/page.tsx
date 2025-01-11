@@ -1,5 +1,5 @@
 "use client";
-import { notFound } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import { getRawArticle, parseMarkdown } from "@/lib/markdown";
 import { Settings } from "@/lib/meta";
 
@@ -20,12 +20,9 @@ import {
 } from "@/lib/contexts";
 import { BarLoader } from "react-spinners";
 import Link from "next/link";
+import { version } from "os";
 
-type PageProps = {
-  params: { slug: string[] };
-};
-
-export default function Pages({ params: { slug = [] } }: PageProps) {
+export default function Pages() {
   const [parsedMarkdown, setParsedMarkdown] = useState<ReactElement<
     any,
     any
@@ -34,10 +31,17 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
   const ecosystem = useContext<Ecosystem>(EcosystemContext);
   const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
 
-  const pathName = slug[0];
-  let articleVersion: number | null = null;
-  if (slug.length > 1) {
-    articleVersion = +slug[1];
+  const searchParams = useSearchParams();
+
+  const pathName = searchParams.get("name")!;
+  const articleVersion = searchParams.has("version")
+    ? +searchParams.get("version")!
+    : undefined;
+
+  const paths: string[] = [pathName];
+
+  if (articleVersion) {
+    paths.push(articleVersion.toString());
   }
 
   useEffect(() => {
@@ -70,9 +74,9 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
   return (
     <div className="flex items-start gap-14">
       <div className="flex-[3] pt-10">
-        <PageBreadcrumb paths={slug} />
+        <PageBreadcrumb paths={paths} />
         <div>
-          <Link href={"/docs/history/" + slug[0]}>History</Link>
+          <Link href={`/articles/history?name=${pathName}`}>History</Link>
         </div>
         {parsedMarkdown && (
           <Typography>

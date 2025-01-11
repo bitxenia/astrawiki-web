@@ -77,11 +77,11 @@ const cache = new MemoizedArticles();
 export async function getRawArticle(
   articleName: string,
   ecosystem: Ecosystem,
-  articleVersion: number | null = null
+  articleVersion?: number
 ): Promise<string> {
   const article = await cache.get(articleName, ecosystem);
 
-  if (articleVersion === null || articleVersion > article.patches.length) {
+  if (articleVersion === undefined || articleVersion > article.patches.length) {
     return getTextFromPatches(article.patches);
   }
 
