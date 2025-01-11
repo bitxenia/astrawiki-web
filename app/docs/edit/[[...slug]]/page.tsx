@@ -6,6 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import { ArticleContext, ArticleContextProps, EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 import { getPatchFromTwoTexts } from "@/lib/diff";
+import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import { getRawArticle } from "@/lib/markdown";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
@@ -24,24 +25,22 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
 
     const [newArticle, setNewArticle] = useState<string | null>(null);
     const [error, setError] = useState<boolean>(false);
-    const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext);
+    const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem };
     const { article, setArticle } = useContext<ArticleContextProps>(ArticleContext);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
         if (!article) {
             async function fetchDocument() {
-                if (ecosystem) {
-                    setIsLoading(true);
-                    try {
-                        const rawArticle = await getRawArticle(pathName, ecosystem, null);
-                        setArticle(rawArticle);
-                        setNewArticle(rawArticle);
-                    } catch {
-                        setError(true);
-                    }
-                    setIsLoading(false);
+                setIsLoading(true);
+                try {
+                    const rawArticle = await getRawArticle(pathName, ecosystem, null);
+                    setArticle(rawArticle);
+                    setNewArticle(rawArticle);
+                } catch {
+                    setError(true);
                 }
+                setIsLoading(false);
 
             }
             fetchDocument();
@@ -50,7 +49,6 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
         }
     }, []);
 
-    if (error) notFound();
 
     const saveChanges = async () => {
         const patch = getPatchFromTwoTexts(article as string, newArticle as string);
@@ -58,7 +56,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
             alert("No changes were made");
             return
         }
-        await ecosystem?.editArticle(pathName, patch);
+        await ecosystem.editArticle(pathName, patch);
         setArticle(newArticle);
         alert("Edited successfully!");
         router.push(`/docs/${pathName}`);
@@ -68,13 +66,8 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
         router.push(`/docs/${pathName}`);
     }
 
-    if (!ecosystem) {
-        return (
-            <text>
-                Choose an ecosystem.
-            </text>
-        )
-    } else if (isLoading) {
+    if (error) notFound();
+    else if (isLoading) {
         return (
             <div>
                 <text>

@@ -30,7 +30,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
         any
     > | null>(null);
     const [error, setError] = useState<boolean>(false);
-    const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext);
+    const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem };
     const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -42,39 +42,30 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
 
     useEffect(() => {
         async function fetchDocument() {
-            if (ecosystem) {
-                setIsLoading(true);
-                try {
-                    const rawArticle = await getRawArticle(
-                        pathName,
-                        ecosystem,
-                        articleVersion
-                    );
-                    const res = await parseMarkdown(pathName, rawArticle);
-                    if (!res) {
-                        setError(true);
-                    } else {
-                        setParsedMarkdown(res);
-                        setArticle(rawArticle);
-                    }
-                } catch {
+            setIsLoading(true);
+            try {
+                const rawArticle = await getRawArticle(
+                    pathName,
+                    ecosystem,
+                    articleVersion
+                );
+                const res = await parseMarkdown(pathName, rawArticle);
+                if (!res) {
                     setError(true);
+                } else {
+                    setParsedMarkdown(res);
+                    setArticle(rawArticle);
                 }
-                setIsLoading(false);
+            } catch {
+                setError(true);
             }
+            setIsLoading(false);
         }
         fetchDocument();
     }, [pathName, ecosystem, setArticle]);
 
     if (error) notFound();
-
-    if (!ecosystem) {
-        return (
-            <text>
-                Choose an ecosystem.
-            </text>
-        )
-    } else if (isLoading) {
+    else if (isLoading) {
         return (
             <div>
                 <text>

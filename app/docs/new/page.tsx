@@ -5,7 +5,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import { ArticleContext, ArticleContextProps, EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 import { getPatchFromTwoTexts } from "@/lib/diff";
-import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
+import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -13,29 +13,21 @@ import remarkGfm from "remark-gfm";
 
 export default function Pages() {
     const router = useRouter();
-    const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext)
+    const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem };
     const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
     const path = ["New"];
     const [title, setTitle] = useState("");
     const [markdown, setMarkdown] = useState("");
 
     const publishArticle = async (name: string) => {
-        await ecosystem?.createArticle(name).catch(err => console.log("Create article: ", err));
+        await ecosystem.createArticle(name).catch(err => console.log("Create article: ", err));
         let patch = getPatchFromTwoTexts("", markdown);
         console.log("Article created successfully!");
-        await ecosystem?.editArticle(name, patch).catch(err => console.log("Edit article: ", err));
+        await ecosystem.editArticle(name, patch).catch(err => console.log("Edit article: ", err));
         alert("Article published successfully!");
         setArticle(markdown);
         router.push(`/docs/${title}`);
     };
-
-    if (!ecosystem) {
-        return (
-            <text>
-                Choose an ecosystem.
-            </text>
-        )
-    }
 
     return (
         <div className="flex items-start gap-14">

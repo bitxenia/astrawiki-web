@@ -15,41 +15,33 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
     const [document, setDocument] = useState<any>(null);
     const [error, setError] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext);
+    const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem };
 
     const pathName = slug.join("/");
     useEffect(() => {
         async function fetchDocument() {
             console.log("Fetching")
-            if (ecosystem) {
-                setIsLoading(true);
-                try {
-                    const res = await getPatches(pathName, ecosystem);
-                    if (!res) {
-                        setError(true);
-                    } else {
-                        setDocument(res);
-                    }
-                } catch {
+            setIsLoading(true);
+            try {
+                const res = await getPatches(pathName, ecosystem);
+                if (!res) {
                     setError(true);
+                } else {
+                    setDocument(res);
                 }
-                setIsLoading(false);
+            } catch {
+                setError(true);
             }
+            setIsLoading(false);
         }
         fetchDocument();
     }, [pathName, ecosystem]);
 
-    if (error) notFound();
 
     const patches = document ? document.patches : [];
 
-    if (!ecosystem) {
-        return (
-            <text>
-                Choose an ecosystem.
-            </text>
-        )
-    } else if (isLoading) {
+    if (error) notFound();
+    else if (isLoading) {
         return (
             <div>
                 <text>

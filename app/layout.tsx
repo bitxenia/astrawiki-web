@@ -77,7 +77,12 @@ export default function RootLayout({
                         <ArticleContext.Provider value={{ article, setArticle }}>
                             {!hideNavbar && <Navbar />}
                             <main className="px-5 sm:px-8 h-auto">
-                                {children}
+                                {(ecosystem || hideNavbar) && children}
+                                {!ecosystem && !hideNavbar && (
+                                    <p>
+                                        Please choose an ecosystem
+                                    </p>
+                                )}
                             </main>
                         </ArticleContext.Provider>
                     </EcosystemContext.Provider>
