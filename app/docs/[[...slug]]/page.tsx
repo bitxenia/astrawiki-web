@@ -16,6 +16,8 @@ import {
     ArticleContextProps,
     EcosystemContext,
     EcosystemContextProps,
+    RawArticleContext,
+    RawArticleContextProps,
 } from "@/lib/contexts";
 import { BarLoader } from "react-spinners";
 import Link from "next/link";
@@ -42,24 +44,27 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
 
     useEffect(() => {
         async function fetchDocument() {
-            setIsLoading(true);
+            setIsLoading(true)
             try {
                 const rawArticle = await getRawArticle(
                     pathName,
                     ecosystem,
                     articleVersion
                 );
+
                 const res = await parseMarkdown(pathName, rawArticle);
+
                 if (!res) {
                     setError(true);
                 } else {
                     setParsedMarkdown(res);
                     setArticle(rawArticle);
                 }
-            } catch {
+            } catch (e) {
+                console.log(e);
                 setError(true);
             }
-            setIsLoading(false);
+            setIsLoading(false)
         }
         fetchDocument();
     }, [pathName, ecosystem, setArticle]);

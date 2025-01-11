@@ -1,6 +1,6 @@
-"use client"
+"use client";
 // import type { Metadata } from "next";
-import { GoogleTagManager } from '@next/third-parties/google';
+import { GoogleTagManager } from "@next/third-parties/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navigation/navbar";
 import { GeistSans } from "geist/font/sans";
@@ -11,8 +11,12 @@ import "./globals.css";
 import { useState } from "react";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import ExampleServer from "@/lib/ecosystems/example-server";
-import { ArticleContext, EcosystemContext } from '@/lib/contexts';
-import { usePathname } from 'next/navigation';
+import {
+    ArticleContext,
+    EcosystemContext,
+    RawArticleContext,
+} from "@/lib/contexts";
+import { usePathname } from "next/navigation";
 
 // const baseUrl = Settings.metadataBase;
 
@@ -54,8 +58,9 @@ export default function RootLayout({
 }>) {
     const [ecosystem, setEcosystem] = useState<Ecosystem | null>(null);
     const [article, setArticle] = useState<any>(null);
+    const [rawArticle, setRawArticle] = useState<any>(null);
 
-    const hideNavbarRoutes = ['/'];
+    const hideNavbarRoutes = ["/"];
     const hideNavbar = hideNavbarRoutes.includes(usePathname());
 
     return (

@@ -1,5 +1,10 @@
 "use client";
-import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
+import {
+    EcosystemContext,
+    EcosystemContextProps,
+    RawArticleContext,
+    RawArticleContextProps,
+} from "@/lib/contexts";
 import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
 import { getDocument, getPatches } from "@/lib/markdown";
 import Link from "next/link";
@@ -12,36 +17,30 @@ type PageProps = {
 };
 
 export default function Pages({ params: { slug = [] } }: PageProps) {
-    const [document, setDocument] = useState<any>(null);
+    const [patches, setPatches] = useState<Patch[]>([]);
     const [error, setError] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem };
 
     const pathName = slug.join("/");
     useEffect(() => {
         async function fetchDocument() {
-            console.log("Fetching")
-            setIsLoading(true);
             try {
                 const res = await getPatches(pathName, ecosystem);
                 if (!res) {
                     setError(true);
                 } else {
-                    setDocument(res);
+                    setPatches(res);
                 }
             } catch {
                 setError(true);
             }
-            setIsLoading(false);
         }
         fetchDocument();
     }, [pathName, ecosystem]);
 
-
-    const patches = document ? document.patches : [];
-
     if (error) notFound();
-    else if (isLoading) {
+
+    if (patches.length === 0) {
         return (
             <div>
                 <text>
@@ -56,13 +55,14 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
         <div className="flex items-start gap-14">
             <ul>
                 {patches
-                    .sort((a: Patch, b: Patch) => {
-                        if (a.date > b.date) return -1;
-                        if (a.date < b.date) return 1;
+                    .map((p: Patch) => p.date)
+                    .sort((a: string, b: string) => {
+                        if (a > b) return -1;
+                        if (a < b) return 1;
                         return 0;
                     })
-                    .map((p: Patch, i: number) => (
-                        <li className="py-2">
+                    .map((d: string, i: number) => (
+                        <li className="py-2" key={i}>
                             <Link
                                 href={
                                     "/docs/" +
@@ -71,7 +71,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
                                     (patches.length - i).toString()
                                 }
                             >
-                                {patches.length - i} - {p.date}
+                                {patches.length - i} - {d}
                             </Link>
                         </li>
                     ))}

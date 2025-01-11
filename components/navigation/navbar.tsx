@@ -6,12 +6,9 @@ import { ModeToggle } from "@/components/navigation/theme-toggle";
 import { SheetLeft } from "@/components/navigation/sidebar";
 import Search from "@/components/navigation/search";
 import Anchor from "@/components/navigation/anchor";
-import { Navigations, GitHubLink } from "@/settings/navigation";
+import { GitHubLink } from "@/settings/navigation";
 import { buttonVariants } from "@/components/ui/button";
-import { SheetClose } from "@/components/ui/sheet";
 import EcosystemPicker from "./ecosystem-picker";
-import { useContext } from "react";
-import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 
 export function Navbar() {
     return (
@@ -24,7 +21,6 @@ export function Navbar() {
                             <Logo />
                         </div>
                         <div className="hidden md:flex items-center gap-5 text-sm font-medium text-muted-foreground">
-                            <NavMenu />
                             <EcosystemPicker />
                         </div>
                     </div>
@@ -57,40 +53,5 @@ export function Navbar() {
                 </div>
             </div>
         </nav>
-    );
-}
-
-export function NavMenu({ isSheet = false }) {
-    return (
-        <>
-            {Navigations.map((item) => {
-                const Comp = (
-                    <Anchor
-                        key={item.title + item.href}
-                        activeClassName="font-bold text-primary"
-                        absolute
-                        className="flex items-center gap-1 text-sm"
-                        href={item.href}
-                        target={item.external ? "_blank" : undefined}
-                        rel={item.external ? "noopener noreferrer" : undefined}
-                    >
-                        {item.title}{" "}
-                        {item.external && (
-                            <LuArrowUpRight
-                                className="w-3 h-3 align-super"
-                                strokeWidth={3}
-                            />
-                        )}
-                    </Anchor>
-                );
-                return isSheet ? (
-                    <SheetClose key={item.title + item.href} asChild>
-                        {Comp}
-                    </SheetClose>
-                ) : (
-                    Comp
-                );
-            })}
-        </>
     );
 }

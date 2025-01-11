@@ -7,7 +7,7 @@ import { Typography } from "@/components/ui/typography";
 import { ArticleContext, ArticleContextProps, EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 import { getPatchFromTwoTexts } from "@/lib/diff";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
-import { getRawArticle } from "@/lib/markdown";
+import { getRawArticle, invalidateCache } from "@/lib/markdown";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -58,6 +58,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
         }
         await ecosystem.editArticle(pathName, patch);
         setArticle(newArticle);
+        invalidateCache(pathName);
         alert("Edited successfully!");
         router.push(`/docs/${pathName}`);
     }
