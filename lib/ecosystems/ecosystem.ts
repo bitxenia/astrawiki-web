@@ -11,6 +11,12 @@ export type Article = {
 }
 
 export interface Ecosystem {
+    /*
+     * Init function, meant to be ran after creating an instance. Useful for
+     * async dependencies.
+     */
+    init(): void;
+
     /* Fetches an article given it's name.
     */
     fetchArticle(name: string): Promise<Article>;

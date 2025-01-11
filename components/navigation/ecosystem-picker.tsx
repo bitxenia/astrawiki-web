@@ -7,21 +7,27 @@ import ExampleServer from "@/lib/ecosystems/example-server";
 let selectedName = "";
 
 export default function EcosystemPicker() {
-    const { ecosystem, setEcosystem } = useContext<EcosystemContextProps>(EcosystemContext);
+    const { ecosystem, setEcosystem, isESLoading, setIsESLoading } = useContext<EcosystemContextProps>(EcosystemContext);
     const [triggerName, setTriggerName] = useState<string>("");
 
     useEffect(() => {
         setTriggerName(ecosystem ? selectedName : "Pick an ecosystem")
     }, [ecosystem])
 
+    const setExampleServer = async () => {
+        setIsESLoading(true);
+        const es = new ExampleServer();
+        await es.init()
+        setEcosystem(es);
+        selectedName = "Example Server";
+        setIsESLoading(false);
+    }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className="button">{triggerName}</DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => {
-                    setEcosystem(new ExampleServer());
-                    selectedName = "Example Server";
-                }}>
+                <DropdownMenuItem onClick={setExampleServer}>
                     Example Server
                 </DropdownMenuItem>
                 <DropdownMenuItem>
