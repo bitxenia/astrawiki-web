@@ -72,6 +72,7 @@ const cache = new MemoizedArticles();
  * Fetches article from the given ecosystem and builds from patches.
  * @param articleName Name of the article, case sensitive.
  * @param ecosystem Ecosystem to fetch the article from.
+ * @param articleVersion Version to build article from. Latest if null.
  * @returns article as raw markdown (without frontmatter).
  */
 export async function getRawArticle(
