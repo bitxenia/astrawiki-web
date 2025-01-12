@@ -21,6 +21,7 @@ import {
 } from "@/lib/contexts";
 import { BarLoader } from "react-spinners";
 import Link from "next/link";
+import Loading from "@/app/loading";
 
 type PageProps = {
     params: { slug: string[] };
@@ -32,7 +33,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
         any
     > | null>(null);
     const [error, setError] = useState<boolean>(false);
-    const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem };
+    const { ecosystem, esName } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem, esName: string };
     const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -70,16 +71,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
     }, [pathName, ecosystem, setArticle]);
 
     if (error) notFound();
-    else if (isLoading) {
-        return (
-            <div>
-                <text>
-                    Loading...
-                </text>
-                <BarLoader />
-            </div>
-        )
-    }
+    else if (isLoading) return <Loading title="Loading article..." desc={`Fetching ${pathName} from ${esName}`} />
 
     return (
         <div className="flex items-start gap-14">

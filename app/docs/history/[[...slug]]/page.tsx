@@ -1,4 +1,5 @@
 "use client";
+import Loading from "@/app/loading";
 import {
     EcosystemContext,
     EcosystemContextProps,
@@ -19,7 +20,7 @@ type PageProps = {
 export default function Pages({ params: { slug = [] } }: PageProps) {
     const [patches, setPatches] = useState<Patch[]>([]);
     const [error, setError] = useState<boolean>(false);
-    const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem };
+    const { ecosystem, esName } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem, esName: string };
 
     const pathName = slug.join("/");
     useEffect(() => {
@@ -40,16 +41,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
 
     if (error) notFound();
 
-    if (patches.length === 0) {
-        return (
-            <div>
-                <text>
-                    Loading...
-                </text>
-                <BarLoader />
-            </div>
-        )
-    }
+    if (patches.length === 0) return <Loading title="Loading edit history..." desc={`Fetching ${pathName} edit list from ${esName}`} />
 
     return (
         <div className="flex items-start gap-14">

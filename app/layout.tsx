@@ -18,6 +18,7 @@ import {
 } from "@/lib/contexts";
 import { usePathname } from "next/navigation";
 import { BarLoader } from "react-spinners";
+import NoEcosystem from "./no-ecosystem";
 
 // const baseUrl = Settings.metadataBase;
 
@@ -59,6 +60,7 @@ export default function RootLayout({
 }>) {
     const [ecosystem, setEcosystem] = useState<Ecosystem | null>(null);
     const [isESLoading, setIsESLoading] = useState<boolean>(false);
+    const [esName, setESName] = useState<string>('Pick an ecosystem');
     const [article, setArticle] = useState<any>(null);
     const [rawArticle, setRawArticle] = useState<any>(null);
 
@@ -80,7 +82,7 @@ export default function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <EcosystemContext.Provider value={{ ecosystem, setEcosystem, isESLoading, setIsESLoading }}>
+                    <EcosystemContext.Provider value={{ ecosystem, setEcosystem, isESLoading, setIsESLoading, esName, setESName }}>
                         <ArticleContext.Provider value={{ article, setArticle }}>
                             {!hideNavbar && <Navbar />}
                             <main className="px-5 sm:px-8 h-auto">
@@ -90,11 +92,7 @@ export default function RootLayout({
                                     </div>
                                 )}
                                 {(ecosystem || hideNavbar) && children}
-                                {!ecosystem && !hideNavbar && (
-                                    <p>
-                                        Please choose an ecosystem
-                                    </p>
-                                )}
+                                {!ecosystem && !hideNavbar && <NoEcosystem />}
                             </main>
                         </ArticleContext.Provider>
                     </EcosystemContext.Provider>

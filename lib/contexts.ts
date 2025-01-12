@@ -6,6 +6,8 @@ export type EcosystemContextProps = {
     setEcosystem: (ecosystem: Ecosystem | null) => void;
     isESLoading: Readonly<boolean>,
     setIsESLoading: (isLoading: boolean) => void,
+    esName: string,
+    setESName: (name: string) => void,
 }
 
 export const EcosystemContext = createContext<EcosystemContextProps>(
@@ -13,7 +15,9 @@ export const EcosystemContext = createContext<EcosystemContextProps>(
         ecosystem: null,
         setEcosystem: () => { },
         isESLoading: false,
-        setIsESLoading: () => { }
+        setIsESLoading: () => { },
+        esName: "",
+        setESName: () => { }
     }
 );
 

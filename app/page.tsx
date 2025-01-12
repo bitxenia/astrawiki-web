@@ -18,7 +18,9 @@ export default function Home() {
             <h2 className="text-2xl font-bold mb-4 sm:text-4xl">
                 Knowledge Repository
             </h2>
-            <EcosystemPicker />
+            <div className="mb-16">
+                <EcosystemPicker />
+            </div>
             {ecosystem && <div className="flex items-center gap-5">
                 <Search />
                 <text className="font-thin">

@@ -1,5 +1,6 @@
 'use client';
 
+import Loading from "@/app/loading";
 import notFound from "@/app/not-found";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
@@ -25,9 +26,10 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
 
     const [newArticle, setNewArticle] = useState<string | null>(null);
     const [error, setError] = useState<boolean>(false);
-    const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem };
+    const { ecosystem, esName } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem, esName: string };
     const { article, setArticle } = useContext<ArticleContextProps>(ArticleContext);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isPublishing, setIsPublishing] = useState(false);
 
     useEffect(() => {
         if (!article) {
@@ -51,6 +53,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
 
 
     const saveChanges = async () => {
+        setIsPublishing(true);
         const patch = getPatchFromTwoTexts(article as string, newArticle as string);
         if (patch.patch.length == 0) {
             alert("No changes were made");
@@ -60,6 +63,7 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
         setArticle(newArticle);
         invalidateCache(pathName);
         alert("Edited successfully!");
+        setIsPublishing(false);
         router.push(`/docs/${pathName}`);
     }
 
@@ -68,16 +72,8 @@ export default function Pages({ params: { slug = [] } }: PageProps) {
     }
 
     if (error) notFound();
-    else if (isLoading) {
-        return (
-            <div>
-                <text>
-                    Loading...
-                </text>
-                <BarLoader />
-            </div>
-        )
-    }
+    else if (isLoading) return <Loading title="Loading article..." desc={`Fetching ${pathName} from ${esName}`} />
+    else if (isPublishing) return <Loading title="Publishing..." desc={`Saving ${pathName} changes to ${esName}`} />
 
     return (
         <div className="flex items-start gap-14">
