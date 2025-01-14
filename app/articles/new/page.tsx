@@ -4,7 +4,12 @@ import Loading from "@/app/loading";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { ArticleContext, ArticleContextProps, EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
+import {
+  ArticleContext,
+  ArticleContextProps,
+  EcosystemContext,
+  EcosystemContextProps,
+} from "@/lib/contexts";
 import { getPatchFromTwoTexts } from "@/lib/diff";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import Link from "next/link";
@@ -14,28 +19,33 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 export default function Pages() {
-    const router = useRouter();
-    const { ecosystem, esName } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem, esName: string };
-    const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
-    const path = ["New"];
-    const [title, setTitle] = useState("");
-    const [markdown, setMarkdown] = useState("");
-    const [isPublishing, setIsPublishing] = useState(false);
+  const router = useRouter();
+  const { ecosystem, esName } = useContext<EcosystemContextProps>(
+    EcosystemContext
+  ) as { ecosystem: Ecosystem; esName: string };
+  const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
+  const path = ["New"];
+  const [title, setTitle] = useState("");
+  const [markdown, setMarkdown] = useState("");
+  const [isPublishing, setIsPublishing] = useState(false);
 
-    const publishArticle = async (name: string) => {
-        setIsPublishing(true);
-        await ecosystem.createArticle(name).catch(err => console.log("Create article: ", err));
-        let patch = getPatchFromTwoTexts("", markdown);
-        console.log("Article created successfully!");
-        await ecosystem.editArticle(name, patch).catch(err => console.log("Edit article: ", err));
-        alert("Article published successfully!");
-        setArticle(markdown);
-        setIsPublishing(false);
-        router.push(`/articles?name=${title}`);
-    };
+  const publishArticle = async (name: string) => {
+    setIsPublishing(true);
+    await ecosystem
+      .createArticle(name)
+      .catch((err) => console.log("Create article: ", err));
+    let patch = getPatchFromTwoTexts("", markdown);
+    console.log("Article created successfully!");
+    await ecosystem
+      .editArticle(name, patch)
+      .catch((err) => console.log("Edit article: ", err));
+    alert("Article published successfully!");
+    setArticle(markdown);
+    setIsPublishing(false);
+    router.push(`/articles?name=${title}`);
+  };
 
-    if (isPublishing) return <Loading title="Publishing..." desc={`Please wait while ${title} is uploaded to ${esName}.`} />
-
+  if (isPublishing)
     return (
         <div className="flex items-start gap-14">
             <div className="flex-[3] pt-10">
