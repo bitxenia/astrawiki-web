@@ -1,28 +1,28 @@
 import { patch_obj } from "diff-match-patch";
 
 export type Patch = {
-    date: string;
-    patch: (new () => patch_obj)[];
+  date: string;
+  patch: (new () => patch_obj)[];
 };
 
 export type Article = {
-    name: string;
-    patches: Patch[];
-}
+  name: string;
+  patches: Patch[];
+};
 
 export interface Ecosystem {
     /*
      * Init function, meant to be ran after creating an instance. Useful for
      * async dependencies.
      */
-    init(): void;
+    init(): Promise<void>;
 
     /* Fetches an article given it's name.
     */
     fetchArticle(name: string): Promise<Article>;
 
     /*
-     * Creates empty article to repository. An article name must be unique.
+    * Creates empty article to repository. An article name must be unique.
     */
     createArticle(name: string): Promise<null>;
 

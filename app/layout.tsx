@@ -8,7 +8,7 @@ import { GeistMono } from "geist/font/mono";
 import { Footer } from "@/components/navigation/footer";
 import { Settings } from "@/lib/meta";
 import "./globals.css";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import ExampleServer from "@/lib/ecosystems/example-server";
 import {
@@ -54,9 +54,9 @@ import NoEcosystem from "./no-ecosystem";
 // };
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
     const [ecosystem, setEcosystem] = useState<Ecosystem | null>(null);
     const [isESLoading, setIsESLoading] = useState<boolean>(false);
