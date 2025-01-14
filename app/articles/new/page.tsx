@@ -31,7 +31,7 @@ export default function Pages() {
         alert("Article published successfully!");
         setArticle(markdown);
         setIsPublishing(false);
-        router.push(`/docs/${title}`);
+        router.push(`/articles?name=${title}`);
     };
 
     if (isPublishing) return <Loading title="Publishing..." desc={`Please wait while ${title} is uploaded to ${esName}.`} />

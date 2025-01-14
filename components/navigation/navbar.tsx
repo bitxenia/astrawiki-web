@@ -26,32 +26,32 @@ export function Navbar() {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <Search />
-                    <div className="flex sm:ml-0 gap-2">
-                        {GitHubLink.href && (
-                            <Link
-                                href={GitHubLink.href}
-                                className={buttonVariants({ variant: "outline", size: "icon" })}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                aria-label="View the repository on GitHub"
-                            >
-                                <LuGithub className="w-[1.1rem] h-[1.1rem]" />
-                            </Link>
-                        )}
-                        <ModeToggle />
-                        <Link
-                            href={"/docs/new/"}
-                            className={buttonVariants({ variant: "default", size: "sm" })}
-                            rel="noopener noreferrer"
-                            aria-label="Create a new article"
-                        >
-                            Create
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    );
+        <div className="flex items-center gap-2">
+          <Search />
+          <div className="flex sm:ml-0 gap-2">
+            {GitHubLink.href && (
+              <Link
+                href={GitHubLink.href}
+                className={buttonVariants({ variant: "outline", size: "icon" })}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="View the repository on GitHub"
+              >
+                <LuGithub className="w-[1.1rem] h-[1.1rem]" />
+              </Link>
+            )}
+            <ModeToggle />
+            <Link
+              href={"/articles/new/"}
+              className={buttonVariants({ variant: "default", size: "sm" })}
+              rel="noopener noreferrer"
+              aria-label="Create a new article"
+            >
+              Create
+            </Link>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
 }

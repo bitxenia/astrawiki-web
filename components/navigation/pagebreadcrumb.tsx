@@ -19,16 +19,18 @@ export default function PageBreadcrumb({ paths }: { paths: string[] }) {
           </BreadcrumbItem>
 
           {paths.map((path, index) => {
-            const href = `/docs/${paths.slice(0, index + 1).join("/")}`;
+            const href = `/articles?name=${paths
+              .slice(0, index + 1)
+              .join("/")}`;
 
             return (
               <Fragment key={path}>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   {index < paths.length - 1 ? (
-                      <BreadcrumbLink href={href} className="a">
-                        {toTitleCase(path)}
-                      </BreadcrumbLink>
+                    <BreadcrumbLink href={href} className="a">
+                      {toTitleCase(path)}
+                    </BreadcrumbLink>
                   ) : (
                     <BreadcrumbPage className="b">
                       {toTitleCase(path)}
