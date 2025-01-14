@@ -7,11 +7,16 @@ import { articuloFactoryContractAddress } from "./utils/eth-ecosystem-utils";
 class EthEcosystem implements Ecosystem {
   factoryInstance: any;
 
-  constructor() {
+  async init(): Promise<void> {
     this.factoryInstance = new web3.eth.Contract(
       articuloFactoryContractABI,
       articuloFactoryContractAddress
     );
+  }
+
+  async getArticleList(): Promise<string[]> {
+    // TODO: complete this method
+    return ["Argentina"];
   }
 
   async fetchArticle(name: string): Promise<Article> {

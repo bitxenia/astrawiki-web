@@ -3,6 +3,7 @@ import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { useContext } from "react";
 import ExampleServer from "@/lib/ecosystems/example-server";
+import EthEcosystem from "@/lib/ecosystems/eth-ecosystem";
 
 export default function EcosystemPicker() {
     const { setEcosystem, setIsESLoading, esName, setESName } = useContext<EcosystemContextProps>(EcosystemContext);
@@ -14,6 +15,16 @@ export default function EcosystemPicker() {
         await es.init()
         setEcosystem(es);
         setESName('Example Server');
+        setIsESLoading(false);
+    }
+
+    const setBlockchain = async () => {
+        setIsESLoading(true);
+        setESName('Loading...');
+        const es = new EthEcosystem();
+        await es.init()
+        setEcosystem(es);
+        setESName('Blockchain');
         setIsESLoading(false);
     }
 
@@ -31,7 +42,7 @@ export default function EcosystemPicker() {
                 <DropdownMenuItem>
                     IPFS
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={setBlockchain}>
                     Blockchain
                 </DropdownMenuItem>
                 <DropdownMenuItem>
