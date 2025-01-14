@@ -71,7 +71,7 @@ export default function Pages() {
                                 </button>
                             </Link>
                         </div>
-                    </div>)
+                    </div>
                 </Typography>
             </div>
         </div>
