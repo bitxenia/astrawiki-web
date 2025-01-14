@@ -1,14 +1,18 @@
-import express from 'express';
-import path from 'path';
-import { readFile, writeFile, access } from "node:fs/promises";
+import express from "express";
+import path from "path";
+import cors from "cors";
+import { readFile, writeFile, access, readdir } from "node:fs/promises";
+import { setTimeout } from "timers/promises";
 const __dirname = import.meta.dirname;
 
-const app = express()
-const port = 3001
+const app = express();
+const port = 3001;
 
+app.use(cors());
 app.use(express.json());
 
-app.get('/articles/:name', async (req, res) => {
+app.get("/articles/:name", async (req, res) => {
+    await setTimeout(5000);
     const { name } = req.params;
     try {
         const patchesPath = path.join(__dirname, "content", `${name}.json`);
@@ -24,9 +28,10 @@ app.get('/articles/:name', async (req, res) => {
             res.status(500).json({ error: "Internal Server Error" });
         }
     }
-})
+});
 
-app.post('/articles', async (req, res) => {
+app.post("/articles", async (req, res) => {
+    await setTimeout(5000);
     const { name } = req.body;
     if (!name) {
         console.log("Name is required");
@@ -38,7 +43,9 @@ app.post('/articles', async (req, res) => {
     try {
         await access(patchesPath);
         console.log("Article with this name already exists");
-        return res.status(409).json({ error: "Article with this name already exists" });
+        return res
+            .status(409)
+            .json({ error: "Article with this name already exists" });
     } catch (err) {
         if (err.code != "ENOENT") {
             console.log(err);
@@ -54,9 +61,10 @@ app.post('/articles', async (req, res) => {
         console.log(err);
         res.status(500).json({ error: "Internal Server Error" });
     }
-})
+});
 
-app.patch('/articles/:name', async (req, res) => {
+app.patch("/articles/:name", async (req, res) => {
+    await setTimeout(5000);
     const { name } = req.params;
     const { date, patch } = req.body;
     if (!date) {
@@ -83,12 +91,19 @@ app.patch('/articles/:name', async (req, res) => {
         console.log(err);
         res.status(500).json({ error: "Internal Server Error" });
     }
-})
+});
+
+app.get('/articles', async (_req, res) => {
+    const contentPath = path.join(__dirname, "content");
+    const articles = (await readdir(contentPath)).map((filename) => filename.replace('.json', ''));
+    await setTimeout(5000);
+    return res.status(200).json(articles);
+});
 
 app.get('/', async (req, res) => {
     return res.status(200).json({ message: "Server is up" });
-})
+});
 
 app.listen(port, () => {
-    console.log('Example server running on port 3001');
+    console.log("Example server running on port 3001");
 });

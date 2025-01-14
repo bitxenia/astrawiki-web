@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { LuCommand, LuFileText, LuSearch } from "react-icons/lu";
 
 import { Input } from "@/components/ui/input";
@@ -16,28 +16,53 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 import Anchor from "./anchor";
 import { advanceSearch, cn, debounce, highlight, search } from "@/lib/utils";
-import { Documents } from '@/settings/documents';
+import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 
 export default function Search() {
   const [searchedInput, setSearchedInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [filteredResults, setFilteredResults] = useState<search[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingList, setIsFetchingList] = useState(false);
+
+  const [searchData, setSearchData] = useState<
+    { title: string; href: string }[]
+  >([]);
+  const { ecosystem, isESLoading } =
+    useContext<EcosystemContextProps>(EcosystemContext);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      setIsFetchingList(true);
+      if (ecosystem) {
+        const articleTitles = await ecosystem.getArticleList();
+        const docs = articleTitles.map((title) => {
+          return {
+            title,
+            href: `?name=${title}`,
+          };
+        });
+        setSearchData(docs);
+      }
+      setIsFetchingList(false);
+    };
+    fetchArticles();
+  }, [ecosystem]);
 
   const debouncedSearch = useMemo(
     () =>
       debounce((input) => {
         setIsLoading(true);
-        const results = advanceSearch(input.trim());
+        const results = advanceSearch(input.trim(), searchData);
         setFilteredResults(results);
         setIsLoading(false);
       }, 200),
-    []
+    [searchData]
   );
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.key === "k") {
+      if (event.ctrlKey && event.key === "k" && !isESLoading) {
         event.preventDefault();
         setIsOpen(true);
       }
@@ -45,7 +70,7 @@ export default function Search() {
       if (isOpen && event.key === "Enter" && filteredResults.length > 2) {
         const selected = filteredResults[0];
         if ("href" in selected) {
-          window.location.href = `/docs${selected.href}`;
+          window.location.href = `/articles${selected.href}`;
           setIsOpen(false);
         }
       }
@@ -56,7 +81,7 @@ export default function Search() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, filteredResults]);
+  }, [isOpen, filteredResults, isESLoading]);
 
   useEffect(() => {
     if (searchedInput.length >= 3) {
@@ -66,13 +91,16 @@ export default function Search() {
     }
   }, [searchedInput, debouncedSearch]);
 
-  function renderDocuments(documents: any[], parentHref: string = "/docs"): React.ReactNode[] {
+  function renderDocuments(
+    documents: any[],
+    parentHref: string = "/articles"
+  ): React.ReactNode[] {
     if (!documents || !Array.isArray(documents)) {
       return [];
     }
 
     return documents.flatMap((doc) => {
-      if ('spacer' in doc && doc.spacer) {
+      if ("spacer" in doc && doc.spacer) {
         return [];
       }
 
@@ -91,7 +119,6 @@ export default function Search() {
             </div>
           </Anchor>
         </DialogClose>,
-        ...renderDocuments(doc.items || [], `${href}`)
       ];
     });
   }
@@ -137,49 +164,60 @@ export default function Search() {
               Please enter at least 3 characters.
             </p>
           )}
-          {isLoading ? (
+          {isLoading && (
             <p className="mx-auto mt-2 text-sm text-muted-foreground">
               Searching...
             </p>
-          ) : (
-            filteredResults.length === 0 && searchedInput.length >= 3 && (
+          )}
+          {isFetchingList && (
+            <p className="mx-auto mt-2 text-sm text-muted-foreground">
+              Fetching articles...
+            </p>
+          )}
+          {!isFetchingList &&
+            !isLoading &&
+            filteredResults.length === 0 &&
+            searchedInput.length >= 3 && (
               <p className="mx-auto mt-2 text-sm text-muted-foreground">
                 No results found for{" "}
                 <span className="text-primary">{`"${searchedInput}"`}</span>
               </p>
-            )
-          )}
+            )}
           <ScrollArea className="max-h-[350px]">
             <div className="flex flex-col items-start overflow-y-auto px-1 pt-1 pb-4 sm:px-3">
-            {searchedInput
+              {searchedInput
                 ? filteredResults.map((item, index) => {
-                  if ("href" in item) {
-                    return (
-                      <DialogClose key={item.href} asChild>
-                        <Anchor
-                          className={cn(
-                            "w-full p-3 flex flex-col gap-0.5 text-[15px] rounded-sm hover:bg-neutral-100 dark:hover:bg-neutral-900"
-                          )}
-                          href={`/docs${item.href}`}
-                        >
-                          <div className="flex items-center h-full w-fit gap-x-2">
-                            <LuFileText className="h-[1.1rem] w-[1.1rem]" /> {item.title}
-                          </div>
-                          {"snippet" in item && item.snippet && (
-                            <p
-                              className="w-full truncate text-xs text-neutral-500 dark:text-neutral-400"
-                              dangerouslySetInnerHTML={{
-                                __html: highlight(item.snippet, searchedInput),
-                              }}
-                            />
-                          )}
-                        </Anchor>
-                      </DialogClose>
-                    );
-                  }
-                  return null;
-                })
-              : renderDocuments(Documents)}
+                    if ("href" in item) {
+                      return (
+                        <DialogClose key={item.href} asChild>
+                          <Anchor
+                            className={cn(
+                              "w-full p-3 flex flex-col gap-0.5 text-[15px] rounded-sm hover:bg-neutral-100 dark:hover:bg-neutral-900"
+                            )}
+                            href={`/articles${item.href}`}
+                          >
+                            <div className="flex items-center h-full w-fit gap-x-2">
+                              <LuFileText className="h-[1.1rem] w-[1.1rem]" />{" "}
+                              {item.title}
+                            </div>
+                            {"snippet" in item && item.snippet && (
+                              <p
+                                className="w-full truncate text-xs text-neutral-500 dark:text-neutral-400"
+                                dangerouslySetInnerHTML={{
+                                  __html: highlight(
+                                    item.snippet,
+                                    searchedInput
+                                  ),
+                                }}
+                              />
+                            )}
+                          </Anchor>
+                        </DialogClose>
+                      );
+                    }
+                    return null;
+                  })
+                : renderDocuments(searchData)}
             </div>
           </ScrollArea>
         </DialogContent>

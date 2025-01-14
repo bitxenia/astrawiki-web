@@ -1,17 +1,22 @@
 import web3 from "../web3";
 import { Article, Ecosystem, Patch } from "./ecosystem";
-import articuloFactoryContractABI from "../../contracts/out/ArticuloFactory.json";
-import articuloContractABI from "../../contracts/out/Articulo.json";
-import articuloFactoryContractAddress from "../../contracts/out/deployedAddress.json";
+import articuloFactoryContractABI from "../../contracts/articuloFactoryContractABI.json";
+import articuloContractABI from "../../contracts/articuloContractABI.json";
+import { articuloFactoryContractAddress } from "./utils/eth-ecosystem-utils";
 
 class EthEcosystem implements Ecosystem {
   factoryInstance: any;
 
-  constructor() {
+  async init(): Promise<void> {
     this.factoryInstance = new web3.eth.Contract(
       articuloFactoryContractABI,
       articuloFactoryContractAddress
     );
+  }
+
+  async getArticleList(): Promise<string[]> {
+    // TODO: complete this method
+    return ["Argentina"];
   }
 
   async fetchArticle(name: string): Promise<Article> {
