@@ -8,6 +8,14 @@ type ArticleResponse = {
 }
 
 export default class ExampleServer implements Ecosystem {
+    async init() {
+        console.log("Initializing")
+        const delay = (ms: number) => new Promise(
+            resolve => setTimeout(resolve, ms)
+        );
+        await delay(5000);
+    }
+
     async fetchArticle(name: string): Promise<Article> {
         if (name.length === 0) {
             return Promise.reject("Name cannot be empty");

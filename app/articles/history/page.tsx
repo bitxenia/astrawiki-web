@@ -5,6 +5,7 @@ import { getPatches } from "@/lib/markdown";
 import Link from "next/link";
 import { notFound, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
+import { BarLoader } from "react-spinners";
 
 export default function Pages() {
   const [patches, setPatches] = useState<Patch[]>([]);

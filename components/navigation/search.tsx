@@ -16,8 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 import Anchor from "./anchor";
 import { advanceSearch, cn, debounce, highlight, search } from "@/lib/utils";
-import { Ecosystem } from "@/lib/ecosystems/ecosystem";
-import { EcosystemContext } from "@/lib/contexts";
+import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 
 export default function Search() {
   const [searchedInput, setSearchedInput] = useState("");
@@ -29,19 +28,22 @@ export default function Search() {
   const [searchData, setSearchData] = useState<
     { title: string; href: string }[]
   >([]);
-  const ecosystem = useContext<Ecosystem>(EcosystemContext);
+  const { ecosystem, isESLoading } =
+    useContext<EcosystemContextProps>(EcosystemContext);
 
   useEffect(() => {
     const fetchArticles = async () => {
       setIsFetchingList(true);
-      const articleTitles = await ecosystem.getArticleList();
-      const docs = articleTitles.map((title) => {
-        return {
-          title,
-          href: `?name=${title}`,
-        };
-      });
-      setSearchData(docs);
+      if (ecosystem) {
+        const articleTitles = await ecosystem.getArticleList();
+        const docs = articleTitles.map((title) => {
+          return {
+            title,
+            href: `?name=${title}`,
+          };
+        });
+        setSearchData(docs);
+      }
       setIsFetchingList(false);
     };
     fetchArticles();
@@ -60,7 +62,7 @@ export default function Search() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.key === "k") {
+      if (event.ctrlKey && event.key === "k" && !isESLoading) {
         event.preventDefault();
         setIsOpen(true);
       }
@@ -79,7 +81,7 @@ export default function Search() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, filteredResults]);
+  }, [isOpen, filteredResults, isESLoading]);
 
   useEffect(() => {
     if (searchedInput.length >= 3) {

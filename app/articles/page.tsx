@@ -15,21 +15,27 @@ import {
   ArticleContext,
   ArticleContextProps,
   EcosystemContext,
+  EcosystemContextProps,
   RawArticleContext,
   RawArticleContextProps,
 } from "@/lib/contexts";
 import { BarLoader } from "react-spinners";
+import Loading from "@/app/loading";
 import Link from "next/link";
-import { version } from "os";
+
+type PageProps = {
+  params: { slug: string[] };
+};
 
 export default function Pages() {
-  const [parsedMarkdown, setParsedMarkdown] = useState<ReactElement<
-    any,
-    any
-  > | null>(null);
-  const [error, setError] = useState<boolean>(false);
-  const ecosystem = useContext<Ecosystem>(EcosystemContext);
-  const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
+    const [parsedMarkdown, setParsedMarkdown] = useState<ReactElement<
+        any,
+        any
+    > | null>(null);
+    const [error, setError] = useState<boolean>(false);
+    const { ecosystem, esName } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem, esName: string };
+    const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const searchParams = useSearchParams();
 
@@ -46,6 +52,7 @@ export default function Pages() {
 
   useEffect(() => {
     async function fetchDocument() {
+      setIsLoading(true);
       try {
         const rawArticle = await getRawArticle(
           pathName,
@@ -65,11 +72,19 @@ export default function Pages() {
         console.log(e);
         setError(true);
       }
+      setIsLoading(false);
     }
     fetchDocument();
   }, [pathName, ecosystem, setArticle]);
 
   if (error) notFound();
+  else if (isLoading)
+    return (
+      <Loading
+        title="Loading article..."
+        desc={`Fetching ${pathName} from ${esName}`}
+      />
+    );
 
   return (
     <div className="flex items-start gap-14">
@@ -91,7 +106,7 @@ export default function Pages() {
           </div>
         )}
       </div>
-      {parsedMarkdown && Settings.rightbar && (
+      {Settings.rightbar && (
         <div className="hidden xl:flex xl:flex-col sticky top-16 gap-3 py-8 min-w-[230px] h-[94.5vh] toc">
           {Settings.toc && <Toc tocs={[]} />}
           {Settings.feedback && <Feedback slug={pathName} title={pathName} />}

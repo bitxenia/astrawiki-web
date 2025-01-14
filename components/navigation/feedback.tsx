@@ -29,13 +29,12 @@ export default function RightSideBar({ slug, title }: SideBarEdit) {
         </Link>
         <Link
           href={editUrl}
-          target="_blank"
           rel="noopener noreferrer"
           className={cn(
             "text-sm text-neutral-800 dark:text-neutral-300/85 no-underline flex items-center"
           )}
         >
-          <LuArrowUpRight className="mr-1 w-4 h-4 inline-block" /> Edit page
+          Edit page
         </Link>
       </div>
     </div>
