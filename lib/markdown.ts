@@ -14,9 +14,10 @@ import { PageRoutes } from "@/lib/pageroutes";
 import { components } from "@/lib/components";
 import { Settings } from "@/lib/meta";
 import { GitHubLink } from "@/settings/navigation";
-import { Ecosystem } from "./ecosystems/ecosystem";
+import { Article, Ecosystem } from "./ecosystems/ecosystem";
 import { getTextFromPatches } from "./diff";
 import { ReactElement } from "react";
+import { MemoizedArticles } from "./memoizedarticles";
 
 async function parseMdx<Frontmatter>(rawMdx: string) {
   return await compileMDX<Frontmatter>({
@@ -63,17 +64,29 @@ const getDocumentPathMemoized = (() => {
 })();
 
 /**
+ * Initializes the cache
+ */
+const cache = new MemoizedArticles();
+
+/**
  * Fetches article from the given ecosystem and builds from patches.
- * @param name Name of the article, case sensitive.
+ * @param articleName Name of the article, case sensitive.
  * @param ecosystem Ecosystem to fetch the article from.
+ * @param articleVersion Version to build article from. Latest if null.
  * @returns article as raw markdown (without frontmatter).
  */
 export async function getRawArticle(
-  name: string,
-  ecosystem: Ecosystem
+  articleName: string,
+  ecosystem: Ecosystem,
+  articleVersion?: number
 ): Promise<string> {
-  const article = await ecosystem.fetchArticle(name);
-  return getTextFromPatches(article.patches);
+  const article = await cache.get(articleName, ecosystem);
+
+  if (articleVersion === undefined || articleVersion > article.patches.length) {
+    return getTextFromPatches(article.patches);
+  }
+
+  return getTextFromPatches(article.patches.slice(0, articleVersion));
 }
 
 //
@@ -131,6 +144,16 @@ export async function getDocument(slug: string, ecosystem: Ecosystem) {
     console.error(err);
     return null;
   }
+}
+
+export async function getPatches(articleName: string, ecosystem: Ecosystem) {
+  const article = await cache.get(articleName, ecosystem);
+
+  return article.patches;
+}
+
+export async function invalidateCache(articleName: string) {
+  cache.invalidate(articleName);
 }
 
 export async function getRawDocument(slug: string, ecosystem: Ecosystem) {

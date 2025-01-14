@@ -1,5 +1,6 @@
 "use client";
 
+import Loading from "@/app/loading";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
@@ -7,9 +8,11 @@ import {
   ArticleContext,
   ArticleContextProps,
   EcosystemContext,
+  EcosystemContextProps,
 } from "@/lib/contexts";
 import { getPatchFromTwoTexts } from "@/lib/diff";
-import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
+import { Ecosystem } from "@/lib/ecosystems/ecosystem";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -17,15 +20,17 @@ import remarkGfm from "remark-gfm";
 
 export default function Pages() {
   const router = useRouter();
-  const ecosystem = useContext<Ecosystem>(EcosystemContext);
+  const { ecosystem, esName } = useContext<EcosystemContextProps>(
+    EcosystemContext
+  ) as { ecosystem: Ecosystem; esName: string };
   const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
   const path = ["New"];
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const publishArticle = async (name: string) => {
-    setIsLoading(true);
+    setIsPublishing(true);
     await ecosystem
       .createArticle(name)
       .catch((err) => console.log("Create article: ", err));
@@ -35,17 +40,25 @@ export default function Pages() {
       .editArticle(name, patch)
       .catch((err) => console.log("Edit article: ", err));
     alert("Article published successfully!");
-    setIsLoading(false);
     setArticle(markdown);
-    router.push(`/docs/${title}`);
+    setIsPublishing(false);
+    router.push(`/articles?name=${title}`);
   };
+
+  if (isPublishing)
+    return (
+      <Loading
+        title="Publishing..."
+        desc={`Please wait while ${title} is uploaded to ${esName}.`}
+      />
+    );
 
   return (
     <div className="flex items-start gap-14">
       <div className="flex-[3] pt-10">
         <PageBreadcrumb paths={path} />
         <Typography>
-          <div className="space-y-4 mb-4">
+          <div className="space-y-4">
             <input
               type="text"
               placeholder="Write a name for your article..."
@@ -73,21 +86,42 @@ export default function Pages() {
                   size: "default",
                 })}
                 onClick={() => publishArticle(title)}
-                disabled={isLoading}
               >
                 Publish
               </button>
-              <button
-                className={buttonVariants({
-                  variant: "secondary",
-                  size: "default",
-                })}
-              >
-                Cancel
-              </button>
+              <Link href="/">
+                <button
+                  className={buttonVariants({
+                    variant: "secondary",
+                    size: "default",
+                  })}
+                >
+                  Cancel
+                </button>
+              </Link>
             </div>
           </div>
         </Typography>
+      </div>
+      <div className="flex justify-right gap-2">
+        <button
+          className={buttonVariants({
+            variant: "default",
+            size: "default",
+          })}
+          onClick={() => publishArticle(title)}
+          disabled={isPublishing}
+        >
+          Publish
+        </button>
+        <button
+          className={buttonVariants({
+            variant: "secondary",
+            size: "default",
+          })}
+        >
+          Cancel
+        </button>
       </div>
     </div>
   );

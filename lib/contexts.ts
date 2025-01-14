@@ -1,15 +1,42 @@
 import { createContext } from "react";
 import { Ecosystem } from "./ecosystems/ecosystem";
-import EthEcosystem from "./ecosystems/eth-ecosystem";
 
-export const EcosystemContext = createContext<Ecosystem>(new EthEcosystem());
+export type EcosystemContextProps = {
+    ecosystem: Ecosystem | null;
+    setEcosystem: (ecosystem: Ecosystem | null) => void;
+    isESLoading: Readonly<boolean>,
+    setIsESLoading: (isLoading: boolean) => void,
+    esName: string,
+    setESName: (name: string) => void,
+}
+
+export const EcosystemContext = createContext<EcosystemContextProps>(
+    {
+        ecosystem: null,
+        setEcosystem: () => { },
+        isESLoading: false,
+        setIsESLoading: () => { },
+        esName: "",
+        setESName: () => { }
+    }
+);
 
 export type ArticleContextProps = {
-  article: string | null;
-  setArticle: (article: string | null) => void;
+    article: string | null;
+    setArticle: (article: string | null) => void;
+};
+
+export type RawArticleContextProps = {
+    rawArticle: string;
+    setRawArticle: (article: string) => void;
 };
 
 export const ArticleContext = createContext<ArticleContextProps>({
-  article: null,
-  setArticle: () => {},
+    article: null,
+    setArticle: () => { },
+});
+
+export const RawArticleContext = createContext<RawArticleContextProps>({
+    rawArticle: "",
+    setRawArticle: () => { },
 });

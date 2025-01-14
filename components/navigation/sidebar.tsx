@@ -10,7 +10,6 @@ import {
   SheetHeader,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { NavMenu } from "@/components/navigation/navbar";
 import { Logo } from "@/components/navigation/logo";
 import PageMenu from "@/components/navigation/pagemenu";
 
@@ -40,9 +39,6 @@ export function SheetLeft() {
           </SheetClose>
         </SheetHeader>
         <ScrollArea className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2.5 mt-3 mx-0 px-5">
-            <NavMenu isSheet />
-          </div>
           <div className="mx-0 px-5">
             <PageMenu isSheet />
           </div>
