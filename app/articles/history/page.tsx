@@ -1,5 +1,6 @@
 "use client";
-import { EcosystemContext } from "@/lib/contexts";
+import Loading from "@/app/loading";
+import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
 import { getPatches } from "@/lib/markdown";
 import Link from "next/link";
@@ -10,7 +11,9 @@ import { BarLoader } from "react-spinners";
 export default function Pages() {
   const [patches, setPatches] = useState<Patch[]>([]);
   const [error, setError] = useState<boolean>(false);
-  const ecosystem = useContext<Ecosystem>(EcosystemContext);
+  const { ecosystem, esName } = useContext<EcosystemContextProps>(
+    EcosystemContext
+  ) as { ecosystem: Ecosystem; esName: string };
 
   const searchParams = useSearchParams();
 
@@ -34,9 +37,13 @@ export default function Pages() {
 
   if (error) notFound();
 
-  if (patches.length === 0) {
-    return <p> Loading... </p>;
-  }
+  if (patches.length === 0)
+    return (
+      <Loading
+        title="Loading edit history..."
+        desc={`Fetching ${pathName} edit list from ${esName}`}
+      />
+    );
 
   return (
     <div className="flex items-start gap-14">
