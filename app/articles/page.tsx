@@ -1,5 +1,9 @@
 "use client";
-import { notFound, useSearchParams } from "next/navigation";
+import {
+  notFound,
+  ReadonlyURLSearchParams,
+  useSearchParams,
+} from "next/navigation";
 import { getRawArticle, parseMarkdown } from "@/lib/markdown";
 import { Settings } from "@/lib/meta";
 
@@ -28,14 +32,16 @@ type PageProps = {
 };
 
 export default function Pages() {
-    const [parsedMarkdown, setParsedMarkdown] = useState<ReactElement<
-        any,
-        any
-    > | null>(null);
-    const [error, setError] = useState<boolean>(false);
-    const { ecosystem, esName } = useContext<EcosystemContextProps>(EcosystemContext) as { ecosystem: Ecosystem, esName: string };
-    const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [parsedMarkdown, setParsedMarkdown] = useState<ReactElement<
+    any,
+    any
+  > | null>(null);
+  const [error, setError] = useState<boolean>(false);
+  const { ecosystem, esName } = useContext<EcosystemContextProps>(
+    EcosystemContext
+  ) as { ecosystem: Ecosystem; esName: string };
+  const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const searchParams = useSearchParams();
 
@@ -90,9 +96,6 @@ export default function Pages() {
     <div className="flex items-start gap-14">
       <div className="flex-[3] pt-10">
         <PageBreadcrumb paths={paths} />
-        <div>
-          <Link href={`/articles/history?name=${pathName}`}>History</Link>
-        </div>
         {parsedMarkdown && (
           <Typography>
             <h1 className="text-3xl -mt-2">{pathName}</h1>

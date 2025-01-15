@@ -60,12 +60,12 @@ export default function Pages() {
   if (error) notFound();
 
   const saveChanges = async () => {
-    setIsPublishing(true);
     const patch = getPatchFromTwoTexts(article as string, newArticle as string);
     if (patch.patch.length == 0) {
       alert("No changes were made");
       return;
     }
+    setIsPublishing(true);
     await ecosystem.editArticle(pathName, patch);
     setArticle(newArticle);
     invalidateCache(pathName);
@@ -136,7 +136,6 @@ export default function Pages() {
             </div>
           </div>
         </Typography>
-        )
       </div>
     </div>
   );
