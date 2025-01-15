@@ -1,12 +1,31 @@
 "use client"
 import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import ExampleServer from "@/lib/ecosystems/example-server";
 import EthEcosystem from "@/lib/ecosystems/eth-ecosystem";
+import { invalidateCache } from "@/lib/markdown";
+
 
 export default function EcosystemPicker() {
     const { setEcosystem, setIsESLoading, esName, setESName } = useContext<EcosystemContextProps>(EcosystemContext);
+
+    const storedEcosystem = localStorage.getItem('ecosystem');
+    useEffect(() => {
+        const setStoredEcosystem = async () => {
+            switch (storedEcosystem) {
+                case 'Example Server':
+                    setExampleServer();
+                    break;
+                case 'Blockchain':
+                    setBlockchain();
+                    break;
+            }
+        };
+        if (storedEcosystem != esName) {
+            setStoredEcosystem();
+        }
+    }, []);
 
     const setExampleServer = async () => {
         setIsESLoading(true);
@@ -15,6 +34,8 @@ export default function EcosystemPicker() {
         await es.init()
         setEcosystem(es);
         setESName('Example Server');
+        invalidateCache();
+        localStorage.setItem('ecosystem', 'Example Server');
         setIsESLoading(false);
     }
 
@@ -25,13 +46,14 @@ export default function EcosystemPicker() {
         await es.init()
         setEcosystem(es);
         setESName('Blockchain');
+        localStorage.setItem('ecosystem', 'Blockchain');
         setIsESLoading(false);
     }
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className="button">
-                <div className="border border-black/20 rounded-lg px-2 py-1">
+                <div className="border w-full px-3 py-2 flex items-center gap-2.5 text-[15px] rounded-sm hover:bg-neutral-100 dark:hover:bg-neutral-900">
                     {esName}
                 </div>
             </DropdownMenuTrigger>

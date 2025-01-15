@@ -34,6 +34,7 @@ export default function Search() {
   useEffect(() => {
     const fetchArticles = async () => {
       setIsFetchingList(true);
+      setSearchData([]);
       if (ecosystem) {
         const articleTitles = await ecosystem.getArticleList();
         const docs = articleTitles.map((title) => {

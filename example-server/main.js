@@ -64,7 +64,6 @@ app.post("/articles", async (req, res) => {
 });
 
 app.patch("/articles/:name", async (req, res) => {
-    await setTimeout(5000);
     const { name } = req.params;
     const { date, patch } = req.body;
     if (!date) {
@@ -96,7 +95,6 @@ app.patch("/articles/:name", async (req, res) => {
 app.get('/articles', async (_req, res) => {
     const contentPath = path.join(__dirname, "content");
     const articles = (await readdir(contentPath)).map((filename) => filename.replace('.json', ''));
-    await setTimeout(5000);
     return res.status(200).json(articles);
 });
 

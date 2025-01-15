@@ -5,7 +5,7 @@ import EcosystemPicker from "@/components/navigation/ecosystem-picker";
 
 export default function NoEcosystem() {
     return (
-        <div className="min-h-[86.5vh] flex flex-col justify-center items-center text-center px-2 py-8">
+        <div className="min-h-[82vh] flex flex-col justify-center items-center text-center px-2 py-8">
             <h1 className="text-4xl font-bold mb-4 sm:text-7xl">
                 Error
             </h1>
