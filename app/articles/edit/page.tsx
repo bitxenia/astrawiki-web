@@ -39,22 +39,18 @@ export default function Pages() {
   const [isPublishing, setIsPublishing] = useState(false);
 
   useEffect(() => {
-    if (!article) {
-      async function fetchDocument() {
-        setIsLoading(true);
-        try {
-          const rawArticle = await getRawArticle(pathName, ecosystem);
-          setArticle(rawArticle);
-          setNewArticle(rawArticle);
-        } catch {
-          setError(true);
-        }
-        setIsLoading(false);
+    async function fetchDocument() {
+      setIsLoading(true);
+      try {
+        const rawArticle = await getRawArticle(pathName, ecosystem);
+        setArticle(rawArticle);
+        setNewArticle(rawArticle);
+      } catch {
+        setError(true);
       }
-      fetchDocument();
-    } else {
-      setNewArticle(article);
+      setIsLoading(false);
     }
+    fetchDocument();
   }, []);
 
   if (error) notFound();
