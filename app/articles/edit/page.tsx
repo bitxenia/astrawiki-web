@@ -16,6 +16,7 @@ import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import { getRawArticle, invalidateCache } from "@/lib/markdown";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
 import { BarLoader } from "react-spinners";
 import remarkGfm from "remark-gfm";
@@ -58,14 +59,21 @@ export default function Pages() {
   const saveChanges = async () => {
     const patch = getPatchFromTwoTexts(article as string, newArticle as string);
     if (patch.patch.length == 0) {
-      alert("No changes were made");
+      // alert("No changes were made");
+      toast("No changes were made");
       return;
     }
     setIsPublishing(true);
-    await ecosystem.editArticle(pathName, patch);
+    const res = await ecosystem.editArticle(pathName, patch);
+    if (!res) {
+      toast.error("Couldn't edit");
+      return;
+    }
+
     setArticle(newArticle);
     invalidateCache(pathName);
-    alert("Edited successfully!");
+    // alert("Edited successfully!");
+    toast.success("Updated successfully!");
     setIsPublishing(false);
     router.push(`/articles?name=${pathName}`);
   };

@@ -15,6 +15,7 @@ import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
+import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -39,7 +40,8 @@ export default function Pages() {
     await ecosystem
       .editArticle(name, patch)
       .catch((err) => console.log("Edit article: ", err));
-    alert("Article published successfully!");
+    // alert("Article published successfully!");
+    toast.success("Article published successfully!");
     setArticle(markdown);
     setIsPublishing(false);
     router.push(`/articles?name=${title}`);
