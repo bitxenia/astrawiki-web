@@ -39,33 +39,29 @@ export default function Pages() {
   const [isPublishing, setIsPublishing] = useState(false);
 
   useEffect(() => {
-    if (!article) {
-      async function fetchDocument() {
-        setIsLoading(true);
-        try {
-          const rawArticle = await getRawArticle(pathName, ecosystem);
-          setArticle(rawArticle);
-          setNewArticle(rawArticle);
-        } catch {
-          setError(true);
-        }
-        setIsLoading(false);
+    async function fetchDocument() {
+      setIsLoading(true);
+      try {
+        const rawArticle = await getRawArticle(pathName, ecosystem);
+        setArticle(rawArticle);
+        setNewArticle(rawArticle);
+      } catch {
+        setError(true);
       }
-      fetchDocument();
-    } else {
-      setNewArticle(article);
+      setIsLoading(false);
     }
+    fetchDocument();
   }, []);
 
   if (error) notFound();
 
   const saveChanges = async () => {
-    setIsPublishing(true);
     const patch = getPatchFromTwoTexts(article as string, newArticle as string);
     if (patch.patch.length == 0) {
       alert("No changes were made");
       return;
     }
+    setIsPublishing(true);
     await ecosystem.editArticle(pathName, patch);
     setArticle(newArticle);
     invalidateCache(pathName);
@@ -136,7 +132,6 @@ export default function Pages() {
             </div>
           </div>
         </Typography>
-        )
       </div>
     </div>
   );

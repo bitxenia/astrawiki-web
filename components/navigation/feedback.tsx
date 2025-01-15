@@ -12,6 +12,7 @@ type SideBarEdit = {
 export default function RightSideBar({ slug, title }: SideBarEdit) {
   const feedbackUrl = `${GitHubLink.href}/issues/new?title=Feedback for "${title}"&labels=feedback`;
   const editUrl = `/articles/edit?name=${title}`;
+  const historyUrl = `/articles/history?name=${title}`;
 
   return (
     <div className="flex flex-col gap-3 pl-2">
@@ -35,6 +36,15 @@ export default function RightSideBar({ slug, title }: SideBarEdit) {
           )}
         >
           Edit page
+        </Link>
+        <Link
+          href={historyUrl}
+          rel="noopener noreferrer"
+          className={cn(
+            "text-sm text-neutral-800 dark:text-neutral-300/85 no-underline flex items-center"
+          )}
+        >
+          History
         </Link>
       </div>
     </div>
