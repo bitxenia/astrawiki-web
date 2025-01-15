@@ -70,6 +70,7 @@ export default function Pages() {
       return;
     }
 
+    await ecosystem.editArticle(pathName, patch);
     setArticle(newArticle);
     invalidateCache(pathName);
     // alert("Edited successfully!");
