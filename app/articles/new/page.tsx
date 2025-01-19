@@ -40,7 +40,6 @@ export default function Pages() {
     await ecosystem
       .editArticle(name, patch)
       .catch((err) => console.log("Edit article: ", err));
-    // alert("Article published successfully!");
     toast.success("Article published successfully!");
     setArticle(markdown);
     setIsPublishing(false);

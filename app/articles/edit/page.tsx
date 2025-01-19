@@ -59,21 +59,14 @@ export default function Pages() {
   const saveChanges = async () => {
     const patch = getPatchFromTwoTexts(article as string, newArticle as string);
     if (patch.patch.length == 0) {
-      // alert("No changes were made");
       toast("No changes were made");
       return;
     }
     setIsPublishing(true);
     const res = await ecosystem.editArticle(pathName, patch);
-    if (!res) {
-      toast.error("Couldn't edit");
-      return;
-    }
-
-    await ecosystem.editArticle(pathName, patch);
+    console.log("res:", res);
     setArticle(newArticle);
     invalidateCache(pathName);
-    // alert("Edited successfully!");
     toast.success("Updated successfully!");
     setIsPublishing(false);
     router.push(`/articles?name=${pathName}`);
