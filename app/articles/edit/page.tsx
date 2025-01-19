@@ -64,10 +64,9 @@ export default function Pages() {
     }
     setIsPublishing(true);
     const res = await ecosystem.editArticle(pathName, patch);
-    console.log("res:", res);
     setArticle(newArticle);
     invalidateCache(pathName);
-    toast.success("Updated successfully!");
+    toast.success("Edited successfully!");
     setIsPublishing(false);
     router.push(`/articles?name=${pathName}`);
   };
