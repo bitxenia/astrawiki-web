@@ -63,7 +63,7 @@ export default function Pages() {
       return;
     }
     setIsPublishing(true);
-    const res = await ecosystem.editArticle(pathName, patch);
+    await ecosystem.editArticle(pathName, patch);
     setArticle(newArticle);
     invalidateCache(pathName);
     toast.success("Edited successfully!");
