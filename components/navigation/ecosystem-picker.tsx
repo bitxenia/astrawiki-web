@@ -10,8 +10,8 @@ import { invalidateCache } from "@/lib/markdown";
 export default function EcosystemPicker() {
     const { setEcosystem, setIsESLoading, esName, setESName } = useContext<EcosystemContextProps>(EcosystemContext);
 
-    const storedEcosystem = localStorage.getItem('ecosystem');
     useEffect(() => {
+        const storedEcosystem = localStorage.getItem('ecosystem');
         const setStoredEcosystem = async () => {
             switch (storedEcosystem) {
                 case 'Example Server':
