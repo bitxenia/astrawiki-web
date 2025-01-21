@@ -12,13 +12,14 @@ import { useContext, useState } from "react";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import ExampleServer from "@/lib/ecosystems/example-server";
 import {
-    ArticleContext,
-    EcosystemContext,
-    RawArticleContext,
+  ArticleContext,
+  EcosystemContext,
+  RawArticleContext,
 } from "@/lib/contexts";
 import { usePathname } from "next/navigation";
 import { BarLoader } from "react-spinners";
 import NoEcosystem from "./no-ecosystem";
+import { Toaster } from "react-hot-toast";
 
 // const baseUrl = Settings.metadataBase;
 
@@ -58,47 +59,59 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const [ecosystem, setEcosystem] = useState<Ecosystem | null>(null);
-    const [isESLoading, setIsESLoading] = useState<boolean>(false);
-    const [esName, setESName] = useState<string>('Pick an ecosystem');
-    const [article, setArticle] = useState<any>(null);
-    const [rawArticle, setRawArticle] = useState<any>(null);
+  const [ecosystem, setEcosystem] = useState<Ecosystem | null>(null);
+  const [isESLoading, setIsESLoading] = useState<boolean>(false);
+  const [esName, setESName] = useState<string>("Pick an ecosystem");
+  const [article, setArticle] = useState<any>(null);
+  const [rawArticle, setRawArticle] = useState<any>(null);
 
-    const hideNavbarRoutes = ["/"];
-    const hideNavbar = hideNavbarRoutes.includes(usePathname());
+  const hideNavbarRoutes = ["/"];
+  const hideNavbar = hideNavbarRoutes.includes(usePathname());
 
-    return (
-        <html lang="en" suppressHydrationWarning>
-            {Settings.gtmconnected && (
-                <GoogleTagManager gtmId={Settings.gtm} />
-            )}
-            <body
-                className={`${GeistSans.variable} ${GeistMono.variable} font-regular`}
-                suppressHydrationWarning
-            >
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <EcosystemContext.Provider value={{ ecosystem, setEcosystem, isESLoading, setIsESLoading, esName, setESName }}>
-                        <ArticleContext.Provider value={{ article, setArticle }}>
-                            {!hideNavbar && <Navbar />}
-                            <main className="px-5 sm:px-8 h-auto">
-                                {isESLoading && (
-                                    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                        <p className="text-white text-2xl">Initializing ecosystem...</p>
-                                    </div>
-                                )}
-                                {(ecosystem || hideNavbar) && children}
-                                {!ecosystem && !hideNavbar && <NoEcosystem />}
-                            </main>
-                        </ArticleContext.Provider>
-                    </EcosystemContext.Provider>
-                </ThemeProvider>
-                <Footer />
-            </body>
-        </html>
-    );
+  return (
+    <html lang="en" suppressHydrationWarning>
+      {Settings.gtmconnected && <GoogleTagManager gtmId={Settings.gtm} />}
+      <body
+        className={`${GeistSans.variable} ${GeistMono.variable} font-regular`}
+        suppressHydrationWarning
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div>
+            <Toaster position="bottom-center" reverseOrder={false} />
+          </div>
+          <EcosystemContext.Provider
+            value={{
+              ecosystem,
+              setEcosystem,
+              isESLoading,
+              setIsESLoading,
+              esName,
+              setESName,
+            }}
+          >
+            <ArticleContext.Provider value={{ article, setArticle }}>
+              {!hideNavbar && <Navbar />}
+              <main className="px-5 sm:px-8 h-auto">
+                {isESLoading && (
+                  <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <p className="text-white text-2xl">
+                      Initializing ecosystem...
+                    </p>
+                  </div>
+                )}
+                {(ecosystem || hideNavbar) && children}
+                {!ecosystem && !hideNavbar && <NoEcosystem />}
+              </main>
+            </ArticleContext.Provider>
+          </EcosystemContext.Provider>
+          <Footer />
+        </ThemeProvider>
+      </body>
+    </html>
+  );
 }
