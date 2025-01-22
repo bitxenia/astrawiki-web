@@ -7,6 +7,7 @@ const nextConfig = {
     loader: "custom",
     loaderFile: "./utils/custom-image-loader.js",
   },
+  trailingSlash: true,
 };
 
 export default nextConfig;
