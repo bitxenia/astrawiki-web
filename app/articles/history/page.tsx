@@ -58,10 +58,13 @@ export default function Pages() {
           .map((d: string, i: number) => (
             <li className="py-2" key={i}>
               <Link
-                href={`
-                  /articles?name=${pathName}&version=${(
-                  patches.length - i
-                ).toString()}`}
+                href={{
+                  pathname: `/articles`,
+                  query: {
+                    name: pathName,
+                    version: (patches.length - i).toString(),
+                  },
+                }}
               >
                 {patches.length - i} - {d}
               </Link>
