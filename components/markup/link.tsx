@@ -1,12 +1,12 @@
-import Link from 'next/link';
+import Link from "next/link";
 
 interface Routed {
-    href?: string;
-    children: React.ReactNode;
+  href?: string;
+  children: React.ReactNode;
 }
 
 const RoutedLink: React.FC<Routed> = ({ href = "#", children }) => {
-  const isInternal = href.startsWith('/') || href.startsWith('#');
+  const isInternal = href.startsWith("/") || href.startsWith("#");
 
   if (isInternal) {
     return (

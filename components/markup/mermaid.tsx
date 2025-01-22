@@ -1,6 +1,13 @@
 "use client";
 
-import React, { useLayoutEffect, useRef, useState, useCallback, useMemo, useEffect } from "react";
+import React, {
+  useLayoutEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+} from "react";
 import mermaid from "mermaid";
 import clsx from "clsx";
 
@@ -29,7 +36,10 @@ const Mermaid = ({ chart, className }: MermaidProps) => {
     }
   }, [chart]);
 
-  const memoizedClassName = useMemo(() => clsx("mermaid", className), [className]);
+  const memoizedClassName = useMemo(
+    () => clsx("mermaid", className),
+    [className],
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -45,9 +55,7 @@ const Mermaid = ({ chart, className }: MermaidProps) => {
     return null;
   }
 
-  return (
-    <div className={memoizedClassName} ref={ref} />
-  );
+  return <div className={memoizedClassName} ref={ref} />;
 };
 
 const MermaidMemo = React.memo(Mermaid);

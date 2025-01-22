@@ -26,7 +26,7 @@ export default class ExampleServer implements Ecosystem {
     }
 
     const { data, status } = await axios.get<ArticleResponse>(
-      `${URL}/articles/${name}`
+      `${URL}/articles/${name}`,
     );
     if (status === HttpStatusCode.NotFound) {
       return Promise.reject("Article not found");

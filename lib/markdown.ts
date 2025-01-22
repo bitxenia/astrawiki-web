@@ -78,7 +78,7 @@ const cache = new MemoizedArticles();
 export async function getRawArticle(
   articleName: string,
   ecosystem: Ecosystem,
-  articleVersion?: number
+  articleVersion?: number,
 ): Promise<string> {
   const article = await cache.get(articleName, ecosystem);
 
@@ -98,11 +98,11 @@ export async function getRawArticle(
  */
 export async function parseMarkdown(
   title: string,
-  rawMd: string
+  rawMd: string,
 ): Promise<ReactElement<any, any>> {
   const rawFrontmatter = `---\ntitle: ${title}\n---\n`;
   const parsedMdx = await parseMdx<BaseMdxFrontmatter>(
-    rawFrontmatter.concat(rawMd)
+    rawFrontmatter.concat(rawMd),
   );
   // const tocs = await getTable(slug);
   return parsedMdx.content;
@@ -218,7 +218,7 @@ export async function getRawDocument(slug: string, ecosystem: Ecosystem) {
 // }
 
 const pathIndexMap = new Map(
-  PageRoutes.map((route, index) => [route.href, index])
+  PageRoutes.map((route, index) => [route.href, index]),
 );
 
 export function getPreviousNext(path: string) {

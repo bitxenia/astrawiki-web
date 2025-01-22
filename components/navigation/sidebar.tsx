@@ -15,7 +15,7 @@ import PageMenu from "@/components/navigation/pagemenu";
 
 export function Sidebar() {
   return (
-    <aside className="md:flex hidden flex-[1] min-w-[230px] sticky top-16 flex-col h-[94.5vh] overflow-y-auto">
+    <aside className="sticky top-16 hidden h-[94.5vh] min-w-[230px] flex-[1] flex-col overflow-y-auto md:flex">
       <ScrollArea className="py-4">
         <PageMenu />
       </ScrollArea>
@@ -27,7 +27,7 @@ export function SheetLeft() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden flex">
+        <Button variant="ghost" size="icon" className="flex md:hidden">
           <AlignLeftIcon />
         </Button>
       </SheetTrigger>

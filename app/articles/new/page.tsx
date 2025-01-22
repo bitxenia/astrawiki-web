@@ -22,7 +22,7 @@ import remarkGfm from "remark-gfm";
 export default function Pages() {
   const router = useRouter();
   const { ecosystem, esName } = useContext<EcosystemContextProps>(
-    EcosystemContext
+    EcosystemContext,
   ) as { ecosystem: Ecosystem; esName: string };
   const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
   const path = ["New"];
@@ -64,24 +64,24 @@ export default function Pages() {
             <input
               type="text"
               placeholder="Write a name for your article..."
-              className="text-3xl font-bold -mt-2 bg-transparent border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 w-full"
+              className="-mt-2 w-full border-b-2 border-gray-300 bg-transparent text-3xl font-bold focus:border-blue-500 focus:outline-none"
               onChange={(e) => setTitle(e.target.value)}
               value={title}
             />
             <div className="markdown-editor flex flex-col gap-6">
               <textarea
-                className="p-4 border rounded-md w-full h-40"
+                className="h-40 w-full rounded-md border p-4"
                 placeholder="Write article here..."
                 value={markdown}
                 onChange={(e) => setMarkdown(e.target.value)}
               />
-              <div className="markdown-preview p-4 border rounded-md">
+              <div className="markdown-preview rounded-md border p-4">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {markdown}
                 </ReactMarkdown>
               </div>
             </div>
-            <div className="flex justify-right gap-2">
+            <div className="justify-right flex gap-2">
               <button
                 className={buttonVariants({
                   variant: "default",

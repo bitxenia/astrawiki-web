@@ -96,10 +96,10 @@ export default function RootLayout({
           >
             <ArticleContext.Provider value={{ article, setArticle }}>
               {!hideNavbar && <Navbar />}
-              <main className="px-5 sm:px-8 h-auto">
+              <main className="h-auto px-5 sm:px-8">
                 {isESLoading && (
-                  <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <p className="text-white text-2xl">
+                  <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
+                    <p className="text-2xl text-white">
                       Initializing ecosystem...
                     </p>
                   </div>

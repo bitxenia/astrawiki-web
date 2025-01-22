@@ -38,7 +38,7 @@ export default function Pages() {
   > | null>(null);
   const [error, setError] = useState<boolean>(false);
   const { ecosystem, esName } = useContext<EcosystemContextProps>(
-    EcosystemContext
+    EcosystemContext,
   ) as { ecosystem: Ecosystem; esName: string };
   const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -63,7 +63,7 @@ export default function Pages() {
         const rawArticle = await getRawArticle(
           pathName,
           ecosystem,
-          articleVersion
+          articleVersion,
         );
 
         const res = await parseMarkdown(pathName, rawArticle);
@@ -98,19 +98,19 @@ export default function Pages() {
         <PageBreadcrumb paths={paths} />
         {parsedMarkdown && (
           <Typography>
-            <h1 className="text-3xl -mt-2">{pathName}</h1>
+            <h1 className="-mt-2 text-3xl">{pathName}</h1>
             <div>{parsedMarkdown}</div>
             <Pagination pathname={pathName} />
           </Typography>
         )}
         {!parsedMarkdown && (
-          <div className="flex justify-center items-center min-h-screen">
+          <div className="flex min-h-screen items-center justify-center">
             <BarLoader />
           </div>
         )}
       </div>
       {Settings.rightbar && (
-        <div className="hidden xl:flex xl:flex-col sticky top-16 gap-3 py-8 min-w-[230px] h-[94.5vh] toc">
+        <div className="toc sticky top-16 hidden h-[94.5vh] min-w-[230px] gap-3 py-8 xl:flex xl:flex-col">
           {Settings.toc && <Toc tocs={[]} />}
           {Settings.feedback && <Feedback slug={pathName} title={pathName} />}
           {Settings.totop && (

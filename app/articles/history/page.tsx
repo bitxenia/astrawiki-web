@@ -12,7 +12,7 @@ export default function Pages() {
   const [patches, setPatches] = useState<Patch[]>([]);
   const [error, setError] = useState<boolean>(false);
   const { ecosystem, esName } = useContext<EcosystemContextProps>(
-    EcosystemContext
+    EcosystemContext,
   ) as { ecosystem: Ecosystem; esName: string };
 
   const searchParams = useSearchParams();
@@ -60,8 +60,8 @@ export default function Pages() {
               <Link
                 href={`
                   /articles?name=${pathName}&version=${(
-                  patches.length - i
-                ).toString()}`}
+                    patches.length - i
+                  ).toString()}`}
               >
                 {patches.length - i} - {d}
               </Link>

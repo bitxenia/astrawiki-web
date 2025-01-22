@@ -1,6 +1,6 @@
-import { Documents } from '@/settings/documents';
+import { Documents } from "@/settings/documents";
 
-export type Paths = 
+export type Paths =
   | {
       title: string;
       href: string;
@@ -12,13 +12,13 @@ export type Paths =
       spacer: true;
     };
 
-export const Routes: Paths[] = [
-  ...Documents,
-];
+export const Routes: Paths[] = [...Documents];
 
 type Page = { title: string; href: string };
 
-function isRoute(node: Paths): node is Extract<Paths, { title: string; href: string }> {
+function isRoute(
+  node: Paths,
+): node is Extract<Paths, { title: string; href: string }> {
   return "title" in node && "href" in node;
 }
 
