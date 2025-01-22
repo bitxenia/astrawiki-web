@@ -15,7 +15,7 @@ export default function PageBreadcrumb({ paths }: { paths: string[] }) {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink>Docs</BreadcrumbLink>
+            <BreadcrumbLink href="/">Articles</BreadcrumbLink>
           </BreadcrumbItem>
 
           {paths.map((path, index) => {

@@ -9,65 +9,65 @@ import { useContext, useEffect, useState } from "react";
 import { BarLoader } from "react-spinners";
 
 export default function Pages() {
-  const [patches, setPatches] = useState<Patch[]>([]);
-  const [error, setError] = useState<boolean>(false);
-  const { ecosystem, esName } = useContext<EcosystemContextProps>(
-    EcosystemContext
-  ) as { ecosystem: Ecosystem; esName: string };
+    const [patches, setPatches] = useState<Patch[]>([]);
+    const [error, setError] = useState<boolean>(false);
+    const { ecosystem, esName } = useContext<EcosystemContextProps>(
+        EcosystemContext
+    ) as { ecosystem: Ecosystem; esName: string };
 
-  const searchParams = useSearchParams();
+    const searchParams = useSearchParams();
 
-  const pathName = searchParams.get("name")!;
+    const pathName = searchParams.get("name")!;
 
-  useEffect(() => {
-    async function fetchDocument() {
-      try {
-        const res = await getPatches(pathName, ecosystem);
-        if (!res) {
-          setError(true);
-        } else {
-          setPatches(res);
+    useEffect(() => {
+        async function fetchDocument() {
+            try {
+                const res = await getPatches(pathName, ecosystem);
+                if (!res) {
+                    setError(true);
+                } else {
+                    setPatches(res);
+                }
+            } catch {
+                setError(true);
+            }
         }
-      } catch {
-        setError(true);
-      }
-    }
-    fetchDocument();
-  }, [pathName, ecosystem]);
+        fetchDocument();
+    }, [pathName, ecosystem]);
 
-  if (error) notFound();
+    if (error) notFound();
 
-  if (patches.length === 0)
+    if (patches.length === 0)
+        return (
+            <Loading
+                title="Loading history..."
+                desc={`Fetching ${pathName} edit list from ${esName}`}
+            />
+        );
+
     return (
-      <Loading
-        title="Loading edit history..."
-        desc={`Fetching ${pathName} edit list from ${esName}`}
-      />
-    );
-
-  return (
-    <div className="flex items-start gap-14">
-      <ul>
-        {patches
-          .map((p: Patch) => p.date)
-          .sort((a: string, b: string) => {
-            if (a > b) return -1;
-            if (a < b) return 1;
-            return 0;
-          })
-          .map((d: string, i: number) => (
-            <li className="py-2" key={i}>
-              <Link
-                href={`
+        <div className="min-h-[82vh] flex flex-col justify-start items-start gap-14">
+            <ul>
+                {patches
+                    .map((p: Patch) => p.date)
+                    .sort((a: string, b: string) => {
+                        if (a > b) return -1;
+                        if (a < b) return 1;
+                        return 0;
+                    })
+                    .map((d: string, i: number) => (
+                        <li className="py-2" key={i}>
+                            <Link
+                                href={`
                   /articles?name=${pathName}&version=${(
-                  patches.length - i
-                ).toString()}`}
-              >
-                {patches.length - i} - {d}
-              </Link>
-            </li>
-          ))}
-      </ul>
-    </div>
-  );
+                                        patches.length - i
+                                    ).toString()}`}
+                            >
+                                {patches.length - i} - {d}
+                            </Link>
+                        </li>
+                    ))}
+            </ul>
+        </div>
+    );
 }

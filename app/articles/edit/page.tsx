@@ -111,7 +111,7 @@ export default function Pages() {
                 </ReactMarkdown>
               </div>
             </div>
-            <div className="flex justify-right gap-2">
+            <div className="flex justify-right gap-2 pb-4">
               <button
                 className={buttonVariants({
                   variant: "default",
