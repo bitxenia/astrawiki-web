@@ -44,30 +44,32 @@ export default function Pages() {
                 desc={`Fetching ${pathName} edit list from ${esName}`}
             />
         );
-
-    return (
-        <div className="min-h-[82vh] flex flex-col justify-start items-start gap-14">
-            <ul>
-                {patches
-                    .map((p: Patch) => p.date)
-                    .sort((a: string, b: string) => {
-                        if (a > b) return -1;
-                        if (a < b) return 1;
-                        return 0;
-                    })
-                    .map((d: string, i: number) => (
-                        <li className="py-2" key={i}>
-                            <Link
-                                href={`
-                  /articles?name=${pathName}&version=${(
-                                        patches.length - i
-                                    ).toString()}`}
-                            >
-                                {patches.length - i} - {d}
-                            </Link>
-                        </li>
-                    ))}
-            </ul>
-        </div>
-    );
+  return (
+    <div className="flex items-start gap-14">
+      <ul>
+        {patches
+          .map((p: Patch) => p.date)
+          .sort((a: string, b: string) => {
+            if (a > b) return -1;
+            if (a < b) return 1;
+            return 0;
+          })
+          .map((d: string, i: number) => (
+            <li className="py-2" key={i}>
+              <Link
+                href={{
+                  pathname: `/articles`,
+                  query: {
+                    name: pathName,
+                    version: (patches.length - i).toString(),
+                  },
+                }}
+              >
+                {patches.length - i} - {d}
+              </Link>
+            </li>
+          ))}
+      </ul>
+    </div>
+  );
 }
