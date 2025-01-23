@@ -9,41 +9,41 @@ import { useContext, useEffect, useState } from "react";
 import { BarLoader } from "react-spinners";
 
 export default function Pages() {
-    const [patches, setPatches] = useState<Patch[]>([]);
-    const [error, setError] = useState<boolean>(false);
-    const { ecosystem, esName } = useContext<EcosystemContextProps>(
-        EcosystemContext
-    ) as { ecosystem: Ecosystem; esName: string };
+  const [patches, setPatches] = useState<Patch[]>([]);
+  const [error, setError] = useState<boolean>(false);
+  const { ecosystem, esName } = useContext<EcosystemContextProps>(
+    EcosystemContext,
+  ) as { ecosystem: Ecosystem; esName: string };
 
-    const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
 
-    const pathName = searchParams.get("name")!;
+  const pathName = searchParams.get("name")!;
 
-    useEffect(() => {
-        async function fetchDocument() {
-            try {
-                const res = await getPatches(pathName, ecosystem);
-                if (!res) {
-                    setError(true);
-                } else {
-                    setPatches(res);
-                }
-            } catch {
-                setError(true);
-            }
+  useEffect(() => {
+    async function fetchDocument() {
+      try {
+        const res = await getPatches(pathName, ecosystem);
+        if (!res) {
+          setError(true);
+        } else {
+          setPatches(res);
         }
-        fetchDocument();
-    }, [pathName, ecosystem]);
+      } catch {
+        setError(true);
+      }
+    }
+    fetchDocument();
+  }, [pathName, ecosystem]);
 
-    if (error) notFound();
+  if (error) notFound();
 
-    if (patches.length === 0)
-        return (
-            <Loading
-                title="Loading history..."
-                desc={`Fetching ${pathName} edit list from ${esName}`}
-            />
-        );
+  if (patches.length === 0)
+    return (
+      <Loading
+        title="Loading history..."
+        desc={`Fetching ${pathName} edit list from ${esName}`}
+      />
+    );
   return (
     <div className="flex items-start gap-14">
       <ul>

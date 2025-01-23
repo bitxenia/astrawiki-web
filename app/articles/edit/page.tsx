@@ -32,7 +32,7 @@ export default function Pages() {
   const [newArticle, setNewArticle] = useState<string | null>(null);
   const [error, setError] = useState<boolean>(false);
   const { ecosystem, esName } = useContext<EcosystemContextProps>(
-    EcosystemContext
+    EcosystemContext,
   ) as { ecosystem: Ecosystem; esName: string };
   const { article, setArticle } =
     useContext<ArticleContextProps>(ArticleContext);
@@ -97,21 +97,21 @@ export default function Pages() {
         <PageBreadcrumb paths={path} />
         <Typography>
           <div className="space-y-4">
-            <h1 className="text-3xl -mt-2">{pathName}</h1>
+            <h1 className="-mt-2 text-3xl">{pathName}</h1>
             <div className="markdown-editor flex flex-col gap-6">
               <textarea
-                className="p-4 border rounded-md w-full h-40"
+                className="h-40 w-full rounded-md border p-4"
                 placeholder="Write article here..."
                 value={newArticle || ""}
                 onChange={(e) => setNewArticle(e.target.value)}
               />
-              <div className="markdown-preview p-4 border rounded-md">
+              <div className="markdown-preview rounded-md border p-4">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {newArticle}
                 </ReactMarkdown>
               </div>
             </div>
-            <div className="flex justify-right gap-2 pb-4">
+            <div className="justify-right flex gap-2">
               <button
                 className={buttonVariants({
                   variant: "default",

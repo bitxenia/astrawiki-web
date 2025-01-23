@@ -10,7 +10,7 @@ class EthEcosystem implements Ecosystem {
   async init(): Promise<void> {
     this.factoryInstance = new web3.eth.Contract(
       articuloFactoryContractABI,
-      articuloFactoryContractAddress
+      articuloFactoryContractAddress,
     );
   }
 
@@ -28,7 +28,7 @@ class EthEcosystem implements Ecosystem {
 
     const articuloInstance = new web3.eth.Contract(
       articuloContractABI,
-      articuloAddress
+      articuloAddress,
     );
     const contenido: string = await articuloInstance.methods.contenido().call();
     const patches = JSON.parse(contenido);
@@ -59,7 +59,7 @@ class EthEcosystem implements Ecosystem {
 
     const articuloInstance = new web3.eth.Contract(
       articuloContractABI,
-      articuloAddress
+      articuloAddress,
     );
     const contenido: string = await articuloInstance.methods.contenido().call();
     const patches = JSON.parse(contenido);

@@ -17,7 +17,7 @@ myContract.handleRevert = true;
 
 const deploy = async () => {
   const acc = web3.eth.accounts.privateKeyToAccount(
-    process.env.DEPLOYER_WALLET_PRIVATE_KEY
+    process.env.DEPLOYER_WALLET_PRIVATE_KEY,
   );
   web3.eth.accounts.wallet.add(acc);
 
@@ -42,13 +42,13 @@ const deploy = async () => {
 
     const deployedAddressPath = path.join(
       __dirname,
-      "../out/deployedAddress.json"
+      "../out/deployedAddress.json",
     );
     fs.writeFileSync(
       deployedAddressPath,
       JSON.stringify(tx.options.address),
       null,
-      "\t"
+      "\t",
     );
   } catch (error) {
     console.error("Deployment failed: ", error);

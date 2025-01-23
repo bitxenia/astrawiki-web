@@ -105,7 +105,7 @@ app.patch("/articles/:name", async (req, res) => {
 app.get("/articles", async (_req, res) => {
   const contentPath = path.join(__dirname, "content");
   const articles = (await readdir(contentPath)).map((filename) =>
-    filename.replace(".json", "")
+    filename.replace(".json", ""),
   );
   await setTimeout(5000);
   return res.status(200).json(articles);

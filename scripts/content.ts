@@ -8,13 +8,15 @@ import remarkStringify from "remark-stringify";
 import remarkMdx from "remark-mdx";
 import { visit } from "unist-util-visit";
 
-import { Documents } from '@/settings/documents';
+import { Documents } from "@/settings/documents";
 import { Paths } from "@/lib/pageroutes";
 
 const docsDir = path.join(process.cwd(), "contents/docs");
 const outputDir = path.join(process.cwd(), "public", "search-data");
 
-function isRoute(node: Paths): node is Extract<Paths, { href: string; title: string }> {
+function isRoute(
+  node: Paths,
+): node is Extract<Paths, { href: string; title: string }> {
   return "href" in node && "title" in node;
 }
 
@@ -23,10 +25,10 @@ function createSlug(filePath: string): string {
   const parsed = path.parse(relativePath);
 
   const slugPath = parsed.dir ? `${parsed.dir}/${parsed.name}` : parsed.name;
-  const normalizedSlug = slugPath.replace(/\\/g, '/');
+  const normalizedSlug = slugPath.replace(/\\/g, "/");
 
   if (parsed.name === "index") {
-    return `/${parsed.dir.replace(/\\/g, '/')}` || "/";
+    return `/${parsed.dir.replace(/\\/g, "/")}` || "/";
   } else {
     return `/${normalizedSlug}`;
   }
@@ -75,7 +77,6 @@ function removeCustomComponents() {
   };
 }
 
-
 async function processMdxFile(filePath: string) {
   const rawMdx = await fs.readFile(filePath, "utf-8");
 
@@ -93,7 +94,9 @@ async function processMdxFile(filePath: string) {
 
   return {
     slug,
-    title: frontmatter.title || (matchedDoc && isRoute(matchedDoc) ? matchedDoc.title : "Untitled"),
+    title:
+      frontmatter.title ||
+      (matchedDoc && isRoute(matchedDoc) ? matchedDoc.title : "Untitled"),
     description: frontmatter.description || "",
     content: String(plainContent.value),
   };
@@ -129,8 +132,10 @@ async function convertMdxToJson() {
     }
 
     const combinedOutputPath = path.join(outputDir, "documents.json");
-    await fs.writeFile(combinedOutputPath, JSON.stringify(combinedData, null, 2));
-
+    await fs.writeFile(
+      combinedOutputPath,
+      JSON.stringify(combinedData, null, 2),
+    );
   } catch (err) {
     console.error("Error processing MDX files:", err);
   }

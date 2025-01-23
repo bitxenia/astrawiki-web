@@ -19,7 +19,7 @@ export default function RightSideBar({ slug, title }: SideBarEdit) {
           href={editUrl}
           rel="noopener noreferrer"
           className={cn(
-            "text-sm text-neutral-800 dark:text-neutral-300/85 no-underline flex items-center"
+            "flex items-center text-sm text-neutral-800 no-underline dark:text-neutral-300/85",
           )}
         >
           Edit page
@@ -28,7 +28,7 @@ export default function RightSideBar({ slug, title }: SideBarEdit) {
           href={historyUrl}
           rel="noopener noreferrer"
           className={cn(
-            "text-sm text-neutral-800 dark:text-neutral-300/85 no-underline flex items-center"
+            "flex items-center text-sm text-neutral-800 no-underline dark:text-neutral-300/85",
           )}
         >
           History

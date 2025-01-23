@@ -11,25 +11,25 @@ export type Article = {
 };
 
 export interface Ecosystem {
-    /*
-     * Init function, meant to be ran after creating an instance. Useful for
-     * async dependencies.
-     */
-    init(): Promise<void>;
+  /*
+   * Init function, meant to be ran after creating an instance. Useful for
+   * async dependencies.
+   */
+  init(): Promise<void>;
 
-    /* Fetches an article given it's name.
-    */
-    fetchArticle(name: string): Promise<Article>;
+  /* Fetches an article given it's name.
+   */
+  fetchArticle(name: string): Promise<Article>;
 
-    /*
-    * Creates empty article to repository. An article name must be unique.
-    */
-    createArticle(name: string): Promise<null>;
+  /*
+   * Creates empty article to repository. An article name must be unique.
+   */
+  createArticle(name: string): Promise<null>;
 
-    /*
-     * Edits an article by passing the delta/diff/patch as an argument.
-    */
-    editArticle(name: string, patch: Patch): Promise<null>;
+  /*
+   * Edits an article by passing the delta/diff/patch as an argument.
+   */
+  editArticle(name: string, patch: Patch): Promise<null>;
 
-    getArticleList(): Promise<string[]>;
+  getArticleList(): Promise<string[]>;
 }

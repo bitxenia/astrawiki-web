@@ -20,17 +20,17 @@ export default function Copy({ content }: { content: string }) {
 
   return (
     <Button variant="secondary" size="xs" onClick={handleCopy}>
-      <span className="relative inline-block w-4 h-4">
+      <span className="relative inline-block h-4 w-4">
         <LuCopy
           className={cn(
-            "absolute w-full h-full transition-opacity duration-300 transform",
-            isCopied ? "opacity-0 scale-90" : "opacity-100 scale-100"
+            "absolute h-full w-full transform transition-opacity duration-300",
+            isCopied ? "scale-90 opacity-0" : "scale-100 opacity-100",
           )}
         />
         <LuCheck
           className={cn(
-            "absolute w-full h-full transition-opacity duration-300 transform",
-            isCopied ? "opacity-100 scale-100" : "opacity-0 scale-90"
+            "absolute h-full w-full transform transition-opacity duration-300",
+            isCopied ? "scale-100 opacity-100" : "scale-90 opacity-0",
           )}
         />
       </span>
