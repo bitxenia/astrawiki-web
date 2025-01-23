@@ -55,9 +55,9 @@ import { Toaster } from "react-hot-toast";
 // };
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
   const [ecosystem, setEcosystem] = useState<Ecosystem | null>(null);
   const [isESLoading, setIsESLoading] = useState<boolean>(false);
