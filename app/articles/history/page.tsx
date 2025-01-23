@@ -40,11 +40,10 @@ export default function Pages() {
   if (patches.length === 0)
     return (
       <Loading
-        title="Loading edit history..."
+        title="Loading history..."
         desc={`Fetching ${pathName} edit list from ${esName}`}
       />
     );
-
   return (
     <div className="flex items-start gap-14">
       <ul>
@@ -58,10 +57,13 @@ export default function Pages() {
           .map((d: string, i: number) => (
             <li className="py-2" key={i}>
               <Link
-                href={`
-                  /articles?name=${pathName}&version=${(
-                    patches.length - i
-                  ).toString()}`}
+                href={{
+                  pathname: `/articles`,
+                  query: {
+                    name: pathName,
+                    version: (patches.length - i).toString(),
+                  },
+                }}
               >
                 {patches.length - i} - {d}
               </Link>

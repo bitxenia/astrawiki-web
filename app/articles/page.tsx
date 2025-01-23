@@ -42,19 +42,12 @@ export default function Pages() {
   ) as { ecosystem: Ecosystem; esName: string };
   const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   const searchParams = useSearchParams();
-
   const pathName = searchParams.get("name")!;
+
   const articleVersion = searchParams.has("version")
     ? +searchParams.get("version")!
     : undefined;
-
-  const paths: string[] = [pathName];
-
-  if (articleVersion) {
-    paths.push(articleVersion.toString());
-  }
 
   useEffect(() => {
     async function fetchDocument() {
@@ -81,7 +74,7 @@ export default function Pages() {
       setIsLoading(false);
     }
     fetchDocument();
-  }, [pathName, ecosystem, setArticle]);
+  }, [pathName, ecosystem, setArticle, searchParams]);
 
   if (error) notFound();
   else if (isLoading)
@@ -92,10 +85,18 @@ export default function Pages() {
       />
     );
 
+  const updatePath = () => {
+    const paths = [pathName];
+    if (articleVersion) {
+      paths.push(`Version ${articleVersion}`);
+    }
+    return paths;
+  };
+
   return (
     <div className="flex items-start gap-14">
       <div className="flex-[3] pt-10">
-        <PageBreadcrumb paths={paths} />
+        <PageBreadcrumb paths={updatePath()} />
         {parsedMarkdown && (
           <Typography>
             <h1 className="-mt-2 text-3xl">{pathName}</h1>

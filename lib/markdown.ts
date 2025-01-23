@@ -152,7 +152,7 @@ export async function getPatches(articleName: string, ecosystem: Ecosystem) {
   return article.patches;
 }
 
-export async function invalidateCache(articleName: string) {
+export async function invalidateCache(articleName?: string) {
   cache.invalidate(articleName);
 }
 

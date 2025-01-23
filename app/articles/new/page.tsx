@@ -68,20 +68,21 @@ export default function Pages() {
               onChange={(e) => setTitle(e.target.value)}
               value={title}
             />
-            <div className="markdown-editor flex flex-col gap-6">
+            <div className="markdown-editor flex flex-col">
               <textarea
                 className="h-40 w-full rounded-md border p-4"
                 placeholder="Write article here..."
                 value={markdown}
                 onChange={(e) => setMarkdown(e.target.value)}
               />
+              <text className="pb-2 pt-4 font-semibold">Preview</text>
               <div className="markdown-preview rounded-md border p-4">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {markdown}
                 </ReactMarkdown>
               </div>
             </div>
-            <div className="justify-right flex gap-2">
+            <div className="justify-right flex gap-2 pb-4">
               <button
                 className={buttonVariants({
                   variant: "default",

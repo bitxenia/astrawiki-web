@@ -7,8 +7,12 @@ export class MemoizedArticles {
     this.cache = new Map<string, Article>();
   }
 
-  invalidate(articleName: string) {
-    this.cache.delete(articleName);
+  invalidate(articleName?: string) {
+    if (articleName) {
+      this.cache.delete(articleName);
+    } else {
+      this.cache.clear();
+    }
   }
 
   async get(articleName: string, ecosystem: Ecosystem): Promise<Article> {
