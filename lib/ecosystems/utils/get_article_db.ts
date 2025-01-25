@@ -12,35 +12,42 @@ export const getArticleDb = async (orbitdb: OrbitDB) => {
   return db;
 };
 
+const ADDRESS_DEBUG = "";
+
 const connect_to_providers = async (helia: any) => {
-  const parts = DB_ADDRESS.split("/");
-  const cid = parts[2];
-  const cidObj = CID.parse(cid);
+    // import multiaddr
+    await helia.libp2p.dial(multiaddr(ADDRESS_DEBUG));
+}
 
-  // Iterate over the providers found for the given cid of the database address
-  for await (const provider of helia.libp2p.contentRouting.findProviders(
-    cidObj
-  )) {
-    console.log(`Found provider: ${provider.id}`);
-
-    // multiaddrs found
-    console.log("Multiaddrs:", provider.multiaddrs.toString());
-
-    // Connect to the provider
-    try {
-      await helia.libp2p.dial(provider.multiaddrs);
-    } catch (err) {
-      console.error(err);
-      continue;
-    }
-
-    // The provider is now connected
-    console.log("Connected to provider:", provider.id);
-
-    // Stop the iteration
-    break;
-  }
-};
+// const connect_to_providers = async (helia: any) => {
+//   const parts = DB_ADDRESS.split("/");
+//   const cid = parts[2];
+//   const cidObj = CID.parse(cid);
+//
+//   // Iterate over the providers found for the given cid of the database address
+//   for await (const provider of helia.libp2p.contentRouting.findProviders(
+//     cidObj
+//   )) {
+//     console.log(`Found provider: ${provider.id}`);
+//
+//     // multiaddrs found
+//     console.log("Multiaddrs:", provider.multiaddrs.toString());
+//
+//     // Connect to the provider
+//     try {
+//       await helia.libp2p.dial(provider.multiaddrs);
+//     } catch (err) {
+//       console.error(err);
+//       continue;
+//     }
+//
+//     // The provider is now connected
+//     console.log("Connected to provider:", provider.id);
+//
+//     // Stop the iteration
+//     break;
+//   }
+// };
 
 const waitFor = async (valueA: any, toBeValueB: any, pollInterval = 100) => {
   return new Promise<void>((resolve) => {
