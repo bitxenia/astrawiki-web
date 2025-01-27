@@ -34,7 +34,7 @@ export const Libp2pOptions = {
   connectionEncrypters: [noise()],
   streamMuxers: [yamux()],
   connectionGater: {
-    denyDialMultiaddr: () => false
+    denyDialMultiaddr: () => false,
   },
   peerDiscovery: [
     pubsubPeerDiscovery({
@@ -68,7 +68,7 @@ export const Libp2pOptions = {
     delegatedRouting: () =>
       createDelegatedRoutingV1HttpApiClient(
         "https://delegated-ipfs.dev",
-        delegatedHTTPRoutingDefaults()
+        delegatedHTTPRoutingDefaults(),
       ),
     dht: kadDHT({
       // https://github.com/libp2p/js-libp2p/tree/main/packages/kad-dht#example---connecting-to-the-ipfs-amino-dht

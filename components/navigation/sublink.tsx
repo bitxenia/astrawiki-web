@@ -9,23 +9,32 @@ import { cn } from "@/lib/utils";
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger
+  CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { SheetClose } from "@/components/ui/sheet";
 
 import Anchor from "@/components/navigation/anchor";
 import { Button } from "@/components/ui/button";
 
-function isRoute(item: Paths): item is Extract<Paths, { title: string; href: string }> {
+function isRoute(
+  item: Paths,
+): item is Extract<Paths, { title: string; href: string }> {
   return "title" in item && "href" in item;
 }
 
-export default function SubLink(props: Paths & { level: number; isSheet: boolean }) {
+export default function SubLink(
+  props: Paths & { level: number; isSheet: boolean },
+) {
   const path = usePathname();
   const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
-    if (isRoute(props) && props.href && path !== props.href && path.includes(props.href)) {
+    if (
+      isRoute(props) &&
+      props.href &&
+      path !== props.href &&
+      path.includes(props.href)
+    ) {
       setIsOpen(true);
     }
   }, [path, props]);
@@ -43,7 +52,11 @@ export default function SubLink(props: Paths & { level: number; isSheet: boolean
   );
 
   const titleOrLink = !noLink ? (
-    isSheet ? <SheetClose asChild>{Comp}</SheetClose> : Comp
+    isSheet ? (
+      <SheetClose asChild>{Comp}</SheetClose>
+    ) : (
+      Comp
+    )
   ) : (
     <h2 className="font-medium text-primary sm:text-sm">{title}</h2>
   );
@@ -53,16 +66,12 @@ export default function SubLink(props: Paths & { level: number; isSheet: boolean
   }
 
   return (
-    <div className="flex flex-col w-full gap-1">
+    <div className="flex w-full flex-col gap-1">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <div className="flex items-center gap-2 text-sm mr-3">
+        <div className="mr-3 flex items-center gap-2 text-sm">
           {titleOrLink}
           <CollapsibleTrigger asChild>
-            <Button
-              className="ml-auto h-6 w-6"
-              variant="link"
-              size="icon"
-            >
+            <Button className="ml-auto h-6 w-6" variant="link" size="icon">
               {!isOpen ? (
                 <LuChevronRight className="h-[0.9rem] w-[0.9rem]" />
               ) : (
@@ -75,8 +84,8 @@ export default function SubLink(props: Paths & { level: number; isSheet: boolean
         <CollapsibleContent className="CollapsibleContent">
           <div
             className={cn(
-              "mt-2.5 flex flex-col items-start gap-3 pl-4 text-sm border-l text-neutral-800 dark:text-neutral-300/85",
-              level > 0 && "ml-1 pl-4 border-l"
+              "mt-2.5 flex flex-col items-start gap-3 border-l pl-4 text-sm text-neutral-800 dark:text-neutral-300/85",
+              level > 0 && "ml-1 border-l pl-4",
             )}
           >
             {items?.map((innerLink) => {

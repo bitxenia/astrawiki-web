@@ -15,20 +15,22 @@ export default function PageBreadcrumb({ paths }: { paths: string[] }) {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink>Docs</BreadcrumbLink>
+            <BreadcrumbLink href="/">Articles</BreadcrumbLink>
           </BreadcrumbItem>
 
           {paths.map((path, index) => {
-            const href = `/docs/${paths.slice(0, index + 1).join("/")}`;
+            const href = `/articles?name=${paths
+              .slice(0, index + 1)
+              .join("/")}`;
 
             return (
               <Fragment key={path}>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   {index < paths.length - 1 ? (
-                      <BreadcrumbLink href={href} className="a">
-                        {toTitleCase(path)}
-                      </BreadcrumbLink>
+                    <BreadcrumbLink href={href} className="a">
+                      {toTitleCase(path)}
+                    </BreadcrumbLink>
                   ) : (
                     <BreadcrumbPage className="b">
                       {toTitleCase(path)}
@@ -47,7 +49,7 @@ export default function PageBreadcrumb({ paths }: { paths: string[] }) {
 function toTitleCase(input: string): string {
   const words = input.split("-");
   const capitalizedWords = words.map(
-    (word) => word.charAt(0).toUpperCase() + word.slice(1)
+    (word) => word.charAt(0).toUpperCase() + word.slice(1),
   );
   return capitalizedWords.join(" ");
 }

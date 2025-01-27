@@ -35,12 +35,12 @@ export const Documents: Paths[] = [
       {
         title: "Deeper",
         href: "/deeper",
-        items : [
+        items: [
           {
             title: "Even deeper",
             href: "/even-deeper",
           },
-        ]
+        ],
       },
     ],
   },
