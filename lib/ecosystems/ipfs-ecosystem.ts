@@ -2,28 +2,25 @@ import { Article, Ecosystem, Patch } from "./ecosystem";
 import { startOrbitDB } from "./utils/start_orbitdb";
 import { getArticleDb } from "./utils/get_article_db";
 import { getArticleContent } from "./utils/get_article_content";
-import { type OrbitDB, IPFSAccessController } from "@orbitdb/core";
+import { OrbitDB } from "@orbitdb/core";
+import { IPFSAccessController } from "@orbitdb/core";
 
 class IPFSEcosystem implements Ecosystem {
+  getArticleList(): Promise<string[]> {
+    return Promise.resolve([]);
+  }
   orbitdb: OrbitDB;
   articleDb: any;
-  initialized: boolean | undefined;
 
   // TODO: This should be called in the constructor, But we need to
   //       figure out how to handle async constructors.
   //       This also has a race condition. We should fix this.
-  private async init() {
-    if (this.initialized) {
-      return;
-    }
-    this.initialized = true;
+  async init() {
     this.orbitdb = await startOrbitDB();
     this.articleDb = await getArticleDb(this.orbitdb);
   }
 
   async fetchArticle(name: string): Promise<Article> {
-    await this.init();
-
     // TODO: Implement a better protocol.
     // Article protocol:
     // <article-name>::<orbitdb_article_address>
@@ -50,8 +47,6 @@ class IPFSEcosystem implements Ecosystem {
   }
 
   async createArticle(name: string): Promise<null> {
-    await this.init();
-
     // TODO: Check if article already exists
 
     // TODO: The new database needs to stay accessible for the collaborators to replicate it.
@@ -70,8 +65,6 @@ class IPFSEcosystem implements Ecosystem {
   }
 
   async editArticle(name: string, patch: Patch): Promise<null> {
-    await this.init();
-
     // TODO: We assume that the providers are already connected. We should add a check for this.
     console.log(`Editing article ${name}`);
     let articleDb = await this.orbitdb.open(name);

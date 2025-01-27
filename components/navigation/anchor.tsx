@@ -31,7 +31,7 @@ export default function Anchor({
     return (
       <div className={cn(className, "cursor-not-allowed")}>{children}</div>
     );
-  
+
   return (
     <Link className={cn(className, isMatch && activeClassName)} {...props}>
       {children}

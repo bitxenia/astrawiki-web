@@ -1,4 +1,6 @@
 import { type OrbitDB } from "@orbitdb/core";
+import { HeliaLibp2p } from "helia";
+import { multiaddr } from "@multiformats/multiaddr";
 import { CID } from "multiformats/cid";
 
 // This address corresponds to the name 'bitxenia-wiki'.
@@ -12,35 +14,44 @@ export const getArticleDb = async (orbitdb: OrbitDB) => {
   return db;
 };
 
-const connect_to_providers = async (helia: any) => {
-  const parts = DB_ADDRESS.split("/");
-  const cid = parts[2];
-  const cidObj = CID.parse(cid);
+// TODO: Move this constant to a .env
+const DB_ADDRESS_DEBUG = "";
 
-  // Iterate over the providers found for the given cid of the database address
-  for await (const provider of helia.libp2p.contentRouting.findProviders(
-    cidObj
-  )) {
-    console.log(`Found provider: ${provider.id}`);
-
-    // multiaddrs found
-    console.log("Multiaddrs:", provider.multiaddrs.toString());
-
-    // Connect to the provider
-    try {
-      await helia.libp2p.dial(provider.multiaddrs);
-    } catch (err) {
-      console.error(err);
-      continue;
-    }
-
-    // The provider is now connected
-    console.log("Connected to provider:", provider.id);
-
-    // Stop the iteration
-    break;
-  }
+const connect_to_providers = async (helia: HeliaLibp2p) => {
+  await helia.libp2p
+    .dial(multiaddr(DB_ADDRESS_DEBUG))
+    .catch(() => console.log(`Cannot dial "${DB_ADDRESS_DEBUG}"`));
 };
+
+//const connect_to_providers = async (helia: any) => {
+//  const parts = DB_ADDRESS.split("/");
+//  const cid = parts[2];
+//  const cidObj = CID.parse(cid);
+//
+//  // Iterate over the providers found for the given cid of the database address
+//  for await (const provider of helia.libp2p.contentRouting.findProviders(
+//    cidObj
+//  )) {
+//    console.log(`Found provider: ${provider.id}`);
+//
+//    // multiaddrs found
+//    console.log("Multiaddrs:", provider.multiaddrs.toString());
+//
+//    // Connect to the provider
+//    try {
+//      await helia.libp2p.dial(provider.multiaddrs);
+//    } catch (err) {
+//      console.error(err);
+//      continue;
+//    }
+//
+//    // The provider is now connected
+//    console.log("Connected to provider:", provider.id);
+//
+//    // Stop the iteration
+//    break;
+//  }
+//};
 
 const waitFor = async (valueA: any, toBeValueB: any, pollInterval = 100) => {
   return new Promise<void>((resolve) => {
@@ -67,7 +78,7 @@ const replicate_database = async (orbitdb: OrbitDB) => {
 
   await waitFor(
     () => replicated,
-    () => true
+    () => true,
   );
   console.log("Database replicated");
 

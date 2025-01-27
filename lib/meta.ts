@@ -1,8 +1,23 @@
 import { OpenGraph, TwitterCard } from "@/lib/metadata";
-import { 
-  gtm, gtmconnected, url, sitename, description, keywords, siteicon, urlimage, imagealt, 
-  twitterhandle, companyname, companylink, branding, rightsidebar, feedbackedit, 
-  tableofcontent, totopscroll, loadfromgithub 
+import {
+  gtm,
+  gtmconnected,
+  url,
+  sitename,
+  description,
+  keywords,
+  siteicon,
+  urlimage,
+  imagealt,
+  twitterhandle,
+  companyname,
+  companylink,
+  branding,
+  rightsidebar,
+  feedbackedit,
+  tableofcontent,
+  totopscroll,
+  loadfromgithub,
 } from "@/settings/settings";
 
 export const Company = {
