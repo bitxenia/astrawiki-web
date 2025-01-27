@@ -3,7 +3,7 @@ import { Patch } from "../ecosystem";
 
 export const getArticleContent = async (
   orbitdb: OrbitDB,
-  articleAddress: string
+  articleAddress: string,
 ) => {
   // TODO: We assume that the providers are already connected. We should add a check for this.
   let db = await orbitdb.open(articleAddress);

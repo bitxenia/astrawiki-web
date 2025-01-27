@@ -7,135 +7,166 @@ import rehypePrism from "rehype-prism-plus";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeSlug from "rehype-slug";
 import rehypeCodeTitles from "rehype-code-titles";
-import rehypeKatex from 'rehype-katex'
+import rehypeKatex from "rehype-katex";
 import { visit } from "unist-util-visit";
 
 import { PageRoutes } from "@/lib/pageroutes";
-import { components } from '@/lib/components';
+import { components } from "@/lib/components";
 import { Settings } from "@/lib/meta";
 import { GitHubLink } from "@/settings/navigation";
-import { Ecosystem } from "./ecosystems/ecosystem";
+import { Article, Ecosystem } from "./ecosystems/ecosystem";
 import { getTextFromPatches } from "./diff";
 import { ReactElement } from "react";
+import { MemoizedArticles } from "./memoizedarticles";
 
 async function parseMdx<Frontmatter>(rawMdx: string) {
-    return await compileMDX<Frontmatter>({
-        source: rawMdx,
-        options: {
-            parseFrontmatter: true,
-            mdxOptions: {
-                rehypePlugins: [
-                    preCopy,
-                    rehypeCodeTitles,
-                    rehypeKatex,
-                    rehypePrism,
-                    rehypeSlug,
-                    rehypeAutolinkHeadings,
-                    postCopy,
-                ],
-                remarkPlugins: [remarkGfm],
-            },
-        },
-        components,
-    });
+  return await compileMDX<Frontmatter>({
+    source: rawMdx,
+    options: {
+      parseFrontmatter: true,
+      mdxOptions: {
+        rehypePlugins: [
+          preCopy,
+          rehypeCodeTitles,
+          rehypeKatex,
+          rehypePrism,
+          rehypeSlug,
+          rehypeAutolinkHeadings,
+          postCopy,
+        ],
+        remarkPlugins: [remarkGfm],
+      },
+    },
+    components,
+  });
 }
 
 type BaseMdxFrontmatter = {
-    title: string;
-    description: string;
-    keywords: string;
+  title: string;
+  description: string;
+  keywords: string;
 };
 
 const computeDocumentPath = (slug: string) => {
-    return Settings.gitload
-        ? `${GitHubLink.href}/raw/main/contents/docs/${slug}/index.mdx`
-        : path.join(process.cwd(), "/contents/docs/", `${slug}/index.mdx`);
+  return Settings.gitload
+    ? `${GitHubLink.href}/raw/main/contents/docs/${slug}/index.mdx`
+    : path.join(process.cwd(), "/contents/docs/", `${slug}/index.mdx`);
 };
 
 const getDocumentPathMemoized = (() => {
-    const cache = new Map<string, string>();
-    return (slug: string) => {
-        if (!cache.has(slug)) {
-            cache.set(slug, computeDocumentPath(slug));
-        }
-        return cache.get(slug)!;
-    };
+  const cache = new Map<string, string>();
+  return (slug: string) => {
+    if (!cache.has(slug)) {
+      cache.set(slug, computeDocumentPath(slug));
+    }
+    return cache.get(slug)!;
+  };
 })();
 
 /**
+ * Initializes the cache
+ */
+const cache = new MemoizedArticles();
+
+/**
  * Fetches article from the given ecosystem and builds from patches.
- * @param name Name of the article, case sensitive.
+ * @param articleName Name of the article, case sensitive.
  * @param ecosystem Ecosystem to fetch the article from.
+ * @param articleVersion Version to build article from. Latest if null.
  * @returns article as raw markdown (without frontmatter).
  */
-export async function getRawArticle(name: string, ecosystem: Ecosystem): Promise<string> {
-        const article = await ecosystem.fetchArticle(name);
-        return getTextFromPatches(article.patches);
+export async function getRawArticle(
+  articleName: string,
+  ecosystem: Ecosystem,
+  articleVersion?: number,
+): Promise<string> {
+  const article = await cache.get(articleName, ecosystem);
+
+  if (articleVersion === undefined || articleVersion > article.patches.length) {
+    return getTextFromPatches(article.patches);
+  }
+
+  return getTextFromPatches(article.patches.slice(0, articleVersion));
 }
 
-// 
+//
 /**
  * Parses article into MDX.
  * @param title Title of the article.
  * @param rawMd raw markdown (without frontmatter).
  * @returns parsed markdown.
  */
-export async function parseMarkdown(title: string, rawMd: string): Promise<ReactElement<any, any>> {
-        const rawFrontmatter = `---\ntitle: ${title}\n---\n`;
-        const parsedMdx = await parseMdx<BaseMdxFrontmatter>(rawFrontmatter.concat(rawMd));
-        // const tocs = await getTable(slug);
-        return parsedMdx.content;
+export async function parseMarkdown(
+  title: string,
+  rawMd: string,
+): Promise<ReactElement<any, any>> {
+  const rawFrontmatter = `---\ntitle: ${title}\n---\n`;
+  const parsedMdx = await parseMdx<BaseMdxFrontmatter>(
+    rawFrontmatter.concat(rawMd),
+  );
+  // const tocs = await getTable(slug);
+  return parsedMdx.content;
 }
 
 export async function getDocument(slug: string, ecosystem: Ecosystem) {
-    try {
-        // const contentPath = getDocumentPathMemoized(slug);
-        // let rawMdx = "";
-        // let lastUpdated: string | null = null;
-        //
-        // if (Settings.gitload) {
-        //     const response = await fetch(contentPath);
-        //     if (!response.ok) {
-        //         throw new Error(`Failed to fetch content from GitHub: ${response.statusText}`);
-        //     }
-        //     rawMdx = await response.text();
-        //     lastUpdated = response.headers.get('Last-Modified') ?? null;
-        // } else {
-        //     rawMdx = await fs.readFile(contentPath, "utf-8");
-        //     const stats = await fs.stat(contentPath);
-        //     lastUpdated = stats.mtime.toISOString();
-        // }
-        const article = await ecosystem.fetchArticle(slug);
-        const frontmatter = `---\ntitle: ${slug}\n---\n`;
-        const rawMdx = frontmatter.concat(getTextFromPatches(article.patches));
+  try {
+    // const contentPath = getDocumentPathMemoized(slug);
+    // let rawMdx = "";
+    // let lastUpdated: string | null = null;
+    //
+    // if (Settings.gitload) {
+    //     const response = await fetch(contentPath);
+    //     if (!response.ok) {
+    //         throw new Error(`Failed to fetch content from GitHub: ${response.statusText}`);
+    //     }
+    //     rawMdx = await response.text();
+    //     lastUpdated = response.headers.get('Last-Modified') ?? null;
+    // } else {
+    //     rawMdx = await fs.readFile(contentPath, "utf-8");
+    //     const stats = await fs.stat(contentPath);
+    //     lastUpdated = stats.mtime.toISOString();
+    // }
+    const article = await ecosystem.fetchArticle(slug);
+    const frontmatter = `---\ntitle: ${slug}\n---\n`;
+    const rawMdx = frontmatter.concat(getTextFromPatches(article.patches));
 
-        const parsedMdx = await parseMdx<BaseMdxFrontmatter>(rawMdx);
-        // const tocs = await getTable(slug);
-        const tocs: any[] = [];
+    const parsedMdx = await parseMdx<BaseMdxFrontmatter>(rawMdx);
+    // const tocs = await getTable(slug);
+    const tocs: any[] = [];
 
-        return {
-            frontmatter: parsedMdx.frontmatter,
-            content: parsedMdx.content,
-            tocs,
-            lastUpdated: null,
-        };
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
+    return {
+      frontmatter: parsedMdx.frontmatter,
+      content: parsedMdx.content,
+      tocs,
+      lastUpdated: null,
+    };
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
 }
 
-// export async function getRawDocument(slug: string) {
-//     try {
-//         const contentPath = getDocumentPathMemoized(slug);
-//         const rawMdx = await fs.readFile(contentPath, "utf-8");
-//
-//         return rawMdx;
-//     } catch (err) {
-//         console.error(err);
-//         return null;
-//     }
-// }
+export async function getPatches(articleName: string, ecosystem: Ecosystem) {
+  const article = await cache.get(articleName, ecosystem);
+
+  return article.patches;
+}
+
+export async function invalidateCache(articleName?: string) {
+  cache.invalidate(articleName);
+}
+
+export async function getRawDocument(slug: string, ecosystem: Ecosystem) {
+  try {
+    // const contentPath = getDocumentPathMemoized(slug);
+    const rawMdx = await ecosystem.fetchArticle(slug);
+
+    return rawMdx;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
 
 // const headingsRegex = /^(#{2,4})\s(.+)$/gm;
 
@@ -186,36 +217,38 @@ export async function getDocument(slug: string, ecosystem: Ecosystem) {
 //     return text.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 // }
 
-const pathIndexMap = new Map(PageRoutes.map((route, index) => [route.href, index]));
+const pathIndexMap = new Map(
+  PageRoutes.map((route, index) => [route.href, index]),
+);
 
 export function getPreviousNext(path: string) {
-    const index = pathIndexMap.get(`/${path}`);
+  const index = pathIndexMap.get(`/${path}`);
 
-    if (index === undefined || index === -1) {
-        return { prev: null, next: null };
-    }
+  if (index === undefined || index === -1) {
+    return { prev: null, next: null };
+  }
 
-    const prev = index > 0 ? PageRoutes[index - 1] : null;
-    const next = index < PageRoutes.length - 1 ? PageRoutes[index + 1] : null;
+  const prev = index > 0 ? PageRoutes[index - 1] : null;
+  const next = index < PageRoutes.length - 1 ? PageRoutes[index + 1] : null;
 
-    return { prev, next };
+  return { prev, next };
 }
 
 const preCopy = () => (tree: any) => {
-    visit(tree, "element", (node) => {
-        if (node.tagName === "pre") {
-            const [codeEl] = node.children;
-            if (codeEl?.tagName === "code") {
-                node.raw = codeEl.children?.[0]?.value || "";
-            }
-        }
-    });
+  visit(tree, "element", (node) => {
+    if (node.tagName === "pre") {
+      const [codeEl] = node.children;
+      if (codeEl?.tagName === "code") {
+        node.raw = codeEl.children?.[0]?.value || "";
+      }
+    }
+  });
 };
 
 const postCopy = () => (tree: any) => {
-    visit(tree, "element", (node) => {
-        if (node.tagName === "pre" && node.raw) {
-            node.properties["raw"] = node.raw;
-        }
-    });
+  visit(tree, "element", (node) => {
+    if (node.tagName === "pre" && node.raw) {
+      node.properties["raw"] = node.raw;
+    }
+  });
 };

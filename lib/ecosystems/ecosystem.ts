@@ -1,27 +1,35 @@
 import { patch_obj } from "diff-match-patch";
 
 export type Patch = {
-    date: string;
-    patch: (new () => patch_obj)[];
+  date: string;
+  patch: (new () => patch_obj)[];
 };
 
 export type Article = {
-    name: string;
-    patches: Patch[];
-}
+  name: string;
+  patches: Patch[];
+};
 
 export interface Ecosystem {
-    /* Fetches an article given it's name.
-    */
-    fetchArticle(name: string): Promise<Article>;
+  /*
+   * Init function, meant to be ran after creating an instance. Useful for
+   * async dependencies.
+   */
+  init(): Promise<void>;
 
-    /*
-     * Creates empty article to repository. An article name must be unique.
-    */
-    createArticle(name: string): Promise<null>;
+  /* Fetches an article given it's name.
+   */
+  fetchArticle(name: string): Promise<Article>;
 
-    /*
-     * Edits an article by passing the delta/diff/patch as an argument.
-    */
-    editArticle(name: string, patch: Patch): Promise<null>;
+  /*
+   * Creates empty article to repository. An article name must be unique.
+   */
+  createArticle(name: string): Promise<null>;
+
+  /*
+   * Edits an article by passing the delta/diff/patch as an argument.
+   */
+  editArticle(name: string, patch: Patch): Promise<null>;
+
+  getArticleList(): Promise<string[]>;
 }
