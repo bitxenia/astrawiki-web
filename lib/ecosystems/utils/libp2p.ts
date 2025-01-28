@@ -39,10 +39,7 @@ export const Libp2pOptions = {
   peerDiscovery: [
     pubsubPeerDiscovery({
       interval: 1000,
-      topics: [
-        "bitxenia._peer-discovery._p2p._pubsub",
-        "_peer-discovery._p2p._pubsub",
-      ],
+      topics: ["bitxenia._peer-discovery._p2p._pubsub"],
       listenOnly: false,
     }),
     bootstrap({
@@ -74,7 +71,6 @@ export const Libp2pOptions = {
       // https://github.com/libp2p/js-libp2p/tree/main/packages/kad-dht#example---connecting-to-the-ipfs-amino-dht
       protocol: "/ipfs/kad/1.0.0",
       peerInfoMapper: removePrivateAddressesMapper,
-      // clientMode: true,
       validators: {
         ipns: ipnsValidator,
       },
