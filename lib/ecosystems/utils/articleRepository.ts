@@ -1,8 +1,15 @@
-import { type OrbitDB, IPFSAccessController } from "@orbitdb/core";
+import {
+  type OrbitDB,
+  ComposedStorage,
+  IPFSAccessController,
+  IPFSBlockStorage,
+  LRUStorage,
+} from "@orbitdb/core";
 import { HeliaLibp2p } from "helia";
 import { multiaddr } from "@multiformats/multiaddr";
 import { CID } from "multiformats/cid";
 import { IPFSArticle } from "./ipfsArticle";
+import { LevelBlockstore } from "blockstore-level";
 
 // This address corresponds to the name 'bitxenia-wiki'.
 // TODO: Move this to a better place? JP
@@ -12,10 +19,12 @@ export class ArticleRepository {
   orbitdb: OrbitDB;
   articleRepositoryDB: any;
   initialized: boolean | undefined;
+  articleAddressByName: Map<string, string>;
 
   constructor(orbitdb: OrbitDB) {
     this.orbitdb = orbitdb;
     this.initialized = false;
+    this.articleAddressByName = new Map();
   }
 
   public async init() {
@@ -24,6 +33,10 @@ export class ArticleRepository {
     }
     this.initialized = true;
     this.articleRepositoryDB = await this.openArticleRepositoryDB();
+    for await (const record of this.articleRepositoryDB.iterator()) {
+      let [articleName, articleAddress] = record.value.split("::");
+      this.articleAddressByName.set(articleName, articleAddress);
+    }
   }
 
   public async getArticle(name: string): Promise<IPFSArticle> {
@@ -32,54 +45,44 @@ export class ArticleRepository {
     // Article protocol:
     // <article-name>::<orbitdb_article_address>
     // TODO: Implement a better protocol.
-    for await (const record of this.articleRepositoryDB.iterator()) {
-      let [articleName, articleAddress] = record.value.split("::");
-      if (articleName === name) {
-        const ipfsArticle = new IPFSArticle(name, this.orbitdb);
-        await ipfsArticle.init(articleAddress);
-
-        return ipfsArticle;
-      }
+    const articleAddress = this.articleAddressByName.get(name);
+    if (!articleAddress) {
+      throw Error(`Article ${name} not found`);
     }
-    console.log(`Article ${name} not found`);
-    // TODO: Handle the case where the article is not found
-    throw Error("Article not found");
+    const ipfsArticle = new IPFSArticle(name, this.orbitdb);
+    await ipfsArticle.init(articleAddress);
+
+    return ipfsArticle;
   }
 
   public async newArticle(name: string) {
     // Check if the article already exists
-    for await (const record of this.articleRepositoryDB.iterator()) {
-      let [articleName, _] = record.value.split("::");
-      if (articleName === name) {
-        console.log(`Article ${name} already exists`);
-        // TODO: Handle the case where the article already exists, throw an error?
-        return;
-      }
+    if (this.articleAddressByName.has(name)) {
+      throw Error(`Article ${name} already exists`);
     }
     // Create the article database
 
     // TODO: The new database needs to stay accessible for the collaborators to replicate it.
     //       See how to achieve this or change the responsibility of creating the database to
     //       the collaborators nodes.
-    const newArticleDb = await this.orbitdb.open(name, {
-      AccessController: IPFSAccessController({ write: ["*"] }),
-    });
 
-    let articleContentAddress = newArticleDb.address.toString();
-    await this.articleRepositoryDB.articledb.add(
-      name + "::" + articleContentAddress,
+    // TODO: We use the default storage, found in:
+    // https://github.com/orbitdb/orbitdb/blob/d290032ebf1692feee1985853b2c54d376bbfc82/src/access-controllers/ipfs.js#L56
+    const storage = await ComposedStorage(
+      await LRUStorage({ size: 1000 }),
+      await IPFSBlockStorage({ ipfs: this.orbitdb.ipfs, pin: true }),
     );
-    console.log(`Article ${name} added to the repository`);
+
+    const newArticleDb = await this.orbitdb.open(name, {
+      AccessController: IPFSAccessController({
+        write: ["*"],
+        storage,
+      }),
+    });
   }
 
   public async getArticleList(): Promise<string[]> {
-    let articleList: string[] = [];
-    for await (const record of this.articleRepositoryDB.iterator()) {
-      let [articleName, _] = record.value.split("::");
-      articleList.push(articleName);
-    }
-
-    return articleList;
+    return this.articleAddressByName.keys().toArray();
   }
 
   private async openArticleRepositoryDB() {
@@ -91,6 +94,11 @@ export class ArticleRepository {
     console.log("Attempting to open article repository database...");
     const db = await this.orbitdb.open(DB_ADDRESS);
     console.log("Database opened & replicated");
+
+    db.events.on("update", async (entry: any) => {
+      let [articleName, articleAddress] = entry.payload.value.split("::");
+      this.articleAddressByName.set(articleName, articleAddress);
+    });
 
     return db;
   }

@@ -1,14 +1,14 @@
-import { type OrbitDB } from "@orbitdb/core";
+//import { type OrbitDB } from "@orbitdb/core";
 import { Patch } from "../ecosystem";
 
 export class IPFSArticle {
-  orbitdb: OrbitDB;
+  orbitdb: any;
   name: string;
   patches: Patch[];
   articleDB: any;
   initialized: boolean | undefined;
 
-  constructor(name: string, orbitdb: OrbitDB) {
+  constructor(name: string, orbitdb: any) {
     this.orbitdb = orbitdb;
     this.name = name;
     this.patches = [];
@@ -20,6 +20,7 @@ export class IPFSArticle {
       return;
     }
     // TODO: We assume that the providers are already connected. We should add a check for this.
+    console.log("Holaaaaaaa");
     this.articleDB = await this.orbitdb.open(articleAddress);
 
     // TODO: Wait for replication to finish?
@@ -28,6 +29,7 @@ export class IPFSArticle {
     let patches: Patch[] = [];
     for await (const record of this.articleDB.iterator()) {
       let patch = JSON.parse(record.value);
+      // TODO: Insert at start to avoid reverse in fetch (double-linked list?)
       patches.push(patch);
     }
     this.patches = patches;

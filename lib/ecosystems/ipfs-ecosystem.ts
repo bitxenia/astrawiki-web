@@ -4,7 +4,7 @@ import { ArticleRepository } from "./utils/articleRepository";
 import { OrbitDB } from "@orbitdb/core";
 
 class IPFSEcosystem implements Ecosystem {
-  orbitdb: OrbitDB;
+  orbitdb!: OrbitDB;
   articleRepository!: ArticleRepository;
 
   async init() {
@@ -21,8 +21,9 @@ class IPFSEcosystem implements Ecosystem {
     // TODO: Find a better way to not break encapsulation.
     let article: Article = {
       name: ipfsArticle.name,
-      patches: ipfsArticle.patches,
+      patches: ipfsArticle.patches.reverse(),
     };
+    console.log("Article: ", article);
 
     return article;
   }
