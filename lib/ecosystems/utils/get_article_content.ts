@@ -13,7 +13,7 @@ export const getArticleContent = async (
   // TODO: We should store the patches in a more efficient way.
   let patches: Patch[] = [];
   for await (const record of db.iterator()) {
-    let patch = JSON.parse(record.payload.value);
+    let patch = JSON.parse(record.value);
     patches.push(patch);
   }
   return patches;

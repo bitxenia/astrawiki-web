@@ -34,10 +34,12 @@ export class ArticleDB {
 
   private async connectToProviders(helia: HeliaLibp2p) {
     // TODO: Move this constant to .env
-    const PEER_ADDRESS_DEBUG = "";
-    helia.libp2p
+    const PEER_ADDRESS_DEBUG =
+      "/ip4/127.0.0.1/tcp/4002/ws/p2p/12D3KooWNyfnTkjW8CmEehXYm4HXpg3RAfzgG1KtCWNA1Fn8SAmR";
+    await helia.libp2p
       .dial(multiaddr(PEER_ADDRESS_DEBUG))
       .catch(() => console.log(`Cannot dial "${PEER_ADDRESS_DEBUG}"`));
+    console.log("Successfully dialed peer address");
   }
 
   //private async connectToProviders(helia: any) {
@@ -108,6 +110,7 @@ export class ArticleDB {
     console.log("Attempting to open articles database...");
     const db = await orbitdb.open(DB_ADDRESS);
     console.log("Database opened");
+    console.log("Database content: ", await db.all());
 
     let replicated = false;
 
@@ -116,10 +119,10 @@ export class ArticleDB {
     };
     db.events.on("join", onJoin);
 
-    await this.waitFor(
-      () => replicated,
-      () => true,
-    );
+    //await this.waitFor(
+    //  () => replicated,
+    //  () => true,
+    //);
     console.log("Database replicated");
 
     return db;

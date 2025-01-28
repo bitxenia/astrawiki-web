@@ -10,15 +10,15 @@ class IPFSEcosystem implements Ecosystem {
     return Promise.resolve([]);
   }
   orbitdb: OrbitDB;
-  articleDb: any;
+  articleRepository: any;
 
   // TODO: This should be called in the constructor, But we need to
   //       figure out how to handle async constructors.
   //       This also has a race condition. We should fix this.
   async init() {
     this.orbitdb = await startOrbitDB();
-    this.articledb = new ArticleDB(this.orbitdb);
-    this.articledb = await this.articledb.init();
+    this.articleRepository = new ArticleDB(this.orbitdb);
+    await this.articleRepository.init();
   }
 
   async fetchArticle(name: string): Promise<Article> {
@@ -26,8 +26,9 @@ class IPFSEcosystem implements Ecosystem {
     // Article protocol:
     // <article-name>::<orbitdb_article_address>
     console.log(`Fetching article ${name}`);
-    for await (const record of this.articledb.iterator()) {
-      let { articleName, articleAddress } = record.payload.value.split("::");
+    for await (const record of this.articleRepository.articledb.iterator()) {
+      console.log("Record: ", record);
+      let [articleName, articleAddress] = record.value.split("::");
       if (articleName === name) {
         let patches = await getArticleContent(this.orbitdb, articleAddress);
         console.log(`Article ${name} fetched`);
@@ -36,15 +37,16 @@ class IPFSEcosystem implements Ecosystem {
           name: articleName,
           patches: patches,
         };
+        console.log("Article fetched: ", article);
         return article;
       }
     }
     console.log(`Article ${name} not found`);
-    let articulo: Article = {
+    let article: Article = {
       name: "",
       patches: [],
     };
-    return articulo;
+    return article;
   }
 
   async createArticle(name: string): Promise<null> {
@@ -59,7 +61,9 @@ class IPFSEcosystem implements Ecosystem {
     });
 
     let articleContentAddress = newArticleContentDb.address.toString();
-    await this.articledb.add(name + "::" + articleContentAddress);
+    await this.articleRepository.articledb.add(
+      name + "::" + articleContentAddress,
+    );
     console.log(`Article ${name} created`);
 
     return null;
@@ -68,13 +72,25 @@ class IPFSEcosystem implements Ecosystem {
   async editArticle(name: string, patch: Patch): Promise<null> {
     // TODO: We assume that the providers are already connected. We should add a check for this.
     console.log(`Editing article ${name}`);
-    let articleDb = await this.orbitdb.open(name);
-    console.log(`Article content retrieved for ${name}`);
+    let address = "";
+    for await (const record of this.articleRepository.articledb.iterator()) {
+      let [articleName, articleAddress] = record.value.split("::");
+      if (articleName === name) {
+        address = articleAddress;
+        break;
+      }
+    }
+    if (!address) {
+      throw Error("Article not found");
+    }
+    const articleDb = await this.orbitdb.open(address);
+    console.log(`Article content retrieved for ${name}: ${articleDb.address}`);
 
     // TODO: Wait to replicate?
     // TODO: We should store the patches in a more efficient way.
     await articleDb.add(JSON.stringify(patch));
     console.log(`Patch added to article ${name}`);
+    console.log("Article content: ", await articleDb.all());
 
     return null;
   }
