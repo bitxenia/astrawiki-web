@@ -1,5 +1,5 @@
 import { Article, Ecosystem, Patch } from "./ecosystem";
-import { startOrbitDB } from "./utils/start_orbitdb";
+import { startOrbitDB } from "./utils/startOrbitdb";
 import { ArticleRepository } from "./utils/articleRepository";
 import { OrbitDB } from "@orbitdb/core";
 

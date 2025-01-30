@@ -65,6 +65,9 @@ export class ArticleRepository {
     // TODO: The new database needs to stay accessible for the collaborators to replicate it.
     //       See how to achieve this or change the responsibility of creating the database to
     //       the collaborators nodes.
+    //       Every change is made without confirmation that it was replicated to the collaborators.
+    //       One way to mitigate this is to obligate to be connected to at least one provider.
+    //       Blocking the creating and editing of articles if not connected to a provider.
 
     // TODO: We use the default storage, found in:
     // https://github.com/orbitdb/orbitdb/blob/d290032ebf1692feee1985853b2c54d376bbfc82/src/access-controllers/ipfs.js#L56
