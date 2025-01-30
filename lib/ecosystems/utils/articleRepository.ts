@@ -79,6 +79,9 @@ export class ArticleRepository {
         storage,
       }),
     });
+
+    let articleContentAddress = newArticleDb.address.toString();
+    await this.articleRepositoryDB.add(name + "::" + articleContentAddress);
   }
 
   public async getArticleList(): Promise<string[]> {
@@ -96,6 +99,7 @@ export class ArticleRepository {
     console.log("Database opened & replicated");
 
     db.events.on("update", async (entry: any) => {
+      console.log("Updating database with new article:", entry.payload.value);
       let [articleName, articleAddress] = entry.payload.value.split("::");
       this.articleAddressByName.set(articleName, articleAddress);
     });
@@ -106,7 +110,7 @@ export class ArticleRepository {
   private async connectToDebugProvider(helia: HeliaLibp2p) {
     // Local debug peer addr
     const PEER_ADDRESS_DEBUG =
-      "/ip4/127.0.0.1/tcp/4002/ws/p2p/12D3KooWNyfnTkjW8CmEehXYm4HXpg3RAfzgG1KtCWNA1Fn8SAmR";
+      "/ip4/127.0.0.1/tcp/4002/ws/p2p/12D3KooWKkmkMjhgRBMbeaMJvSXGd3MGiY3TfXZM8BkuBANnKB4K";
 
     await helia.libp2p
       .dial(multiaddr(PEER_ADDRESS_DEBUG))

@@ -9,6 +9,7 @@ const nextConfig = {
     loaderFile: "./utils/custom-image-loader.js",
   },
   trailingSlash: true,
+  reactStrictMode: false, // TODO: delete this when the orbitdb build issue is fixed
 };
 
 export default nextConfig;

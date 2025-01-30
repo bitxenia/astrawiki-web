@@ -20,7 +20,6 @@ export class IPFSArticle {
       return;
     }
     // TODO: We assume that the providers are already connected. We should add a check for this.
-    console.log("Holaaaaaaa");
     this.articleDB = await this.orbitdb.open(articleAddress);
 
     // TODO: Wait for replication to finish?
