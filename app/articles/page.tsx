@@ -118,12 +118,12 @@ export default function Pages() {
         )}
       </div>
       {Settings.rightbar && (
-        <div className="toc sticky top-16 hidden h-[94.5vh] min-w-[230px] gap-3 py-8 xl:flex xl:flex-col">
-          {Settings.toc && <Toc tocs={tableOfContents} />}
-          {Settings.feedback && <Feedback slug={pathName} title={pathName} />}
+        <div className="toc sticky top-16 hidden min-w-[230px] gap-3 py-8 xl:flex xl:flex-col">
           {Settings.totop && (
             <BackToTop className="mt-6 self-start text-sm text-neutral-800 dark:text-neutral-300/85" />
           )}
+          {Settings.feedback && <Feedback slug={pathName} title={pathName} />}
+          {Settings.toc && <Toc tocs={tableOfContents} />}
         </div>
       )}
     </div>
