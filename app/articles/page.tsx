@@ -4,11 +4,15 @@ import {
   ReadonlyURLSearchParams,
   useSearchParams,
 } from "next/navigation";
-import { getRawArticle, parseMarkdown } from "@/lib/markdown";
+import {
+  getRawArticle,
+  getTableOfContents,
+  TocItem,
+  TocProps,
+} from "@/lib/markdown";
 import { Settings } from "@/lib/meta";
 
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
-import Pagination from "@/components/navigation/pagination";
 import Toc from "@/components/navigation/toc";
 import Feedback from "@/components/navigation/feedback";
 import { BackToTop } from "@/components/navigation/backtotop";
@@ -26,22 +30,26 @@ import {
 import { BarLoader } from "react-spinners";
 import Loading from "@/app/loading";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeKatex from "rehype-katex";
+import rehypePrism from "rehype-prism-plus";
+import remarkGfm from "remark-gfm";
 
 type PageProps = {
   params: { slug: string[] };
 };
 
 export default function Pages() {
-  const [parsedMarkdown, setParsedMarkdown] = useState<ReactElement<
-    any,
-    any
-  > | null>(null);
   const [error, setError] = useState<boolean>(false);
   const { ecosystem, esName } = useContext<EcosystemContextProps>(
     EcosystemContext,
   ) as { ecosystem: Ecosystem; esName: string };
-  const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
+  const { article, setArticle } =
+    useContext<ArticleContextProps>(ArticleContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [tableOfContents, setTableOfContents] = useState<TocItem[]>([]);
   const searchParams = useSearchParams();
   const pathName = searchParams.get("name")!;
 
@@ -58,14 +66,9 @@ export default function Pages() {
           ecosystem,
           articleVersion,
         );
-
-        const res = await parseMarkdown(pathName, rawArticle);
-
-        if (!res) {
-          setError(true);
-        } else {
-          setParsedMarkdown(res);
-          setArticle(rawArticle);
+        setArticle(rawArticle);
+        if (rawArticle) {
+          setTableOfContents(await getTableOfContents(rawArticle));
         }
       } catch (e) {
         console.log(e);
@@ -97,22 +100,26 @@ export default function Pages() {
     <div className="flex items-start gap-14">
       <div className="flex-[3] pt-10">
         <PageBreadcrumb paths={updatePath()} />
-        {parsedMarkdown && (
+        {article && (
           <Typography>
             <h1 className="-mt-2 text-3xl">{pathName}</h1>
-            <div>{parsedMarkdown}</div>
-            <Pagination pathname={pathName} />
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[
+                rehypeSlug,
+                rehypeAutolinkHeadings,
+                rehypeKatex,
+                rehypePrism,
+              ]}
+            >
+              {article}
+            </ReactMarkdown>
           </Typography>
-        )}
-        {!parsedMarkdown && (
-          <div className="flex min-h-screen items-center justify-center">
-            <BarLoader />
-          </div>
         )}
       </div>
       {Settings.rightbar && (
         <div className="toc sticky top-16 hidden h-[94.5vh] min-w-[230px] gap-3 py-8 xl:flex xl:flex-col">
-          {Settings.toc && <Toc tocs={[]} />}
+          {Settings.toc && <Toc tocs={tableOfContents} />}
           {Settings.feedback && <Feedback slug={pathName} title={pathName} />}
           {Settings.totop && (
             <BackToTop className="mt-6 self-start text-sm text-neutral-800 dark:text-neutral-300/85" />

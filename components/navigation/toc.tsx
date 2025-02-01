@@ -3,9 +3,10 @@
 import Link from "next/link";
 import clsx from "clsx";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { TocItem } from "@/lib/markdown";
 
 type TocProps = {
-  tocs: { href: string; level: number; text: string }[];
+  tocs: TocItem[];
 };
 
 export default function Toc({ tocs }: TocProps) {
