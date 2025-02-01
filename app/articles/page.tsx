@@ -4,12 +4,7 @@ import {
   ReadonlyURLSearchParams,
   useSearchParams,
 } from "next/navigation";
-import {
-  getRawArticle,
-  getTableOfContents,
-  TocItem,
-  TocProps,
-} from "@/lib/markdown";
+import { getRawArticle, getTableOfContents, TocItem } from "@/lib/markdown";
 import { Settings } from "@/lib/meta";
 
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
