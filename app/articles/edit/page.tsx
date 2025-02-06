@@ -19,6 +19,10 @@ import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
 import { BarLoader } from "react-spinners";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeKatex from "rehype-katex";
+import rehypePrism from "rehype-prism-plus";
+import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 
 export default function Pages() {
@@ -106,7 +110,14 @@ export default function Pages() {
                 onChange={(e) => setNewArticle(e.target.value)}
               />
               <div className="markdown-preview rounded-md border p-4">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[
+                    rehypeSlug,
+                    rehypeAutolinkHeadings,
+                    rehypeKatex,
+                  ]}
+                >
                   {newArticle}
                 </ReactMarkdown>
               </div>
