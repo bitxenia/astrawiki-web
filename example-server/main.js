@@ -63,9 +63,10 @@ app.post("/articles", async (req, res) => {
   }
 
   try {
-    await writeFile(patchesPath, "[]", "utf-8");
-    console.log("Empty article created successfully");
-    res.status(201).json({ message: "Empty article created successfully" });
+    const patches = [req.body.patch];
+    await writeFile(patchesPath, JSON.stringify(patches), "utf-8");
+    console.log("Article created successfully");
+    res.status(201).json({ message: "Article created successfully" });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Internal Server Error" });
@@ -95,6 +96,7 @@ app.patch("/articles/:name", async (req, res) => {
 
   try {
     await writeFile(patchesPath, JSON.stringify(patches), "utf-8");
+    console.log("Article updated successfully");
     res.status(200).json({ message: "Article updated successfully" });
   } catch (err) {
     console.log(err);

@@ -32,14 +32,23 @@ export default function Pages() {
 
   const publishArticle = async (name: string) => {
     setIsPublishing(true);
-    await ecosystem
-      .createArticle(name)
-      .catch((err) => console.log("Create article: ", err));
-    let patch = getPatchFromTwoTexts("", markdown);
-    console.log("Article created successfully!");
-    await ecosystem
-      .editArticle(name, patch)
-      .catch((err) => console.log("Edit article: ", err));
+    const patch = getPatchFromTwoTexts("", markdown);
+    if (ecosystem.optIn?.createWithContent) {
+      // Create article with one API call
+      await ecosystem
+        .createArticle(name, patch)
+        .catch((err) => console.log("Create article: ", err));
+      console.log("Article created successfully!");
+    } else {
+      // Create article with two separate API calls
+      await ecosystem
+        .createArticle(name)
+        .catch((err) => console.log("Create empty article: ", err));
+      console.log("Empty article created successfully!");
+      await ecosystem
+        .editArticle(name, patch)
+        .catch((err) => console.log("Edit article: ", err));
+    }
     toast.success("Article published successfully!");
     setArticle(markdown);
     setIsPublishing(false);

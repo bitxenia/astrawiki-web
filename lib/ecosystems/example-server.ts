@@ -13,6 +13,10 @@ type ArticleResponse = {
 };
 
 export default class ExampleServer implements Ecosystem {
+  optIn: { createWithContent: boolean } = {
+    createWithContent: true,
+  };
+
   async init() {
     console.log("Initializing");
     const delay = (ms: number) =>
@@ -40,14 +44,16 @@ export default class ExampleServer implements Ecosystem {
     return Promise.resolve(newArticle);
   }
 
-  async createArticle(name: string): Promise<null> {
+  async createArticle(name: string, patch?: Patch): Promise<null> {
     if (name.length === 0) {
       console.log("Name cannot be empty");
       return Promise.reject("Name cannot be empty");
     }
 
     console.log(`Name: ${name}`);
-    const { status } = await axios.post(`${URL}/articles/`, { name });
+    const { status } = patch
+      ? await axios.post(`${URL}/articles/`, { name, patch })
+      : await axios.post(`${URL}/articles/`, { name });
     if (status === HttpStatusCode.Conflict) {
       console.log("Article already exists");
       return Promise.reject("Article already exists");
