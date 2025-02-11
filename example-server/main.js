@@ -14,10 +14,6 @@ import {
   getArticles,
 } from "./sqlite.js";
 
-// const __dirname = import.meta.dirname
-//   ? import.meta.dirname
-//   : dirname(fileURLToPath(import.meta.url));
-
 openDB();
 
 dotenv.config();
