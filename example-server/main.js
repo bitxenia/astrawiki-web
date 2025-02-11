@@ -11,6 +11,8 @@ const __dirname = import.meta.dirname
   ? import.meta.dirname
   : dirname(fileURLToPath(import.meta.url));
 
+const db = require("./sqlite.js");
+
 dotenv.config();
 
 const PORT = process.env.PORT ? process.env.PORT : 3001;
