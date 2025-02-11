@@ -1,11 +1,7 @@
 import express from "express";
-import path from "path";
 import cors from "cors";
-import { readFile, writeFile, access, readdir } from "node:fs/promises";
 import { setTimeout } from "timers/promises";
 import dotenv from "dotenv";
-import { dirname } from "node:path"; // For Node 16
-import { fileURLToPath } from "node:url"; // For Node 16
 import {
   openDB,
   createArticle,
