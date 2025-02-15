@@ -2,8 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 import { Paths } from "@/lib/pageroutes";
-
-import searchData from "@/public/search-data/documents.json";
+import { Ecosystem } from "./ecosystems/ecosystem";
 
 export type search = {
   title: string;
@@ -35,7 +34,6 @@ function memoize<T extends (...args: any[]) => any>(fn: T) {
 }
 
 const memoizedSearchMatch = memoize(searchMatch);
-const memoizedCleanMdxContent = memoize(cleanMdxContent);
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -185,7 +183,7 @@ function cleanMdxContent(content: string): string {
     .trim();
 }
 
-export function advanceSearch(query: string, data: any[]) {
+export function simpleSearch(query: string, data: any[]) {
   const lowerQuery = query.toLowerCase().trim();
 
   const queryWords = lowerQuery.split(/\s+/).filter((word) => word.length >= 3);
@@ -212,6 +210,31 @@ export function advanceSearch(query: string, data: any[]) {
   );
 
   return results;
+}
+
+/**
+ * Performs search using the searchArticles method from ecosystems that
+ * support it.
+ *
+ * @param {string} query Text to match
+ * @param {Ecosystem} ecosystem
+ * @param {number} offset Pagination offset
+ * @returns Array of objects that contain a result's title and href for the
+ * search component
+ */
+export async function serverSideSearch(
+  query: string,
+  ecosystem: Ecosystem,
+  offset: number = 0,
+): Promise<{ title: string; href: string }[]> {
+  console.log("Getting server side search results...");
+  const results = await ecosystem.searchArticles(query, 10, offset);
+  return results.map((title) => {
+    return {
+      title,
+      href: `?name=${title}`,
+    };
+  });
 }
 
 function chunkArray<T>(array: T[], chunkSize: number): T[][] {

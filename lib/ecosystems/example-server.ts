@@ -1,5 +1,5 @@
 import axios, { HttpStatusCode } from "axios";
-import { Article, Patch, Ecosystem } from "./ecosystem";
+import { Article, Patch, Ecosystem, OptIn } from "./ecosystem";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -13,8 +13,9 @@ type ArticleResponse = {
 };
 
 export default class ExampleServer implements Ecosystem {
-  optIn: { createWithContent: boolean } = {
+  optIn?: OptIn = {
     createWithContent: true,
+    optimizedSearch: true,
   };
 
   async init() {
@@ -78,6 +79,22 @@ export default class ExampleServer implements Ecosystem {
 
   async getArticleList(): Promise<string[]> {
     const { data } = await axios.get<string[]>(`${URL}/articles`);
+    return Promise.resolve(data);
+  }
+
+  async searchArticles(
+    query: string,
+    limit: number = 10,
+    offset: number = 0,
+  ): Promise<string[]> {
+    console.log("Getting search data from server...");
+    const { data } = await axios.get<string[]>(`${URL}/articles`, {
+      params: {
+        query,
+        limit,
+        offset,
+      },
+    });
     return Promise.resolve(data);
   }
 }
