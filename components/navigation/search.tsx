@@ -41,8 +41,14 @@ export default function Search() {
   useEffect(() => {
     const fetchArticles = async () => {
       setSearchData([]);
+      if (!ecosystem) {
+        // NOTE: This should be unreachable unless localStorage ecosystem is
+        // not set and the user access a page without going through the
+        // landing page first.
+        return;
+      }
+      setIsFetchingList(true);
       if (ecosystem && !ecosystem.optIn?.optimizedSearch) {
-        setIsFetchingList(true);
         const articleTitles = await ecosystem.getArticleList();
         const docs = articleTitles.map((title) => {
           return {
@@ -51,8 +57,11 @@ export default function Search() {
           };
         });
         setSearchData(docs);
-        setIsFetchingList(false);
+      } else {
+        const docs = await optimizedSearch("", ecosystem);
+        setSearchData(docs);
       }
+      setIsFetchingList(false);
     };
     fetchArticles();
   }, [ecosystem]);
