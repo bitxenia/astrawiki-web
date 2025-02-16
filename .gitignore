@@ -40,3 +40,4 @@ next-env.d.ts
 /example-server/content
 
 .env
+**/.data/*.db
