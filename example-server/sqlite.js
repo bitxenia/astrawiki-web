@@ -74,7 +74,6 @@ export async function getArticles(query, offset, limit) {
     sql += " LIMIT ? OFFSET ?";
     params.push(limit, offset);
   }
-  console.log("DEBUGPRINT[13]: sqlite.js:74: sql=", sql);
 
   return await db.all(sql, ...params);
 }
