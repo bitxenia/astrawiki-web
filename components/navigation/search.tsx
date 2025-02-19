@@ -15,14 +15,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import Anchor from "./anchor";
-import {
-  simpleSearch,
-  cn,
-  debounce,
-  highlight,
-  search,
-  serverSideSearch as optimizedSearch,
-} from "@/lib/utils";
+import { simpleSearch, cn, debounce, highlight, search } from "@/lib/utils";
 import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 
 export default function Search() {
@@ -48,7 +41,7 @@ export default function Search() {
         return;
       }
       setIsFetchingList(true);
-      if (ecosystem && !ecosystem.optIn?.optimizedSearch) {
+      if (ecosystem) {
         const articleTitles = await ecosystem.getArticleList();
         const docs = articleTitles.map((title) => {
           return {
@@ -56,9 +49,6 @@ export default function Search() {
             href: `?name=${title}`,
           };
         });
-        setSearchData(docs);
-      } else {
-        const docs = await optimizedSearch("", ecosystem);
         setSearchData(docs);
       }
       setIsFetchingList(false);
@@ -70,12 +60,7 @@ export default function Search() {
     () =>
       debounce(async (input) => {
         setIsLoading(true);
-        if (ecosystem?.optIn?.optimizedSearch) {
-          console.log("Getting filtered results...");
-          setFilteredResults(await optimizedSearch(input.trim(), ecosystem));
-        } else {
-          setFilteredResults(simpleSearch(input.trim(), searchData));
-        }
+        setFilteredResults(simpleSearch(input.trim(), searchData));
         setIsLoading(false);
       }, 300),
     [searchData],

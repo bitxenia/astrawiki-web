@@ -212,29 +212,37 @@ export function simpleSearch(query: string, data: any[]) {
   return results;
 }
 
+const PAGE_SIZE = 10;
 /**
  * Performs search using the searchArticles method from ecosystems that
  * support it.
  *
  * @param {string} query Text to match
  * @param {Ecosystem} ecosystem
- * @param {number} offset Pagination offset
+ * @param {number} page Page number
  * @returns Array of objects that contain a result's title and href for the
  * search component
  */
-export async function serverSideSearch(
+export async function optimizedSearch(
   query: string,
   ecosystem: Ecosystem,
-  offset: number = 0,
-): Promise<{ title: string; href: string }[]> {
+  page: number,
+): Promise<{ results: { title: string; href: string }[]; hasMore: boolean }> {
   console.log("Getting server side search results...");
-  const results = await ecosystem.searchArticles(query, 10, offset);
-  return results.map((title) => {
-    return {
-      title,
-      href: `?name=${title}`,
-    };
-  });
+  const results = await ecosystem.searchArticles(
+    query,
+    PAGE_SIZE,
+    PAGE_SIZE * page,
+  );
+  return {
+    results: results.map((title) => {
+      return {
+        title,
+        href: `?name=${title}`,
+      };
+    }),
+    hasMore: results.length === PAGE_SIZE,
+  };
 }
 
 function chunkArray<T>(array: T[], chunkSize: number): T[][] {
