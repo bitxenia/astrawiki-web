@@ -10,7 +10,15 @@ export type Article = {
   patches: Patch[];
 };
 
+export type OptIn = {
+  createWithContent: boolean;
+  optimizedSearch: boolean;
+};
+
 export interface Ecosystem {
+  // NOTE: This could be better handled but would mean breaking the current
+  // implementations of the ecosystems
+  optIn?: OptIn;
   /*
    * Init function, meant to be ran after creating an instance. Useful for
    * async dependencies.
@@ -22,14 +30,31 @@ export interface Ecosystem {
   fetchArticle(name: string): Promise<Article>;
 
   /*
-   * Creates empty article to repository. An article name must be unique.
+   * Creates an article to repository. An article name must be unique.
+   * If no patch is given, an empty article will be created.
    */
-  createArticle(name: string): Promise<null>;
+  createArticle(name: string, patch?: Patch): Promise<null>;
 
   /*
    * Edits an article by passing the delta/diff/patch as an argument.
    */
   editArticle(name: string, patch: Patch): Promise<null>;
 
+  // TODO: Deprecate this function and leave searching functionality to the
+  // ecosystem
   getArticleList(): Promise<string[]>;
+
+  /**
+   * Searches the ecosystem's data for articles whose titles match the query,
+   * and returns them in a paginated way.
+   * @param query The text to be matched against
+   * @param limit The amount of articles to return
+   * @param offset The starting article to pick up from
+   * @returns An array of article titles
+   */
+  searchArticles(
+    query: string,
+    limit: number,
+    offset: number,
+  ): Promise<string[]>;
 }

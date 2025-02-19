@@ -22,20 +22,25 @@ export async function openDB() {
 }
 
 export async function getArticle(articleName) {
+  console.log(`Getting ${articleName}`);
   const article = await db.get(
-    "SELECT patches FROM articles WHERE name = '" + articleName + "'",
+    "SELECT patches FROM articles WHERE name = ?",
+    articleName,
   );
 
   return article ? article.patches : null;
 }
 
-export async function createArticle(articleName) {
+export async function createArticle(articleName, patches) {
   let success = false;
 
+  const content = JSON.stringify(patches);
+
   try {
-    success = await db.run("INSERT INTO articles (name) VALUES (?)", [
-      articleName,
-    ]);
+    success = await db.run(
+      "INSERT INTO articles (name, patches) VALUES (?, ?)",
+      [articleName, content ?? null],
+    );
   } catch (dbError) {
     console.error(dbError);
   }
@@ -57,6 +62,18 @@ export async function updateArticle(articleName, patches) {
   return success.changes > 0;
 }
 
-export async function getArticles() {
-  return await db.all("SELECT name FROM articles");
+export async function getArticles(query, offset, limit) {
+  let sql = "SELECT name FROM articles";
+  const params = [];
+
+  if (query) {
+    sql += " WHERE name LIKE ?";
+    params.push(`%${query}%`);
+  }
+  if (offset !== undefined && limit !== undefined) {
+    sql += " LIMIT ? OFFSET ?";
+    params.push(limit, offset);
+  }
+
+  return await db.all(sql, ...params);
 }

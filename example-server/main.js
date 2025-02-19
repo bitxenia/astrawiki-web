@@ -40,11 +40,13 @@ app.get("/articles/:name", async (req, res) => {
 
 app.post("/articles", async (req, res) => {
   await setTimeout(5000);
-  const { name } = req.body;
+  const { name, patch } = req.body;
   if (!name) {
     console.log("Name is required");
     return res.status(400).json({ error: "Name is required" });
   }
+
+  const content = patch ? [patch] : null;
 
   const articlePatches = await getArticle(name);
 
@@ -56,14 +58,15 @@ app.post("/articles", async (req, res) => {
   }
 
   try {
-    const success = await createArticle(name);
+    // TODO: Create article with content
+    const success = await createArticle(name, content);
 
     if (!success) {
       throw new Error("Could not create article");
     }
 
-    console.log("Empty article created successfully");
-    res.status(201).json({ message: "Empty article created successfully" });
+    console.log("Article created successfully");
+    res.status(201).json({ message: "Article created successfully" });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Internal Server Error" });
@@ -102,9 +105,11 @@ app.patch("/articles/:name", async (req, res) => {
   }
 });
 
-app.get("/articles", async (_req, res) => {
-  const articles = (await getArticles()).map((article) => article.name);
-
+app.get("/articles", async (req, res) => {
+  // TODO: Filter results optionally
+  const articles = (
+    await getArticles(req.query.query, req.query.offset, req.query.limit)
+  ).map((article) => article.name);
   return res.status(200).json(articles);
 });
 

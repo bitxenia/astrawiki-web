@@ -1,10 +1,18 @@
 import web3 from "../web3";
-import { Article, Ecosystem, Patch } from "./ecosystem";
+import { Article, Ecosystem, OptIn, Patch } from "./ecosystem";
 import articuloFactoryContractABI from "../../contracts/out/ArticuloFactory.json";
 import articuloContractABI from "../../contracts/out/Articulo.json";
 import articuloFactoryContractAddress from "../../contracts/out/deployedAddress.json";
 
 class EthEcosystem implements Ecosystem {
+  optIn?: OptIn | undefined;
+  searchArticles(
+    query: string,
+    limit: number,
+    offset: number,
+  ): Promise<string[]> {
+    throw new Error("Method not implemented.");
+  }
   factoryInstance: any;
 
   async init(): Promise<void> {

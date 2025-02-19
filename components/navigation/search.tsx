@@ -15,7 +15,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import Anchor from "./anchor";
-import { advanceSearch, cn, debounce, highlight, search } from "@/lib/utils";
+import { simpleSearch, cn, debounce, highlight, search } from "@/lib/utils";
 import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 
 export default function Search() {
@@ -33,8 +33,14 @@ export default function Search() {
 
   useEffect(() => {
     const fetchArticles = async () => {
-      setIsFetchingList(true);
       setSearchData([]);
+      if (!ecosystem) {
+        // NOTE: This should be unreachable unless localStorage ecosystem is
+        // not set and the user access a page without going through the
+        // landing page first.
+        return;
+      }
+      setIsFetchingList(true);
       if (ecosystem) {
         const articleTitles = await ecosystem.getArticleList();
         const docs = articleTitles.map((title) => {
@@ -52,12 +58,11 @@ export default function Search() {
 
   const debouncedSearch = useMemo(
     () =>
-      debounce((input) => {
+      debounce(async (input) => {
         setIsLoading(true);
-        const results = advanceSearch(input.trim(), searchData);
-        setFilteredResults(results);
+        setFilteredResults(simpleSearch(input.trim(), searchData));
         setIsLoading(false);
-      }, 200),
+      }, 300),
     [searchData],
   );
 
@@ -85,11 +90,14 @@ export default function Search() {
   }, [isOpen, filteredResults, isESLoading]);
 
   useEffect(() => {
-    if (searchedInput.length >= 3) {
-      debouncedSearch(searchedInput);
-    } else {
-      setFilteredResults([]);
-    }
+    const processInput = async () => {
+      if (searchedInput.length >= 3) {
+        debouncedSearch(searchedInput);
+      } else {
+        setFilteredResults([]);
+      }
+    };
+    processInput();
   }, [searchedInput, debouncedSearch]);
 
   function renderDocuments(

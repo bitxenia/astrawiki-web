@@ -1,5 +1,5 @@
 import axios, { HttpStatusCode } from "axios";
-import { Article, Patch, Ecosystem } from "./ecosystem";
+import { Article, Patch, Ecosystem, OptIn } from "./ecosystem";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -15,11 +15,13 @@ type ArticleResponse = {
 };
 
 export default class ExampleServer implements Ecosystem {
+  optIn?: OptIn = {
+    createWithContent: true,
+    optimizedSearch: true,
+  };
+
   async init() {
     console.log("Initializing");
-    const delay = (ms: number) =>
-      new Promise((resolve) => setTimeout(resolve, ms));
-    await delay(5000);
   }
 
   async fetchArticle(name: string): Promise<Article> {
@@ -42,14 +44,16 @@ export default class ExampleServer implements Ecosystem {
     return Promise.resolve(newArticle);
   }
 
-  async createArticle(name: string): Promise<null> {
+  async createArticle(name: string, patch?: Patch): Promise<null> {
     if (name.length === 0) {
       console.log("Name cannot be empty");
       return Promise.reject("Name cannot be empty");
     }
 
     console.log(`Name: ${name}`);
-    const { status } = await axios.post(`${URL}/articles/`, { name });
+    const { status } = patch
+      ? await axios.post(`${URL}/articles/`, { name, patch })
+      : await axios.post(`${URL}/articles/`, { name });
     if (status === HttpStatusCode.Conflict) {
       console.log("Article already exists");
       return Promise.reject("Article already exists");
@@ -74,6 +78,22 @@ export default class ExampleServer implements Ecosystem {
 
   async getArticleList(): Promise<string[]> {
     const { data } = await axios.get<string[]>(`${URL}/articles`);
+    return Promise.resolve(data);
+  }
+
+  async searchArticles(
+    query: string,
+    limit: number = 10,
+    offset: number = 0,
+  ): Promise<string[]> {
+    console.log("Getting search data from server...");
+    const { data } = await axios.get<string[]>(`${URL}/articles`, {
+      params: {
+        query,
+        limit,
+        offset,
+      },
+    });
     return Promise.resolve(data);
   }
 }

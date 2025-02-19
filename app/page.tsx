@@ -7,6 +7,7 @@ import Search from "@/components/navigation/search";
 import EcosystemPicker from "@/components/navigation/ecosystem-picker";
 import { useContext } from "react";
 import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
+import OptimizedSearch from "@/components/navigation/optimized-search";
 
 export default function Home() {
   const { ecosystem } = useContext<EcosystemContextProps>(EcosystemContext);
@@ -21,7 +22,7 @@ export default function Home() {
       </div>
       {ecosystem && (
         <div className="flex items-center gap-5">
-          <Search />
+          {ecosystem.optIn?.optimizedSearch ? <OptimizedSearch /> : <Search />}
           <text className="font-thin">or</text>
           <Link
             href={"/articles/new/"}
