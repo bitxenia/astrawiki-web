@@ -64,11 +64,11 @@ export default function OptimizedSearch() {
 
   useEffect(() => {
     const processInput = async () => {
-      setPage(0);
       if (searchedInput.length > 0 && searchedInput.length < 3) {
         setSearchData([]);
         setHasMoreResults(false);
       } else {
+        setPage(0);
         debouncedSearch();
       }
     };

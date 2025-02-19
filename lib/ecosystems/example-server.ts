@@ -6,7 +6,9 @@ dotenv.config();
 
 const PORT = process.env.PORT ? process.env.PORT : 3001;
 const URL =
-  process.env.ENV === "prod" ? process.env.URL : `http://localhost:${PORT}`;
+  process.env.ENV === "prod"
+    ? process.env.EXAMPLE_SERVER_URL
+    : `http://localhost:${PORT}`;
 
 type ArticleResponse = {
   patches: string;

@@ -1,15 +1,16 @@
 import express from "express";
-import path from "path";
 import cors from "cors";
-import { readFile, writeFile, access, readdir } from "node:fs/promises";
 import { setTimeout } from "timers/promises";
 import dotenv from "dotenv";
-import { dirname } from "node:path"; // For Node 16
-import { fileURLToPath } from "node:url"; // For Node 16
+import {
+  openDB,
+  createArticle,
+  getArticle,
+  updateArticle,
+  getArticles,
+} from "./sqlite.js";
 
-const __dirname = import.meta.dirname
-  ? import.meta.dirname
-  : dirname(fileURLToPath(import.meta.url));
+openDB();
 
 dotenv.config();
 
@@ -24,9 +25,7 @@ app.get("/articles/:name", async (req, res) => {
   await setTimeout(5000);
   const { name } = req.params;
   try {
-    const patchesPath = path.join(__dirname, "content", `${name}.json`);
-
-    const patches = await readFile(patchesPath, "utf-8");
+    const patches = await getArticle(name);
 
     res.status(200).json({ patches });
   } catch (err) {
@@ -41,30 +40,31 @@ app.get("/articles/:name", async (req, res) => {
 
 app.post("/articles", async (req, res) => {
   await setTimeout(5000);
-  const { name } = req.body;
+  const { name, patch } = req.body;
   if (!name) {
     console.log("Name is required");
     return res.status(400).json({ error: "Name is required" });
   }
 
-  const patchesPath = path.join(__dirname, "content", `${name}.json`);
+  const content = patch ? [patch] : null;
 
-  try {
-    await access(patchesPath);
+  const articlePatches = await getArticle(name);
+
+  if (articlePatches) {
     console.log("Article with this name already exists");
     return res
       .status(409)
       .json({ error: "Article with this name already exists" });
-  } catch (err) {
-    if (err.code != "ENOENT") {
-      console.log(err);
-      return res.status(500).json({ error: "Internal Server Error" });
-    }
   }
 
   try {
-    const patches = [req.body.patch];
-    await writeFile(patchesPath, JSON.stringify(patches), "utf-8");
+    // TODO: Create article with content
+    const success = await createArticle(name, content);
+
+    if (!success) {
+      throw new Error("Could not create article");
+    }
+
     console.log("Article created successfully");
     res.status(201).json({ message: "Article created successfully" });
   } catch (err) {
@@ -77,26 +77,27 @@ app.patch("/articles/:name", async (req, res) => {
   await setTimeout(5000);
   const { name } = req.params;
   const { date, patch } = req.body;
+
   if (!date) {
     return res.status(400).json({ error: "Date is required" });
   } else if (!patch) {
     return res.status(400).json({ error: "Patch is required" });
   }
-  const patchesPath = path.join(__dirname, "content", `${name}.json`);
+
   let patches = [];
+
   try {
-    patches = JSON.parse(await readFile(patchesPath, "utf-8"));
+    patches = JSON.parse(await getArticle(name));
   } catch (err) {
     if (err.code !== "ENOENT") {
-      return res.status(404).json({ error: `File "${patchesPath}" not found` });
+      return res.status(404).json({ error: `Article "${name}" not found` });
     }
   }
 
   patches.push({ date, patch });
 
   try {
-    await writeFile(patchesPath, JSON.stringify(patches), "utf-8");
-    console.log("Article updated successfully");
+    await updateArticle(name, JSON.stringify(patches));
     res.status(200).json({ message: "Article updated successfully" });
   } catch (err) {
     console.log(err);
@@ -105,23 +106,10 @@ app.patch("/articles/:name", async (req, res) => {
 });
 
 app.get("/articles", async (req, res) => {
-  console.log("Getting articles...");
-  const contentPath = path.join(__dirname, "content");
-  const query = req.query.query ? req.query.query : "";
-  const offset = req.query.offset ? req.query.offset : 0;
-  const limit = req.query.limit;
-  let articles;
-  if (limit) {
-    articles = (await readdir(contentPath))
-      .map((filename) => filename.replace(".json", ""))
-      .filter((name) => name.includes(query))
-      .slice(offset, offset + limit);
-  } else {
-    articles = (await readdir(contentPath))
-      .map((filename) => filename.replace(".json", ""))
-      .filter((name) => name.includes(query))
-      .slice(offset);
-  }
+  // TODO: Filter results optionally
+  const articles = (
+    await getArticles(req.query.query, req.query.offset, req.query.limit)
+  ).map((article) => article.name);
   return res.status(200).json(articles);
 });
 
