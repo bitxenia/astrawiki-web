@@ -13,7 +13,7 @@ import {
 } from "@/lib/contexts";
 import { getPatchFromTwoTexts } from "@/lib/diff";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
-import { getRawArticle, invalidateCache } from "@/lib/markdown";
+import { getPatches, getRawArticle, invalidateCache } from "@/lib/markdown";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -61,7 +61,15 @@ export default function Pages() {
   if (error) notFound();
 
   const saveChanges = async () => {
-    const patch = getPatchFromTwoTexts(article as string, newArticle as string);
+    const parentPatch = (await getPatches(pathName, ecosystem)).pop();
+    if (!parentPatch) {
+      throw Error("Parent patch not found while saving article edit");
+    }
+    const patch = getPatchFromTwoTexts(
+      article as string,
+      newArticle as string,
+      parentPatch.date,
+    );
     if (patch.patch.length == 0) {
       toast("No changes were made");
       return;

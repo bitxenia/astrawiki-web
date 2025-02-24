@@ -3,6 +3,7 @@ import { patch_obj } from "diff-match-patch";
 export type Patch = {
   date: string;
   patch: (new () => patch_obj)[];
+  parentId: string | null; // Date string
 };
 
 export type Article = {
@@ -35,8 +36,10 @@ export interface Ecosystem {
    */
   createArticle(name: string, patch?: Patch): Promise<null>;
 
-  /*
+  /**
    * Edits an article by passing the delta/diff/patch as an argument.
+   * @param name Name of the article to edit
+   * @param patch Patch to add to article
    */
   editArticle(name: string, patch: Patch): Promise<null>;
 

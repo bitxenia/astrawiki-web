@@ -32,7 +32,7 @@ export default function Pages() {
 
   const publishArticle = async (name: string) => {
     setIsPublishing(true);
-    const patch = getPatchFromTwoTexts("", markdown);
+    const patch = getPatchFromTwoTexts("", markdown, null);
     if (ecosystem.optIn?.createWithContent) {
       // Create article with one API call
       await ecosystem

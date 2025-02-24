@@ -13,12 +13,22 @@ export function getTextFromPatches(patches: Patch[]): string {
   return ret;
 }
 
-export function getPatchFromTwoTexts(oldText: string, newText: string): Patch {
+/**
+ * @param oldText text of the article up until the parent patch
+ * @param newText new version of the article's text
+ * @param parentId id of the patch the new patch is built on top of
+ */
+export function getPatchFromTwoTexts(
+  oldText: string,
+  newText: string,
+  parentId: string | null,
+): Patch {
   const dmp = new DiffMatchPatch();
   const patch_objs = dmp.patch_make(oldText, newText);
   const date = new Date();
   return {
     date: date.toISOString(),
     patch: patch_objs,
+    parentId,
   };
 }

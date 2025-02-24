@@ -39,7 +39,6 @@ app.get("/articles/:name", async (req, res) => {
 });
 
 app.post("/articles", async (req, res) => {
-  await setTimeout(5000);
   const { name, patch } = req.body;
   if (!name) {
     console.log("Name is required");
