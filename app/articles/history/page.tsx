@@ -2,11 +2,10 @@
 import Loading from "@/app/loading";
 import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
-import { getAllPatches } from "@/lib/markdown";
+import { getAllPatches } from "@/lib/articles";
 import Link from "next/link";
 import { notFound, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
-import { BarLoader } from "react-spinners";
 
 export default function Pages() {
   const [patches, setPatches] = useState<Patch[]>([]);

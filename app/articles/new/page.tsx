@@ -4,13 +4,13 @@ import Loading from "@/app/loading";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
+import { createArticle } from "@/lib/articles";
 import {
   ArticleContext,
   ArticleContextProps,
   EcosystemContext,
   EcosystemContextProps,
 } from "@/lib/contexts";
-import { getPatchFromTwoTexts } from "@/lib/diff";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,30 +25,13 @@ export default function Pages() {
     EcosystemContext,
   ) as { ecosystem: Ecosystem; esName: string };
   const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
-  const path = ["New"];
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
 
   const publishArticle = async (name: string) => {
     setIsPublishing(true);
-    const patch = getPatchFromTwoTexts("", markdown, null);
-    if (ecosystem.optIn?.createWithContent) {
-      // Create article with one API call
-      await ecosystem
-        .createArticle(name, patch)
-        .catch((err) => console.log("Create article: ", err));
-      console.log("Article created successfully!");
-    } else {
-      // Create article with two separate API calls
-      await ecosystem
-        .createArticle(name)
-        .catch((err) => console.log("Create empty article: ", err));
-      console.log("Empty article created successfully!");
-      await ecosystem
-        .editArticle(name, patch)
-        .catch((err) => console.log("Edit article: ", err));
-    }
+    createArticle(name, markdown, ecosystem);
     toast.success("Article published successfully!");
     setArticle(markdown);
     setIsPublishing(false);
@@ -67,7 +50,7 @@ export default function Pages() {
   return (
     <div className="flex items-start gap-14">
       <div className="flex-[3] pt-10">
-        <PageBreadcrumb paths={path} />
+        <PageBreadcrumb paths={["New"]} />
         <Typography>
           <div className="space-y-4">
             <input

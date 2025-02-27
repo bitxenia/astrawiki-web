@@ -80,7 +80,7 @@ describe("Article", () => {
       patch: [],
       parentId: patch1Date,
     };
-    const expected = [patch2, patch1];
+    const expected = [patch1, patch2];
     const article = new Article("test", expected);
     const ret = article.getMainPatchBranch();
     expect(ret.length).toBe(2);
@@ -106,7 +106,7 @@ describe("Article", () => {
       patch: [],
       parentId: patch2Date,
     };
-    const expected = [patch3, patch2, patch1];
+    const expected = [patch1, patch2, patch3];
     const article = new Article("test", [patch2, patch3, patch1]);
     const ret = article.getMainPatchBranch();
     expect(ret.length).toBe(3);
@@ -132,7 +132,7 @@ describe("Article", () => {
       patch: [],
       parentId: patch1Date,
     };
-    const expected = [patch2, patch1];
+    const expected = [patch1, patch2];
     const article = new Article("test", [patch2, patch3, patch1]);
     const ret = article.getMainPatchBranch();
     expect(ret.length).toBe(2);
@@ -164,7 +164,7 @@ describe("Article", () => {
       patch: [],
       parentId: patch3Date,
     };
-    const expected = [patch4, patch3, patch1];
+    const expected = [patch1, patch3, patch4];
     const article = new Article("test", [patch4, patch2, patch3, patch1]);
     const ret = article.getMainPatchBranch();
     expect(ret.length).toBe(3);
@@ -227,7 +227,7 @@ describe("Article", () => {
       patch: [],
       parentId: patch3Date,
     };
-    const expected = [patch2, patch1];
+    const expected = [patch1, patch2];
     const article = new Article("test", [patch4, patch2, patch3, patch1]);
     const ret = article.getPatchBranch(patch2Date);
     expect(ret.length).toBe(2);

@@ -11,17 +11,14 @@ import {
   EcosystemContext,
   EcosystemContextProps,
 } from "@/lib/contexts";
-import { getPatchFromTwoTexts } from "@/lib/diff";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
-import { getArticle, getParentPatch, invalidateCache } from "@/lib/markdown";
+import { editArticle, getArticle } from "@/lib/articles";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
-import { BarLoader } from "react-spinners";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeKatex from "rehype-katex";
-import rehypePrism from "rehype-prism-plus";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 
@@ -61,20 +58,9 @@ export default function Pages() {
   if (error) notFound();
 
   const saveChanges = async () => {
-    const parentPatchId = await getParentPatch(pathName, ecosystem);
-    const patch = getPatchFromTwoTexts(
-      article as string,
-      newArticle as string,
-      parentPatchId,
-    );
-    if (patch.patch.length == 0) {
-      toast("No changes were made");
-      return;
-    }
     setIsPublishing(true);
-    await ecosystem.editArticle(pathName, patch);
+    editArticle(pathName, article as string, newArticle as string, ecosystem);
     setArticle(newArticle);
-    invalidateCache(pathName);
     toast.success("Edited successfully!");
     setIsPublishing(false);
     router.push(`/articles?name=${pathName}`);

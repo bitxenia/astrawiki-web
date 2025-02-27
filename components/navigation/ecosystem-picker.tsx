@@ -9,7 +9,7 @@ import {
 import { useContext, useEffect } from "react";
 import ExampleServer from "@/lib/ecosystems/example-server";
 import EthEcosystem from "@/lib/ecosystems/eth-ecosystem";
-import { invalidateCache } from "@/lib/markdown";
+import { invalidateCache } from "@/lib/articles";
 
 export default function EcosystemPicker() {
   const { setEcosystem, setIsESLoading, esName, setESName } =

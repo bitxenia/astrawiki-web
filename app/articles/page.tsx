@@ -1,10 +1,6 @@
 "use client";
-import {
-  notFound,
-  ReadonlyURLSearchParams,
-  useSearchParams,
-} from "next/navigation";
-import { getArticle, getTableOfContents, TocItem } from "@/lib/markdown";
+import { notFound, useSearchParams } from "next/navigation";
+import { getArticle } from "@/lib/articles";
 import { Settings } from "@/lib/meta";
 
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
@@ -12,29 +8,22 @@ import Toc from "@/components/navigation/toc";
 import Feedback from "@/components/navigation/feedback";
 import { BackToTop } from "@/components/navigation/backtotop";
 import { Typography } from "@/components/ui/typography";
-import { ReactElement, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import {
   ArticleContext,
   ArticleContextProps,
   EcosystemContext,
   EcosystemContextProps,
-  RawArticleContext,
-  RawArticleContextProps,
 } from "@/lib/contexts";
-import { BarLoader } from "react-spinners";
 import Loading from "@/app/loading";
-import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeKatex from "rehype-katex";
 import rehypePrism from "rehype-prism-plus";
 import remarkGfm from "remark-gfm";
-
-type PageProps = {
-  params: { slug: string[] };
-};
+import { getTableOfContents, TocItem } from "@/lib/toc";
 
 export default function Pages() {
   const [error, setError] = useState<boolean>(false);
