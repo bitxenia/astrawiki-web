@@ -4,14 +4,12 @@ import Loading from "@/app/loading";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { createArticle } from "@/lib/articles";
 import {
   ArticleContext,
   ArticleContextProps,
   EcosystemContext,
-  EcosystemContextProps,
+  StorageContext,
 } from "@/lib/contexts";
-import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
@@ -21,9 +19,8 @@ import remarkGfm from "remark-gfm";
 
 export default function Pages() {
   const router = useRouter();
-  const { ecosystem, esName } = useContext<EcosystemContextProps>(
-    EcosystemContext,
-  ) as { ecosystem: Ecosystem; esName: string };
+  const { esName } = useContext(EcosystemContext);
+  const { storage } = useContext(StorageContext);
   const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
@@ -31,7 +28,7 @@ export default function Pages() {
 
   const publishArticle = async (name: string) => {
     setIsPublishing(true);
-    createArticle(name, markdown, ecosystem);
+    storage!.createArticle(name, markdown);
     toast.success("Article published successfully!");
     setArticle(markdown);
     setIsPublishing(false);

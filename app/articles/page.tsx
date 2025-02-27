@@ -1,6 +1,5 @@
 "use client";
 import { notFound, useSearchParams } from "next/navigation";
-import { getArticle } from "@/lib/articles";
 import { Settings } from "@/lib/meta";
 
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
@@ -9,12 +8,11 @@ import Feedback from "@/components/navigation/feedback";
 import { BackToTop } from "@/components/navigation/backtotop";
 import { Typography } from "@/components/ui/typography";
 import { useContext, useEffect, useState } from "react";
-import { Ecosystem } from "@/lib/ecosystems/ecosystem";
 import {
   ArticleContext,
   ArticleContextProps,
   EcosystemContext,
-  EcosystemContextProps,
+  StorageContext,
 } from "@/lib/contexts";
 import Loading from "@/app/loading";
 import ReactMarkdown from "react-markdown";
@@ -27,9 +25,8 @@ import { getTableOfContents, TocItem } from "@/lib/toc";
 
 export default function Pages() {
   const [error, setError] = useState<boolean>(false);
-  const { ecosystem, esName } = useContext<EcosystemContextProps>(
-    EcosystemContext,
-  ) as { ecosystem: Ecosystem; esName: string };
+  const { esName } = useContext(EcosystemContext);
+  const { storage } = useContext(StorageContext);
   const { article, setArticle } =
     useContext<ArticleContextProps>(ArticleContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -42,11 +39,7 @@ export default function Pages() {
     async function fetchDocument() {
       setIsLoading(true);
       try {
-        const rawArticle = await getArticle(
-          pathName,
-          ecosystem,
-          articleVersion,
-        );
+        const rawArticle = await storage!.getArticle(pathName, articleVersion);
         setArticle(rawArticle);
         if (rawArticle) {
           setTableOfContents(await getTableOfContents(rawArticle));
@@ -58,7 +51,7 @@ export default function Pages() {
       setIsLoading(false);
     }
     fetchDocument();
-  }, [pathName, ecosystem, setArticle, searchParams]);
+  }, [pathName, storage, setArticle, searchParams]);
 
   if (error) notFound();
   else if (isLoading)

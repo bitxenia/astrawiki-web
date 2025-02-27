@@ -9,10 +9,8 @@ import {
   ArticleContext,
   ArticleContextProps,
   EcosystemContext,
-  EcosystemContextProps,
+  StorageContext,
 } from "@/lib/contexts";
-import { Ecosystem } from "@/lib/ecosystems/ecosystem";
-import { editArticle, getArticle } from "@/lib/articles";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -32,9 +30,8 @@ export default function Pages() {
 
   const [newArticle, setNewArticle] = useState<string | null>(null);
   const [error, setError] = useState<boolean>(false);
-  const { ecosystem, esName } = useContext<EcosystemContextProps>(
-    EcosystemContext,
-  ) as { ecosystem: Ecosystem; esName: string };
+  const { esName } = useContext(EcosystemContext);
+  const { storage } = useContext(StorageContext);
   const { article, setArticle } =
     useContext<ArticleContextProps>(ArticleContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -44,7 +41,7 @@ export default function Pages() {
     async function fetchDocument() {
       setIsLoading(true);
       try {
-        const rawArticle = await getArticle(pathName, ecosystem);
+        const rawArticle = await storage!.getArticle(pathName);
         setArticle(rawArticle);
         setNewArticle(rawArticle);
       } catch {
@@ -59,7 +56,7 @@ export default function Pages() {
 
   const saveChanges = async () => {
     setIsPublishing(true);
-    editArticle(pathName, article as string, newArticle as string, ecosystem);
+    storage!.editArticle(pathName, article as string, newArticle as string);
     setArticle(newArticle);
     toast.success("Edited successfully!");
     setIsPublishing(false);

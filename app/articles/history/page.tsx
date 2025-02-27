@@ -1,8 +1,7 @@
 "use client";
 import Loading from "@/app/loading";
-import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
-import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
-import { getAllPatches } from "@/lib/articles";
+import { EcosystemContext, StorageContext } from "@/lib/contexts";
+import { Patch } from "@/lib/ecosystems/ecosystem";
 import Link from "next/link";
 import { notFound, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
@@ -10,9 +9,8 @@ import { useContext, useEffect, useState } from "react";
 export default function Pages() {
   const [patches, setPatches] = useState<Patch[]>([]);
   const [error, setError] = useState<boolean>(false);
-  const { ecosystem, esName } = useContext<EcosystemContextProps>(
-    EcosystemContext,
-  ) as { ecosystem: Ecosystem; esName: string };
+  const { esName } = useContext(EcosystemContext);
+  const { storage } = useContext(StorageContext);
 
   const searchParams = useSearchParams();
 
@@ -21,7 +19,7 @@ export default function Pages() {
   useEffect(() => {
     async function fetchDocument() {
       try {
-        const res = await getAllPatches(pathName, ecosystem);
+        const res = await storage!.getArticlePatches(pathName);
         if (!res) {
           setError(true);
         } else {
@@ -32,7 +30,7 @@ export default function Pages() {
       }
     }
     fetchDocument();
-  }, [pathName, ecosystem]);
+  }, [pathName, storage]);
 
   if (error) notFound();
 
