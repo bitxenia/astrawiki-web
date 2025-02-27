@@ -12,7 +12,8 @@
     "generate-content-json": "ts-node scripts/content.ts",
     "prepare": "husky",
     "compile-contracts": "npx solc contracts/Articulo.sol contracts/ArticuloFactory.sol --bin --abi -o contracts/out && mv contracts/out/contracts_Articulo_sol_Articulo.abi contracts/out/Articulo.json && mv contracts/out/contracts_ArticuloFactory_sol_ArticuloFactory.abi contracts/out/ArticuloFactory.json && mv contracts/out/contracts_Articulo_sol_Articulo.bin contracts/out/Articulo.bin && mv contracts/out/contracts_ArticuloFactory_sol_ArticuloFactory.bin contracts/out/ArticuloFactory.bin",
-    "deploy-contracts": "node ./contracts/utils/deploy.js"
+    "deploy-contracts": "node ./contracts/utils/deploy.js",
+    "test": "jest"
   },
   "dependencies": {
     "@next/third-parties": "^14.2.11",
@@ -65,6 +66,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.14",
     "@types/diff-match-patch": "^1.0.36",
+    "@types/jest": "^29.5.14",
     "@types/next": "^9.0.0",
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.6",
@@ -74,10 +76,12 @@
     "eslint-config-next": "^14.2.6",
     "eslint-config-prettier": "^10.0.1",
     "husky": "^9.1.7",
+    "jest": "^29.7.0",
     "lint-staged": "^15.4.1",
     "postcss": "^8",
     "prettier-plugin-tailwindcss": "^0.6.10",
     "tailwindcss": "^3.4.10",
+    "ts-jest": "^29.2.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2"
   }

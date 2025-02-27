@@ -2,7 +2,7 @@
 import Loading from "@/app/loading";
 import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
 import { Ecosystem, Patch } from "@/lib/ecosystems/ecosystem";
-import { getPatches } from "@/lib/markdown";
+import { getAllPatches } from "@/lib/markdown";
 import Link from "next/link";
 import { notFound, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
@@ -22,7 +22,7 @@ export default function Pages() {
   useEffect(() => {
     async function fetchDocument() {
       try {
-        const res = await getPatches(pathName, ecosystem);
+        const res = await getAllPatches(pathName, ecosystem);
         if (!res) {
           setError(true);
         } else {
@@ -54,18 +54,18 @@ export default function Pages() {
             if (a < b) return 1;
             return 0;
           })
-          .map((d: string, i: number) => (
-            <li className="py-2" key={i}>
+          .map((patchDate: string) => (
+            <li className="py-2" key={patchDate}>
               <Link
                 href={{
                   pathname: `/articles`,
                   query: {
                     name: pathName,
-                    version: (patches.length - i).toString(),
+                    version: patchDate,
                   },
                 }}
               >
-                {patches.length - i} - {d}
+                {patchDate}
               </Link>
             </li>
           ))}

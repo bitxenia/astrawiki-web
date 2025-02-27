@@ -4,6 +4,7 @@ import { MemoizedArticles } from "./memoizedarticles";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import { visit } from "unist-util-visit";
+import { Article } from "./ecosystems/article";
 
 /**
  * Initializes the cache
@@ -17,18 +18,17 @@ const cache = new MemoizedArticles();
  * @param articleVersion Version to build article from. Latest if null.
  * @returns article as raw markdown (without frontmatter).
  */
-export async function getRawArticle(
+export async function getArticle(
   articleName: string,
   ecosystem: Ecosystem,
-  articleVersion?: number,
+  version?: string,
 ): Promise<string> {
   const article = await cache.get(articleName, ecosystem);
-
-  if (articleVersion === undefined || articleVersion > article.patches.length) {
-    return getTextFromPatches(article.patches);
-  }
-
-  return getTextFromPatches(article.patches.slice(0, articleVersion));
+  let patches;
+  if (version === undefined) patches = article.getMainPatchBranch();
+  else patches = article.getPatchBranch(version);
+  console.log("Patches retrieved: ", patches);
+  return getTextFromPatches(patches);
 }
 
 /**
@@ -37,10 +37,18 @@ export async function getRawArticle(
  * @param ecosystem Ecosystem to get the article patches from.
  * @returns Array of patches from the article.
  */
-export async function getPatches(articleName: string, ecosystem: Ecosystem) {
+export async function getAllPatches(articleName: string, ecosystem: Ecosystem) {
   const article = await cache.get(articleName, ecosystem);
 
-  return article.patches;
+  return article.getPatches();
+}
+
+export async function getParentPatch(
+  articleName: string,
+  ecosystem: Ecosystem,
+) {
+  const article = await cache.get(articleName, ecosystem);
+  return article.getParentPatchId();
 }
 
 /**

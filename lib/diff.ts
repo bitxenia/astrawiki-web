@@ -1,6 +1,10 @@
 import { Patch } from "./ecosystems/ecosystem";
 import DiffMatchPatch from "diff-match-patch";
 
+/**
+ * @param patches Array of patches to apply to get the final result, from
+ * oldest to newest
+ */
 export function getTextFromPatches(patches: Patch[]): string {
   const dmp = new DiffMatchPatch();
   const patch_objs = patches.flatMap((patch) => patch.patch);

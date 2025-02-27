@@ -1,4 +1,5 @@
-import { Article, Ecosystem } from "./ecosystems/ecosystem";
+import { Article } from "./ecosystems/article";
+import { Ecosystem } from "./ecosystems/ecosystem";
 
 export class MemoizedArticles {
   cache: Map<string, Article>;

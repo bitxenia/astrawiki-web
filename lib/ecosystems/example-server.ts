@@ -1,6 +1,7 @@
 import axios, { HttpStatusCode } from "axios";
-import { Article, Patch, Ecosystem, OptIn } from "./ecosystem";
+import { Patch, Ecosystem, OptIn } from "./ecosystem";
 import dotenv from "dotenv";
+import { Article } from "./article";
 
 dotenv.config();
 
@@ -37,11 +38,7 @@ export default class ExampleServer implements Ecosystem {
     } else if (status !== HttpStatusCode.Ok) {
       return Promise.reject("Server error");
     }
-    const newArticle: Article = {
-      name,
-      patches: JSON.parse(data.patches),
-    };
-    return Promise.resolve(newArticle);
+    return new Article(name, JSON.parse(data.patches));
   }
 
   async createArticle(name: string, patch?: Patch): Promise<null> {

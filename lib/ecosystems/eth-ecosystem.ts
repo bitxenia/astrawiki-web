@@ -1,8 +1,9 @@
 import web3 from "../web3";
-import { Article, Ecosystem, OptIn, Patch } from "./ecosystem";
+import { Ecosystem, OptIn, Patch } from "./ecosystem";
 import articuloFactoryContractABI from "../../contracts/out/ArticuloFactory.json";
 import articuloContractABI from "../../contracts/out/Articulo.json";
 import articuloFactoryContractAddress from "../../contracts/out/deployedAddress.json";
+import { Article } from "./article";
 
 class EthEcosystem implements Ecosystem {
   optIn?: OptIn | undefined;
@@ -40,11 +41,7 @@ class EthEcosystem implements Ecosystem {
     );
     const contenido: string = await articuloInstance.methods.contenido().call();
     const patches = JSON.parse(contenido);
-    const articulo: Article = {
-      name,
-      patches,
-    };
-    return articulo;
+    return new Article(name, patches);
   }
 
   async createArticle(name: string): Promise<null> {

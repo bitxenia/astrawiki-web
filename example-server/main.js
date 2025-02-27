@@ -75,7 +75,7 @@ app.post("/articles", async (req, res) => {
 app.patch("/articles/:name", async (req, res) => {
   await setTimeout(5000);
   const { name } = req.params;
-  const { date, patch } = req.body;
+  const { date, patch, parentId } = req.body;
 
   if (!date) {
     return res.status(400).json({ error: "Date is required" });
@@ -93,7 +93,7 @@ app.patch("/articles/:name", async (req, res) => {
     }
   }
 
-  patches.push({ date, patch });
+  patches.push({ date, patch, parentId });
 
   try {
     await updateArticle(name, JSON.stringify(patches));

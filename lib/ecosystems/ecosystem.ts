@@ -1,14 +1,10 @@
 import { patch_obj } from "diff-match-patch";
+import { Article } from "./article";
 
 export type Patch = {
   date: string;
   patch: (new () => patch_obj)[];
   parentId: string | null; // Date string
-};
-
-export type Article = {
-  name: string;
-  patches: Patch[];
 };
 
 export type OptIn = {

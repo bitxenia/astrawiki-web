@@ -4,7 +4,7 @@ import {
   ReadonlyURLSearchParams,
   useSearchParams,
 } from "next/navigation";
-import { getRawArticle, getTableOfContents, TocItem } from "@/lib/markdown";
+import { getArticle, getTableOfContents, TocItem } from "@/lib/markdown";
 import { Settings } from "@/lib/meta";
 
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
@@ -47,16 +47,13 @@ export default function Pages() {
   const [tableOfContents, setTableOfContents] = useState<TocItem[]>([]);
   const searchParams = useSearchParams();
   const pathName = searchParams.get("name")!;
-
-  const articleVersion = searchParams.has("version")
-    ? +searchParams.get("version")!
-    : undefined;
+  const articleVersion = searchParams.get("version") || undefined;
 
   useEffect(() => {
     async function fetchDocument() {
       setIsLoading(true);
       try {
-        const rawArticle = await getRawArticle(
+        const rawArticle = await getArticle(
           pathName,
           ecosystem,
           articleVersion,
