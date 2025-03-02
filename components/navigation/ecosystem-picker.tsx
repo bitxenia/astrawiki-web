@@ -14,7 +14,7 @@ import {
 import { useContext, useEffect } from "react";
 import ExampleServer from "@/lib/ecosystems/example-server";
 import EthEcosystem from "@/lib/ecosystems/eth-ecosystem";
-import { Storage } from "@/lib/storage";
+import { Storage } from "@/lib/articles/storage";
 
 export default function EcosystemPicker() {
   const { setIsESLoading, esName, setESName } =

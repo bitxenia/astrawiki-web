@@ -1,13 +1,13 @@
 "use client";
 import Loading from "@/app/loading";
+import { Version } from "@/lib/articles/version";
 import { EcosystemContext, StorageContext } from "@/lib/contexts";
-import { Patch } from "@/lib/ecosystems/ecosystem";
 import Link from "next/link";
 import { notFound, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 
 export default function Pages() {
-  const [patches, setPatches] = useState<Patch[]>([]);
+  const [patches, setPatches] = useState<Version[]>([]);
   const [error, setError] = useState<boolean>(false);
   const { esName } = useContext(EcosystemContext);
   const { storage } = useContext(StorageContext);
@@ -19,7 +19,7 @@ export default function Pages() {
   useEffect(() => {
     async function fetchDocument() {
       try {
-        const res = await storage!.getArticlePatches(pathName);
+        const res = await storage!.getArticleVersions(pathName);
         if (!res) {
           setError(true);
         } else {
@@ -45,24 +45,21 @@ export default function Pages() {
     <div className="flex items-start gap-14">
       <ul>
         {patches
-          .map((p: Patch) => p.date)
-          .sort((a: string, b: string) => {
-            if (a > b) return -1;
-            if (a < b) return 1;
-            return 0;
+          .sort((a, b) => {
+            return a.date > b.date ? -1 : 1;
           })
-          .map((patchDate: string) => (
-            <li className="py-2" key={patchDate}>
+          .map((version) => (
+            <li className="py-2" key={version.id}>
               <Link
                 href={{
                   pathname: `/articles`,
                   query: {
                     name: pathName,
-                    version: patchDate,
+                    version: version.id,
                   },
                 }}
               >
-                {patchDate}
+                {`${version.date} - ${version.id} / Parent: ${version.parent ? version.parent : "None"}`}
               </Link>
             </li>
           ))}

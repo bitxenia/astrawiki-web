@@ -1,6 +1,6 @@
-import { Ecosystem, Patch } from "./ecosystems/ecosystem";
-import { getPatchFromTwoTexts, getTextFromPatches } from "./diff";
+import { Ecosystem } from "../ecosystems/ecosystem";
 import { ArticleCache } from "./cache";
+import { compileTextFromVersions, createVersion, Version } from "./version";
 
 export class Storage {
   cache: ArticleCache;
@@ -19,10 +19,12 @@ export class Storage {
    */
   async getArticle(name: string, version?: string): Promise<string> {
     const article = await this.cache.get(name, this.ecosystem);
-    const patches = version
-      ? article.getPatchBranch(version)
-      : article.getMainPatchBranch();
-    return getTextFromPatches(patches);
+    console.log("Fetched article! ", JSON.stringify(article));
+    console.log("Versions! ", article.getVersions());
+    const versions = version
+      ? article.getBranch(version)
+      : article.getMainBranch();
+    return compileTextFromVersions(versions);
   }
 
   /**
@@ -31,20 +33,21 @@ export class Storage {
    * @param rawMarkdown content of the article
    */
   async createArticle(articleName: string, rawMarkdown: string) {
-    const patch = getPatchFromTwoTexts("", rawMarkdown, null);
+    const version = createVersion("", rawMarkdown, null);
     if (this.ecosystem.optIn?.createWithContent) {
-      await this.ecosystem.createArticle(articleName, patch);
+      await this.ecosystem.createArticle(articleName, version);
       console.log("Article created successfully!");
     } else {
       await this.ecosystem.createArticle(articleName);
       console.log("Empty article created successfully!");
-      await this.ecosystem.editArticle(articleName, patch);
+      await this.ecosystem.editArticle(articleName, version);
     }
   }
 
   /**
-   * Builds patch and publishes update to the given ecosystem. Also invalidates
-   * the cache for the given article to force fetch the article again.
+   * Builds new article version and publishes it to the given ecosystem. Also
+   * invalidates the cache for the given article to force fetch the article
+   * again.
    * @param articleName name of the article to edit
    * @param oldPlainText raw markdown of the old version
    * @param newPlainText raw markdown of the updated version
@@ -56,20 +59,21 @@ export class Storage {
     newPlainText: string,
   ) {
     const article = await this.cache.get(articleName, this.ecosystem);
-    const parentId = article.getParentPatchId();
-    const patch = getPatchFromTwoTexts(oldPlainText, newPlainText, parentId);
-    this.ecosystem.editArticle(articleName, patch);
+    const parent = article.getLastVersion();
+    const version = createVersion(oldPlainText, newPlainText, parent);
+    console.log("Version created! ", version);
+    this.ecosystem.editArticle(articleName, version);
     this.cache.invalidate(articleName);
   }
 
   /**
-   * Gets article patches from the given ecosystem.
+   * Gets article versions from the given ecosystem.
    * @param name Name of the article, case sensitive.
-   * @returns Array of patches from the article.
+   * @returns Array of versions from the article.
    */
-  async getArticlePatches(name: string): Promise<Patch[]> {
+  async getArticleVersions(name: string): Promise<Version[]> {
     const article = await this.cache.get(name, this.ecosystem);
-    return article.getPatches();
+    return article.getVersions();
   }
 
   /**

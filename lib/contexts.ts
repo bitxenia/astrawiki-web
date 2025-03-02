@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { Storage } from "./storage";
+import { Storage } from "./articles/storage";
 
 export type EcosystemContextProps = {
   isESLoading: Readonly<boolean>;

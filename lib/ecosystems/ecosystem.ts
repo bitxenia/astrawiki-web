@@ -1,11 +1,5 @@
-import { patch_obj } from "diff-match-patch";
-import { Article } from "./article";
-
-export type Patch = {
-  date: string;
-  patch: (new () => patch_obj)[];
-  parentId: string | null; // Date string
-};
+import { Article } from "../articles/article";
+import { Version } from "../articles/version";
 
 export type OptIn = {
   createWithContent: boolean;
@@ -30,14 +24,14 @@ export interface Ecosystem {
    * Creates an article to repository. An article name must be unique.
    * If no patch is given, an empty article will be created.
    */
-  createArticle(name: string, patch?: Patch): Promise<null>;
+  createArticle(name: string, patch?: Version): Promise<void>;
 
   /**
-   * Edits an article by passing the delta/diff/patch as an argument.
+   * Edits an article by passing the new version as an argument.
    * @param name Name of the article to edit
-   * @param patch Patch to add to article
+   * @param version Version to add to article
    */
-  editArticle(name: string, patch: Patch): Promise<null>;
+  editArticle(name: string, version: Version): Promise<void>;
 
   // TODO: Deprecate this function and leave searching functionality to the
   // ecosystem

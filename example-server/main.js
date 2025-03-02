@@ -6,7 +6,7 @@ import {
   openDB,
   createArticle,
   getArticle,
-  updateArticle,
+  updateArticle as updateArticle,
   getArticles,
 } from "./sqlite.js";
 
@@ -22,34 +22,33 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/articles/:name", async (req, res) => {
-  await setTimeout(5000);
   const { name } = req.params;
   try {
-    const patches = await getArticle(name);
-
-    res.status(200).json({ patches });
-  } catch (err) {
-    if (err.code === "ENOENT") {
-      res.status(404).json({ error: "Document not found" });
-    } else {
-      console.log(err);
-      res.status(500).json({ error: "Internal Server Error" });
+    const versions = await getArticle(name);
+    if (!versions) {
+      console.log("Article not found");
+      return res.status(404).json({ error: "Article not found" });
     }
+    console.log("Versions fetched! ", versions);
+    return res.status(200).json({ versions });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 app.post("/articles", async (req, res) => {
-  const { name, patch } = req.body;
+  const { name, version } = req.body;
   if (!name) {
     console.log("Name is required");
     return res.status(400).json({ error: "Name is required" });
   }
 
-  const content = patch ? [patch] : null;
+  const content = version ? [version] : null;
 
-  const articlePatches = await getArticle(name);
+  const versions = await getArticle(name);
 
-  if (articlePatches) {
+  if (versions) {
     console.log("Article with this name already exists");
     return res
       .status(409)
@@ -57,7 +56,6 @@ app.post("/articles", async (req, res) => {
   }
 
   try {
-    // TODO: Create article with content
     const success = await createArticle(name, content);
 
     if (!success) {
@@ -73,39 +71,52 @@ app.post("/articles", async (req, res) => {
 });
 
 app.patch("/articles/:name", async (req, res) => {
-  await setTimeout(5000);
   const { name } = req.params;
-  const { date, patch, parentId } = req.body;
+  const version = req.body;
+  console.log(`Editing "${name} with version: ${JSON.stringify(version)}`);
 
-  if (!date) {
+  if (!version.date) {
+    console.log("Date is required");
     return res.status(400).json({ error: "Date is required" });
-  } else if (!patch) {
+  } else if (!version.patch) {
+    console.log("Patch is required");
     return res.status(400).json({ error: "Patch is required" });
+  } else if (!version.id) {
+    console.log("ID is required");
+    return res.status(400).json({ error: "ID is required" });
+  } else if (!version.parent) {
+    console.log("Parent is required");
+    return res.status(400).json({ error: "Parent is required" });
   }
 
-  let patches = [];
+  let versions = [];
 
   try {
-    patches = JSON.parse(await getArticle(name));
-  } catch (err) {
-    if (err.code !== "ENOENT") {
-      return res.status(404).json({ error: `Article "${name}" not found` });
+    const ret = await getArticle(name);
+    if (!ret) {
+      console.log("Article not found");
+      return res.status(409).json({ error: "Article not found" });
     }
-  }
-
-  patches.push({ date, patch, parentId });
-
-  try {
-    await updateArticle(name, JSON.stringify(patches));
-    res.status(200).json({ message: "Article updated successfully" });
+    versions = JSON.parse(ret);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+
+  versions.push(version);
+  console.log("New versions: ", versions);
+
+  try {
+    const ret = await updateArticle(name, JSON.stringify(versions));
+    if (!ret) return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(200).json({ message: "Article updated successfully" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 app.get("/articles", async (req, res) => {
-  // TODO: Filter results optionally
   const articles = (
     await getArticles(req.query.query, req.query.offset, req.query.limit)
   ).map((article) => article.name);
