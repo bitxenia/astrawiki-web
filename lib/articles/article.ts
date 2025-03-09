@@ -5,16 +5,14 @@ export class Article {
   private versions: Map<string, Version>;
   private lastVersion: VersionID | null;
   private cachedMainBranch: Version[] | null;
-  constructor(name: string, patches: Version[]) {
+  constructor(name: string, versions: Version[]) {
     this.name = name;
     this.versions = new Map();
-    for (const patch of patches) {
-      this.versions.set(patch.id, patch);
+    for (const version of versions) {
+      this.versions.set(version.id, version);
     }
     this.lastVersion = this.versions.size > 0 ? this.getLastPatch() : null;
     this.cachedMainBranch = null;
-    console.log("Last patches: ", this.lastVersion);
-    console.log("Patches1: ", this.versions);
   }
 
   private getLastPatch(): string {
@@ -45,14 +43,14 @@ export class Article {
     leaves: Set<VersionID>,
     versions: Map<VersionID, Version>,
   ): VersionID[] {
-    const rootDistanceByPatch: Map<VersionID, number> = new Map();
+    const rootDistanceByVersion: Map<VersionID, number> = new Map();
     let maxDistance = 0;
     const leafDistances: { leaf: VersionID; distance: number }[] = [];
 
     for (const leaf of leaves) {
       const distance = this.getVersionRootDistance(
         leaf,
-        rootDistanceByPatch,
+        rootDistanceByVersion,
         versions,
       );
       leafDistances.push({ leaf, distance });
@@ -105,7 +103,7 @@ export class Article {
    * Get complete main branch, down to the root. The main branch is defined by
    * the length of the branch, and the age of the latest version (in that order
    * of priority).
-   * @returns Array of patches, from root to the latest "main" patch.
+   * @returns Array of versions, from root to the latest "main" version.
    */
   getMainBranch(): Version[] {
     if (this.cachedMainBranch) return this.cachedMainBranch;
@@ -118,18 +116,18 @@ export class Article {
 
   /**
    * Get complete branch starting from a given version, down to the root.
-   * @param version Patch to start the branch from.
-   * @returns Array of patches, from root to the given patch.
+   * @param version Version to start the branch from.
+   * @returns Array of versions, from root to the given version.
    */
   getBranch(version: VersionID): Version[] {
     const ret = [];
-    let currentPatchId: string | null = version;
-    while (currentPatchId) {
-      const patch = this.versions.get(currentPatchId);
-      if (!patch)
-        throw Error("Version not found while walking main patch branch");
-      ret.push(patch);
-      currentPatchId = patch.parent;
+    let currentVersion: VersionID | null = version;
+    while (currentVersion) {
+      const version = this.versions.get(currentVersion);
+      if (!version)
+        throw Error("Version not found while walking main version branch");
+      ret.push(version);
+      currentVersion = version.parent;
     }
     ret.reverse();
     return ret;

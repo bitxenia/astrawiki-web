@@ -16,12 +16,12 @@ export class ArticleCache {
     }
   }
 
-  async get(articleName: string, ecosystem: Ecosystem): Promise<Article> {
-    let article = this.cache.get(articleName);
+  async get(name: string, ecosystem: Ecosystem): Promise<Article> {
+    let article = this.cache.get(name);
 
     if (article === undefined) {
-      article = await ecosystem.fetchArticle(articleName);
-      this.cache.set(articleName, article);
+      article = await ecosystem.fetchArticle(name);
+      this.cache.set(name, article);
     }
 
     return article;

@@ -22,9 +22,9 @@ export interface Ecosystem {
 
   /*
    * Creates an article to repository. An article name must be unique.
-   * If no patch is given, an empty article will be created.
+   * If no version is given, an empty article will be created.
    */
-  createArticle(name: string, patch?: Version): Promise<void>;
+  createArticle(name: string, version?: Version): Promise<void>;
 
   /**
    * Edits an article by passing the new version as an argument.

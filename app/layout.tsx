@@ -16,7 +16,7 @@ import {
 import { usePathname } from "next/navigation";
 import NoEcosystem from "./no-ecosystem";
 import { Toaster } from "react-hot-toast";
-import { Storage } from "@/lib/storage";
+import { Storage } from "@/lib/articles/storage";
 
 export default function RootLayout({
   children,
