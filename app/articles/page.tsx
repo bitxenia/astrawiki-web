@@ -65,7 +65,7 @@ export default function Pages() {
   const updatePath = () => {
     const paths = [pathName];
     if (articleVersion) {
-      paths.push(`Version ${articleVersion}`);
+      paths.push(`${articleVersion}`);
     }
     return paths;
   };

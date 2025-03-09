@@ -1,6 +1,11 @@
 import { Ecosystem } from "../ecosystems/ecosystem";
 import { ArticleCache } from "./cache";
-import { compileTextFromVersions, createVersion, Version } from "./version";
+import {
+  compileTextFromVersions,
+  createVersion,
+  Version,
+  VersionID,
+} from "./version";
 
 export class Storage {
   cache: ArticleCache;
@@ -101,5 +106,11 @@ export class Storage {
   isSearchOptimized(): boolean {
     if (!this.ecosystem.optIn) return false;
     return this.ecosystem.optIn.optimizedSearch;
+  }
+
+  async getMainBranchVersionIds(name: string): Promise<Set<VersionID>> {
+    const article = await this.cache.get(name, this.ecosystem);
+    const mainBranch = article.getMainBranch();
+    return new Set(mainBranch.map((version) => version.id));
   }
 }
