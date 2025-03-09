@@ -2,8 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 import { Paths } from "@/lib/pageroutes";
-import { Ecosystem } from "./ecosystems/ecosystem";
-import { Storage } from "./storage";
+import { Storage } from "./articles/storage";
 
 export type search = {
   title: string;
@@ -219,6 +218,7 @@ const PAGE_SIZE = 10;
  * support it.
  *
  * @param {string} query Text to match
+<<<<<<< HEAD
  * @param {Storage} storage Current storage
  * @param {number} page Page number
  * @returns Array of objects that contain a result's title and href for the

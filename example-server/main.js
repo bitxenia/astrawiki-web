@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import { setTimeout } from "timers/promises";
 import dotenv from "dotenv";
 import {
   openDB,
