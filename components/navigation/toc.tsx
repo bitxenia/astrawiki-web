@@ -3,7 +3,7 @@
 import Link from "next/link";
 import clsx from "clsx";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { TocItem } from "@/lib/markdown";
+import { TocItem } from "@/lib/toc";
 
 type TocProps = {
   tocs: TocItem[];

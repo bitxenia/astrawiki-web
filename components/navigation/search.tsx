@@ -16,7 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 import Anchor from "./anchor";
 import { simpleSearch, cn, debounce, highlight, search } from "@/lib/utils";
-import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
+import { EcosystemContext, StorageContext } from "@/lib/contexts";
 
 export default function Search() {
   const [searchedInput, setSearchedInput] = useState("");
@@ -28,33 +28,28 @@ export default function Search() {
   const [searchData, setSearchData] = useState<
     { title: string; href: string }[]
   >([]);
-  const { ecosystem, isESLoading } =
-    useContext<EcosystemContextProps>(EcosystemContext);
+  const { isESLoading } = useContext(EcosystemContext);
+  const { storage } = useContext(StorageContext);
 
   useEffect(() => {
     const fetchArticles = async () => {
       setSearchData([]);
-      if (!ecosystem) {
-        // NOTE: This should be unreachable unless localStorage ecosystem is
-        // not set and the user access a page without going through the
-        // landing page first.
+      if (!storage) {
         return;
       }
       setIsFetchingList(true);
-      if (ecosystem) {
-        const articleTitles = await ecosystem.getArticleList();
-        const docs = articleTitles.map((title) => {
-          return {
-            title,
-            href: `?name=${title}`,
-          };
-        });
-        setSearchData(docs);
-      }
+      const articleTitles = await storage.getArticleList();
+      const docs = articleTitles.map((title) => {
+        return {
+          title,
+          href: `?name=${title}`,
+        };
+      });
+      setSearchData(docs);
       setIsFetchingList(false);
     };
     fetchArticles();
-  }, [ecosystem]);
+  }, [storage]);
 
   const debouncedSearch = useMemo(
     () =>
@@ -195,7 +190,7 @@ export default function Search() {
           <ScrollArea className="max-h-[350px]">
             <div className="flex flex-col items-start overflow-y-auto px-1 pb-4 pt-1 sm:px-3">
               {searchedInput
-                ? filteredResults.map((item, index) => {
+                ? filteredResults.map((item) => {
                     if ("href" in item) {
                       return (
                         <DialogClose key={item.href} asChild>

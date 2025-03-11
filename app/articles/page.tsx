@@ -1,10 +1,5 @@
 "use client";
-import {
-  notFound,
-  ReadonlyURLSearchParams,
-  useSearchParams,
-} from "next/navigation";
-import { getRawArticle, getTableOfContents, TocItem } from "@/lib/markdown";
+import { notFound, useSearchParams } from "next/navigation";
 import { Settings } from "@/lib/meta";
 
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
@@ -12,55 +7,39 @@ import Toc from "@/components/navigation/toc";
 import Feedback from "@/components/navigation/feedback";
 import { BackToTop } from "@/components/navigation/backtotop";
 import { Typography } from "@/components/ui/typography";
-import { ReactElement, useContext, useEffect, useState } from "react";
-import { Ecosystem } from "@/lib/ecosystems/ecosystem";
+import { useContext, useEffect, useState } from "react";
 import {
   ArticleContext,
   ArticleContextProps,
   EcosystemContext,
-  EcosystemContextProps,
-  RawArticleContext,
-  RawArticleContextProps,
+  StorageContext,
 } from "@/lib/contexts";
-import { BarLoader } from "react-spinners";
 import Loading from "@/app/loading";
-import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeKatex from "rehype-katex";
 import rehypePrism from "rehype-prism-plus";
 import remarkGfm from "remark-gfm";
-
-type PageProps = {
-  params: { slug: string[] };
-};
+import { getTableOfContents, TocItem } from "@/lib/toc";
 
 export default function Pages() {
   const [error, setError] = useState<boolean>(false);
-  const { ecosystem, esName } = useContext<EcosystemContextProps>(
-    EcosystemContext,
-  ) as { ecosystem: Ecosystem; esName: string };
+  const { esName } = useContext(EcosystemContext);
+  const { storage } = useContext(StorageContext);
   const { article, setArticle } =
     useContext<ArticleContextProps>(ArticleContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [tableOfContents, setTableOfContents] = useState<TocItem[]>([]);
   const searchParams = useSearchParams();
   const pathName = searchParams.get("name")!;
-
-  const articleVersion = searchParams.has("version")
-    ? +searchParams.get("version")!
-    : undefined;
+  const articleVersion = searchParams.get("version") || undefined;
 
   useEffect(() => {
     async function fetchDocument() {
       setIsLoading(true);
       try {
-        const rawArticle = await getRawArticle(
-          pathName,
-          ecosystem,
-          articleVersion,
-        );
+        const rawArticle = await storage!.getArticle(pathName, articleVersion);
         setArticle(rawArticle);
         if (rawArticle) {
           setTableOfContents(await getTableOfContents(rawArticle));
@@ -72,7 +51,7 @@ export default function Pages() {
       setIsLoading(false);
     }
     fetchDocument();
-  }, [pathName, ecosystem, setArticle, searchParams]);
+  }, [pathName, storage, setArticle, searchParams]);
 
   if (error) notFound();
   else if (isLoading)
@@ -86,7 +65,7 @@ export default function Pages() {
   const updatePath = () => {
     const paths = [pathName];
     if (articleVersion) {
-      paths.push(`Version ${articleVersion}`);
+      paths.push(`${articleVersion}`);
     }
     return paths;
   };

@@ -9,19 +9,14 @@ import {
   ArticleContext,
   ArticleContextProps,
   EcosystemContext,
-  EcosystemContextProps,
+  StorageContext,
 } from "@/lib/contexts";
-import { getPatchFromTwoTexts } from "@/lib/diff";
-import { Ecosystem } from "@/lib/ecosystems/ecosystem";
-import { getRawArticle, invalidateCache } from "@/lib/markdown";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
-import { BarLoader } from "react-spinners";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeKatex from "rehype-katex";
-import rehypePrism from "rehype-prism-plus";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 
@@ -35,9 +30,8 @@ export default function Pages() {
 
   const [newArticle, setNewArticle] = useState<string | null>(null);
   const [error, setError] = useState<boolean>(false);
-  const { ecosystem, esName } = useContext<EcosystemContextProps>(
-    EcosystemContext,
-  ) as { ecosystem: Ecosystem; esName: string };
+  const { esName } = useContext(EcosystemContext);
+  const { storage } = useContext(StorageContext);
   const { article, setArticle } =
     useContext<ArticleContextProps>(ArticleContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -47,7 +41,7 @@ export default function Pages() {
     async function fetchDocument() {
       setIsLoading(true);
       try {
-        const rawArticle = await getRawArticle(pathName, ecosystem);
+        const rawArticle = await storage!.getArticle(pathName);
         setArticle(rawArticle);
         setNewArticle(rawArticle);
       } catch {
@@ -61,15 +55,9 @@ export default function Pages() {
   if (error) notFound();
 
   const saveChanges = async () => {
-    const patch = getPatchFromTwoTexts(article as string, newArticle as string);
-    if (patch.patch.length == 0) {
-      toast("No changes were made");
-      return;
-    }
     setIsPublishing(true);
-    await ecosystem.editArticle(pathName, patch);
+    storage!.editArticle(pathName, article as string, newArticle as string);
     setArticle(newArticle);
-    invalidateCache(pathName);
     toast.success("Edited successfully!");
     setIsPublishing(false);
     router.push(`/articles?name=${pathName}`);

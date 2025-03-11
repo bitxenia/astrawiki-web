@@ -13,7 +13,7 @@ export async function openDB() {
 
     try {
       await db.run(
-        'CREATE TABLE IF NOT EXISTS articles (name TEXT PRIMARY KEY NOT NULL, patches TEXT DEFAULT "[]")',
+        'CREATE TABLE IF NOT EXISTS articles (name TEXT PRIMARY KEY NOT NULL, versions TEXT DEFAULT "[]")',
       );
     } catch (dbError) {
       console.error(dbError);
@@ -24,42 +24,35 @@ export async function openDB() {
 export async function getArticle(articleName) {
   console.log(`Getting ${articleName}`);
   const article = await db.get(
-    "SELECT patches FROM articles WHERE name = ?",
+    "SELECT versions FROM articles WHERE name = ?",
     articleName,
   );
 
-  return article ? article.patches : null;
+  return article ? article.versions : null;
 }
 
-export async function createArticle(articleName, patches) {
-  let success = false;
-
-  const content = JSON.stringify(patches);
-
+export async function createArticle(articleName, versions) {
+  const content = JSON.stringify(versions);
   try {
-    success = await db.run(
-      "INSERT INTO articles (name, patches) VALUES (?, ?)",
-      [articleName, content ?? null],
+    const { changes } = await db.run(
+      "INSERT INTO articles (name, versions) VALUES (?, ?)",
+      [articleName, content],
     );
-  } catch (dbError) {
-    console.error(dbError);
+    return changes > 0;
+  } catch (err) {
+    throw Error(err);
   }
-
-  return success.changes > 0;
 }
-export async function updateArticle(articleName, patches) {
-  let success = false;
+export async function updateArticle(articleName, versions) {
   try {
-    success = db.run(
-      "UPDATE articles SET patches = ? WHERE name = ?",
-      patches,
-      articleName,
+    const { changes } = await db.run(
+      "UPDATE articles SET versions = ? WHERE name = ?",
+      [versions, articleName],
     );
-  } catch (dbError) {
-    console.error(dbError);
+    return changes > 0;
+  } catch (err) {
+    throw Error(err);
   }
-
-  return success.changes > 0;
 }
 
 export async function getArticles(query, offset, limit) {

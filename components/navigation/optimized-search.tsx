@@ -16,7 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 import Anchor from "./anchor";
 import { cn, debounce, optimizedSearch } from "@/lib/utils";
-import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
+import { EcosystemContext, StorageContext } from "@/lib/contexts";
 import { buttonVariants } from "../ui/button";
 
 export default function OptimizedSearch() {
@@ -29,11 +29,11 @@ export default function OptimizedSearch() {
   const [searchData, setSearchData] = useState<
     { title: string; href: string }[]
   >([]);
-  const { ecosystem, isESLoading } =
-    useContext<EcosystemContextProps>(EcosystemContext);
+  const { isESLoading } = useContext(EcosystemContext);
+  const { storage } = useContext(StorageContext);
 
   async function fetchResults() {
-    if (!ecosystem) {
+    if (!storage) {
       return;
     }
     setIsFetching(true);
@@ -42,7 +42,7 @@ export default function OptimizedSearch() {
     }
     const { results, hasMore } = await optimizedSearch(
       searchedInput,
-      ecosystem,
+      storage,
       page,
     );
     setHasMoreResults(hasMore);
@@ -52,7 +52,7 @@ export default function OptimizedSearch() {
 
   useEffect(() => {
     fetchResults();
-  }, [ecosystem, page]);
+  }, [storage, page]);
 
   const debouncedSearch = debounce(async () => {
     if (searchedInput.length < 3 && searchedInput.length > 0) {

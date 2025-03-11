@@ -1,9 +1,7 @@
 import { createContext } from "react";
-import { Ecosystem } from "./ecosystems/ecosystem";
+import { Storage } from "./articles/storage";
 
 export type EcosystemContextProps = {
-  ecosystem: Ecosystem | null;
-  setEcosystem: (ecosystem: Ecosystem | null) => void;
   isESLoading: Readonly<boolean>;
   setIsESLoading: (isLoading: boolean) => void;
   esName: string;
@@ -11,12 +9,20 @@ export type EcosystemContextProps = {
 };
 
 export const EcosystemContext = createContext<EcosystemContextProps>({
-  ecosystem: null,
-  setEcosystem: () => {},
   isESLoading: false,
   setIsESLoading: () => {},
   esName: "",
   setESName: () => {},
+});
+
+export type StorageContextProps = {
+  storage: Storage | null;
+  setStorage: (storage: Storage | null) => void;
+};
+
+export const StorageContext = createContext<StorageContextProps>({
+  storage: null,
+  setStorage: () => {},
 });
 
 export type ArticleContextProps = {
