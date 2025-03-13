@@ -22,7 +22,6 @@ export default function RootLayout({
   const [storage, setStorage] = useState<Storage | null>(null);
   const [isESLoading, setIsESLoading] = useState<boolean>(false);
   const [esName, setESName] = useState<string>("Pick an ecosystem");
-  const [article, setArticle] = useState<any>(null);
 
   const hideNavbarRoutes = ["/"];
   const hideNavbar = hideNavbarRoutes.includes(usePathname());
@@ -61,8 +60,7 @@ export default function RootLayout({
                     </p>
                   </div>
                 )}
-                {(storage || hideNavbar) && children}
-                {!storage && !hideNavbar && <NoEcosystem />}
+                {storage || hideNavbar ? children : <NoEcosystem />}
               </main>
             </StorageContext.Provider>
           </EcosystemContext.Provider>

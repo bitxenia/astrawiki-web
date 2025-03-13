@@ -1,5 +1,3 @@
-import { BarLoader } from "react-spinners";
-
 export default function Loading({
   title,
   desc,
