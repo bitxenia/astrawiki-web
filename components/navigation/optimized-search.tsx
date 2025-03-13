@@ -15,7 +15,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import Anchor from "./anchor";
-import { cn, debounce, optimizedSearch } from "@/lib/utils";
+import { debounce, optimizedSearch } from "@/lib/search";
+import { cn } from "@/lib/utils";
 import { EcosystemContext, StorageContext } from "@/lib/contexts";
 import { buttonVariants } from "../ui/button";
 
