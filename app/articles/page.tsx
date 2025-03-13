@@ -8,12 +8,7 @@ import Feedback from "@/components/navigation/feedback";
 import { BackToTop } from "@/components/navigation/backtotop";
 import { Typography } from "@/components/ui/typography";
 import { useContext, useEffect, useState } from "react";
-import {
-  ArticleContext,
-  ArticleContextProps,
-  EcosystemContext,
-  StorageContext,
-} from "@/lib/contexts";
+import { EcosystemContext, StorageContext } from "@/lib/contexts";
 import Loading from "@/app/loading";
 import ReactMarkdown from "react-markdown";
 import rehypeSlug from "rehype-slug";
@@ -27,8 +22,7 @@ export default function Pages() {
   const [error, setError] = useState<boolean>(false);
   const { esName } = useContext(EcosystemContext);
   const { storage } = useContext(StorageContext);
-  const { article, setArticle } =
-    useContext<ArticleContextProps>(ArticleContext);
+  const [article, setArticle] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [tableOfContents, setTableOfContents] = useState<TocItem[]>([]);
   const searchParams = useSearchParams();
@@ -51,7 +45,7 @@ export default function Pages() {
       setIsLoading(false);
     }
     fetchDocument();
-  }, [pathName, storage, setArticle, searchParams]);
+  }, [pathName, storage, searchParams]);
 
   if (error) notFound();
   else if (isLoading)
