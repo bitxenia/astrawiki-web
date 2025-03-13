@@ -1,6 +1,3 @@
-import Link from "next/link";
-
-import { buttonVariants } from "@/components/ui/button";
 import EcosystemPicker from "@/components/navigation/ecosystem-picker";
 
 export default function NoEcosystem() {

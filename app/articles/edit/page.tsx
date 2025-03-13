@@ -5,12 +5,7 @@ import notFound from "@/app/not-found";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import {
-  ArticleContext,
-  ArticleContextProps,
-  EcosystemContext,
-  StorageContext,
-} from "@/lib/contexts";
+import { EcosystemContext, StorageContext } from "@/lib/contexts";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -32,8 +27,7 @@ export default function Pages() {
   const [error, setError] = useState<boolean>(false);
   const { esName } = useContext(EcosystemContext);
   const { storage } = useContext(StorageContext);
-  const { article, setArticle } =
-    useContext<ArticleContextProps>(ArticleContext);
+  const [article, setArticle] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isPublishing, setIsPublishing] = useState(false);
 
@@ -55,8 +49,9 @@ export default function Pages() {
   if (error) notFound();
 
   const saveChanges = async () => {
+    if (!newArticle) return;
     setIsPublishing(true);
-    storage!.editArticle(pathName, article as string, newArticle as string);
+    storage!.editArticle(pathName, article, newArticle);
     setArticle(newArticle);
     toast.success("Edited successfully!");
     setIsPublishing(false);

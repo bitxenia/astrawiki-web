@@ -15,7 +15,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import Anchor from "./anchor";
-import { simpleSearch, cn, debounce, highlight, search } from "@/lib/utils";
+import { simpleSearch, debounce, search } from "@/lib/search";
+import { cn } from "@/lib/utils";
 import { EcosystemContext, StorageContext } from "@/lib/contexts";
 
 export default function Search() {
@@ -204,17 +205,6 @@ export default function Search() {
                               <LuFileText className="h-[1.1rem] w-[1.1rem]" />{" "}
                               {item.title}
                             </div>
-                            {"snippet" in item && item.snippet && (
-                              <p
-                                className="w-full truncate text-xs text-neutral-500 dark:text-neutral-400"
-                                dangerouslySetInnerHTML={{
-                                  __html: highlight(
-                                    item.snippet,
-                                    searchedInput,
-                                  ),
-                                }}
-                              />
-                            )}
                           </Anchor>
                         </DialogClose>
                       );

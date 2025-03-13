@@ -4,12 +4,7 @@ import Loading from "@/app/loading";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import {
-  ArticleContext,
-  ArticleContextProps,
-  EcosystemContext,
-  StorageContext,
-} from "@/lib/contexts";
+import { EcosystemContext, StorageContext } from "@/lib/contexts";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
@@ -21,7 +16,6 @@ export default function Pages() {
   const router = useRouter();
   const { esName } = useContext(EcosystemContext);
   const { storage } = useContext(StorageContext);
-  const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
@@ -30,7 +24,6 @@ export default function Pages() {
     setIsPublishing(true);
     storage!.createArticle(name, markdown);
     toast.success("Article published successfully!");
-    setArticle(markdown);
     setIsPublishing(false);
     router.push(`/articles?name=${title}`);
   };

@@ -8,11 +8,7 @@ import { Footer } from "@/components/navigation/footer";
 import { Settings } from "@/lib/meta";
 import "./globals.css";
 import { useState } from "react";
-import {
-  ArticleContext,
-  EcosystemContext,
-  StorageContext,
-} from "@/lib/contexts";
+import { EcosystemContext, StorageContext } from "@/lib/contexts";
 import { usePathname } from "next/navigation";
 import NoEcosystem from "./no-ecosystem";
 import { Toaster } from "react-hot-toast";
@@ -26,7 +22,6 @@ export default function RootLayout({
   const [storage, setStorage] = useState<Storage | null>(null);
   const [isESLoading, setIsESLoading] = useState<boolean>(false);
   const [esName, setESName] = useState<string>("Pick an ecosystem");
-  const [article, setArticle] = useState<any>(null);
 
   const hideNavbarRoutes = ["/"];
   const hideNavbar = hideNavbarRoutes.includes(usePathname());
@@ -56,20 +51,17 @@ export default function RootLayout({
             }}
           >
             <StorageContext.Provider value={{ storage, setStorage }}>
-              <ArticleContext.Provider value={{ article, setArticle }}>
-                {!hideNavbar && <Navbar />}
-                <main className="h-auto px-5 sm:px-8">
-                  {isESLoading && (
-                    <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
-                      <p className="text-2xl text-white">
-                        Initializing ecosystem...
-                      </p>
-                    </div>
-                  )}
-                  {(storage || hideNavbar) && children}
-                  {!storage && !hideNavbar && <NoEcosystem />}
-                </main>
-              </ArticleContext.Provider>
+              {!hideNavbar && <Navbar />}
+              <main className="h-auto px-5 sm:px-8">
+                {isESLoading && (
+                  <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
+                    <p className="text-2xl text-white">
+                      Initializing ecosystem...
+                    </p>
+                  </div>
+                )}
+                {storage || hideNavbar ? children : <NoEcosystem />}
+              </main>
             </StorageContext.Provider>
           </EcosystemContext.Provider>
           <Footer />
