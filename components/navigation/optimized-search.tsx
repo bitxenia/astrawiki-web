@@ -46,14 +46,15 @@ export default function OptimizedSearch() {
       storage,
       page,
     );
+
     setHasMoreResults(hasMore);
     setSearchData((data) => data.concat(results));
     setIsFetching(false);
   }
 
   useEffect(() => {
-    fetchResults();
-  }, [storage, page]);
+    setPage(0);
+  }, [searchedInput]);
 
   const debouncedSearch = debounce(async () => {
     if (searchedInput.length < 3 && searchedInput.length > 0) {
@@ -69,12 +70,11 @@ export default function OptimizedSearch() {
         setSearchData([]);
         setHasMoreResults(false);
       } else {
-        setPage(0);
         debouncedSearch();
       }
     };
     processInput();
-  }, [searchedInput]);
+  }, [searchedInput, storage, page]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
