@@ -23,7 +23,7 @@ export default function Pages() {
   const publishArticle = async (name: string) => {
     setIsPublishing(true);
     console.time("createArticle");
-    storage!.createArticle(name, markdown);
+    await storage!.createArticle(name, markdown);
     console.timeEnd("createArticle");
     toast.success("Article published successfully!");
     setIsPublishing(false);

@@ -7,15 +7,20 @@ import { Article } from "../articles/article";
 import { Version } from "../articles/version";
 
 class EthEcosystem implements Ecosystem {
-  optIn?: OptIn | undefined;
-  searchArticles(
+  optIn?: OptIn = {
+    createWithContent: true,
+    optimizedSearch: false,
+  };
+
+  factoryInstance: any;
+
+  async searchArticles(
     query: string,
     limit: number,
     offset: number,
   ): Promise<string[]> {
     throw new Error("Method not implemented.");
   }
-  factoryInstance: any;
 
   async init(): Promise<void> {
     this.factoryInstance = new web3.eth.Contract(
@@ -45,13 +50,12 @@ class EthEcosystem implements Ecosystem {
     return new Article(name, patches);
   }
 
-  async createArticle(name: string): Promise<void> {
+  async createArticle(name: string, version?: Version): Promise<void> {
     const accounts = await web3.eth.getAccounts();
-    await this.factoryInstance.methods
-      .crearArticulo(name, JSON.stringify([]))
-      .send({
-        from: accounts[0],
-      });
+    const contenido = version ? JSON.stringify([version]) : JSON.stringify([]);
+    await this.factoryInstance.methods.crearArticulo(name, contenido).send({
+      from: accounts[0],
+    });
   }
 
   async editArticle(name: string, version: Version): Promise<void> {
