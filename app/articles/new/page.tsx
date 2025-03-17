@@ -22,7 +22,7 @@ export default function Pages() {
 
   const publishArticle = async (name: string) => {
     setIsPublishing(true);
-    storage!.createArticle(name, markdown);
+    await storage!.createArticle(name, markdown);
     toast.success("Article published successfully!");
     setIsPublishing(false);
     router.push(`/articles?name=${title}`);
