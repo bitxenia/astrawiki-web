@@ -22,7 +22,7 @@ export default function Home() {
       {storage && (
         <div className="flex items-center gap-5">
           {storage.isSearchOptimized() ? <OptimizedSearch /> : <Search />}
-          <text className="font-thin">or</text>
+          <span className="font-thin">or</span>
           <Link
             href={"/articles/new/"}
             className={buttonVariants({ variant: "default", size: "sm" })}

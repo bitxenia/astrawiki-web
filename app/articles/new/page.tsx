@@ -22,7 +22,9 @@ export default function Pages() {
 
   const publishArticle = async (name: string) => {
     setIsPublishing(true);
+    console.time("createArticle");
     await storage!.createArticle(name, markdown);
+    console.timeEnd("createArticle");
     toast.success("Article published successfully!");
     setIsPublishing(false);
     router.push(`/articles?name=${title}`);
@@ -57,7 +59,7 @@ export default function Pages() {
                 value={markdown}
                 onChange={(e) => setMarkdown(e.target.value)}
               />
-              <text className="pb-2 pt-4 font-semibold">Preview</text>
+              <span className="pb-2 pt-4 font-semibold">Preview</span>
               <div className="markdown-preview rounded-md border p-4">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {markdown}

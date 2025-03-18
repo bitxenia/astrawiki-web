@@ -1,15 +1,15 @@
 import axios, { HttpStatusCode } from "axios";
 import { Ecosystem, OptIn } from "./ecosystem";
-import dotenv from "dotenv";
 import { Article } from "../articles/article";
 import { Version } from "../articles/version";
+import env from "dotenv";
 
-dotenv.config();
+env.config();
 
 const PORT = process.env.PORT ? process.env.PORT : 3001;
 const URL =
-  process.env.ENV === "prod"
-    ? process.env.EXAMPLE_SERVER_URL
+  process.env.NEXT_PUBLIC_RUN_ENV === "prod"
+    ? process.env.NEXT_PUBLIC_EXAMPLE_SERVER_URL
     : `http://localhost:${PORT}`;
 
 type ArticleResponse = {
@@ -51,8 +51,11 @@ export default class ExampleServer implements Ecosystem {
     const { status } = version
       ? await axios.post(`${URL}/articles/`, { name, version })
       : await axios.post(`${URL}/articles/`, { name });
+
     if (status === HttpStatusCode.Conflict) {
       throw Error("Article already exists");
+    } else if (status !== HttpStatusCode.Created) {
+      throw Error(`Server error: ${status}`);
     }
 
     console.log("Article posted succesfully");
