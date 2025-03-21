@@ -75,7 +75,7 @@ const PAGE_SIZE = 10;
  * support it.
  *
  * @param {string} query Text to match
- * @param {Storage} storage Current storage
+ * @param {EcosystemBasedStorage} storage Current storage
  * @param {number} page Page number
  * @returns Array of objects that contain a result's title and href for the
  * search component

@@ -14,7 +14,8 @@ import {
 import { useContext, useEffect } from "react";
 import ExampleServer from "@/lib/ecosystems/example-server";
 import EthEcosystem from "@/lib/ecosystems/eth-ecosystem";
-import { Storage } from "@/lib/articles/storage";
+import { EcosystemBasedStorage } from "@/lib/articles/ecosystem-based-storage";
+import IPFSStorage from "@/lib/articles/ipfs-storage";
 
 export default function EcosystemPicker() {
   const { setIsESLoading, esName, setESName } =
@@ -43,7 +44,7 @@ export default function EcosystemPicker() {
     setESName("Loading...");
     const es = new ExampleServer();
     await es.init();
-    setStorage(new Storage(es));
+    setStorage(new EcosystemBasedStorage(es));
     setESName("Example Server");
     localStorage.setItem("ecosystem", "Example Server");
     setIsESLoading(false);
@@ -54,9 +55,18 @@ export default function EcosystemPicker() {
     setESName("Loading...");
     const es = new EthEcosystem();
     await es.init();
-    setStorage(new Storage(es));
+    setStorage(new EcosystemBasedStorage(es));
     setESName("Blockchain");
     localStorage.setItem("ecosystem", "Blockchain");
+    setIsESLoading(false);
+  };
+
+  const setIPFS = async () => {
+    setIsESLoading(true);
+    setESName("Loading...");
+    setStorage(new IPFSStorage());
+    setESName("IPFS");
+    localStorage.setItem("ecosystem", "IPFS");
     setIsESLoading(false);
   };
 
@@ -71,7 +81,7 @@ export default function EcosystemPicker() {
         <DropdownMenuItem onClick={setExampleServer}>
           Example Server
         </DropdownMenuItem>
-        <DropdownMenuItem>IPFS</DropdownMenuItem>
+        <DropdownMenuItem onClick={setIPFS}>IPFS</DropdownMenuItem>
         <DropdownMenuItem onClick={setBlockchain}>Blockchain</DropdownMenuItem>
         <DropdownMenuItem>Freenet</DropdownMenuItem>
       </DropdownMenuContent>
