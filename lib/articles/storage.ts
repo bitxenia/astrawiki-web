@@ -29,7 +29,9 @@ export class Storage {
     const versions = version
       ? article.getBranch(version)
       : article.getMainBranch();
-    return compileTextFromVersions(versions);
+    const res = compileTextFromVersions(versions);
+    console.timeEnd("Fetching article");
+    return res;
   }
 
   /**
@@ -67,7 +69,7 @@ export class Storage {
     const parent = article.getLastVersion();
     const version = createVersion(oldPlainText, newPlainText, parent);
     console.log("Version created! ", version);
-    this.ecosystem.editArticle(articleName, version);
+    await this.ecosystem.editArticle(articleName, version);
     this.cache.invalidate(articleName);
   }
 

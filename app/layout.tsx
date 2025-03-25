@@ -13,6 +13,7 @@ import { usePathname } from "next/navigation";
 import NoEcosystem from "./no-ecosystem";
 import { Toaster } from "react-hot-toast";
 import { Storage } from "@/lib/articles/storage";
+import Datadog from "@/components/datadog";
 
 export default function RootLayout({
   children,
@@ -33,6 +34,7 @@ export default function RootLayout({
         className={`${GeistSans.variable} ${GeistMono.variable} font-regular`}
         suppressHydrationWarning
       >
+        <Datadog />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
