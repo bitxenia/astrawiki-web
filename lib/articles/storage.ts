@@ -29,9 +29,7 @@ export class Storage {
     const versions = version
       ? article.getBranch(version)
       : article.getMainBranch();
-    const res = compileTextFromVersions(versions);
-    console.timeEnd("Fetching article");
-    return res;
+    return compileTextFromVersions(versions);
   }
 
   /**
