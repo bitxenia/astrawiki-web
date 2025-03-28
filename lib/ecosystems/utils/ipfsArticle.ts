@@ -1,10 +1,11 @@
 //import { type OrbitDB } from "@orbitdb/core";
-import { Patch } from "../ecosystem";
+
+import { Version } from "@/lib/articles/version";
 
 export class IPFSArticle {
   orbitdb: any;
   name: string;
-  patches: Patch[];
+  patches: Version[];
   articleDB: any;
   initialized: boolean | undefined;
 
@@ -25,7 +26,7 @@ export class IPFSArticle {
     // TODO: Wait for replication to finish?
 
     // TODO: We should store the patches in a more efficient way.
-    let patches: Patch[] = [];
+    let patches: Version[] = [];
     for await (const record of this.articleDB.iterator()) {
       let patch = JSON.parse(record.value);
       // TODO: Insert at start to avoid reverse in fetch (double-linked list?)
@@ -36,7 +37,7 @@ export class IPFSArticle {
     this.initialized = true;
   }
 
-  public async newPatch(patch: Patch) {
+  public async newPatch(patch: Version) {
     this.patches.push(patch);
     await this.articleDB.add(JSON.stringify(patch));
   }

@@ -15,6 +15,7 @@ import { useContext, useEffect } from "react";
 import ExampleServer from "@/lib/ecosystems/example-server";
 import EthEcosystem from "@/lib/ecosystems/eth-ecosystem";
 import { Storage } from "@/lib/articles/storage";
+import IPFSEcosystem from "@/lib/ecosystems/ipfs-ecosystem";
 
 export default function EcosystemPicker() {
   const { setIsESLoading, esName, setESName } =
@@ -65,7 +66,7 @@ export default function EcosystemPicker() {
     setESName("Loading...");
     const es = new IPFSEcosystem();
     await es.init();
-    setEcosystem(es);
+    setStorage(new Storage(es));
     setESName("IPFS");
     localStorage.setItem("ecosystem", "IPFS");
     setIsESLoading(false);
