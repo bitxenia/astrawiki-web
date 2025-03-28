@@ -4,14 +4,7 @@ import Loading from "@/app/loading";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import {
-  ArticleContext,
-  ArticleContextProps,
-  EcosystemContext,
-  EcosystemContextProps,
-} from "@/lib/contexts";
-import { getPatchFromTwoTexts } from "@/lib/diff";
-import { Ecosystem } from "@/lib/ecosystems/ecosystem";
+import { EcosystemContext, StorageContext } from "@/lib/contexts";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
@@ -21,27 +14,18 @@ import remarkGfm from "remark-gfm";
 
 export default function Pages() {
   const router = useRouter();
-  const { ecosystem, esName } = useContext<EcosystemContextProps>(
-    EcosystemContext,
-  ) as { ecosystem: Ecosystem; esName: string };
-  const { setArticle } = useContext<ArticleContextProps>(ArticleContext);
-  const path = ["New"];
+  const { esName } = useContext(EcosystemContext);
+  const { storage } = useContext(StorageContext);
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
 
   const publishArticle = async (name: string) => {
     setIsPublishing(true);
-    await ecosystem
-      .createArticle(name)
-      .catch((err) => console.log("Create article: ", err));
-    let patch = getPatchFromTwoTexts("", markdown);
-    console.log("Article created successfully!");
-    await ecosystem
-      .editArticle(name, patch)
-      .catch((err) => console.log("Edit article: ", err));
+    console.time("createArticle");
+    await storage!.createArticle(name, markdown);
+    console.timeEnd("createArticle");
     toast.success("Article published successfully!");
-    setArticle(markdown);
     setIsPublishing(false);
     router.push(`/articles?name=${title}`);
   };
@@ -58,7 +42,7 @@ export default function Pages() {
   return (
     <div className="flex items-start gap-14">
       <div className="flex-[3] pt-10">
-        <PageBreadcrumb paths={path} />
+        <PageBreadcrumb paths={["New"]} />
         <Typography>
           <div className="space-y-4">
             <input
@@ -75,7 +59,7 @@ export default function Pages() {
                 value={markdown}
                 onChange={(e) => setMarkdown(e.target.value)}
               />
-              <text className="pb-2 pt-4 font-semibold">Preview</text>
+              <span className="pb-2 pt-4 font-semibold">Preview</span>
               <div className="markdown-preview rounded-md border p-4">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {markdown}

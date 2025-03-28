@@ -15,8 +15,9 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import Anchor from "./anchor";
-import { advanceSearch, cn, debounce, highlight, search } from "@/lib/utils";
-import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
+import { simpleSearch, debounce, search } from "@/lib/search";
+import { cn } from "@/lib/utils";
+import { EcosystemContext, StorageContext } from "@/lib/contexts";
 
 export default function Search() {
   const [searchedInput, setSearchedInput] = useState("");
@@ -28,36 +29,36 @@ export default function Search() {
   const [searchData, setSearchData] = useState<
     { title: string; href: string }[]
   >([]);
-  const { ecosystem, isESLoading } =
-    useContext<EcosystemContextProps>(EcosystemContext);
+  const { isESLoading } = useContext(EcosystemContext);
+  const { storage } = useContext(StorageContext);
 
   useEffect(() => {
     const fetchArticles = async () => {
-      setIsFetchingList(true);
       setSearchData([]);
-      if (ecosystem) {
-        const articleTitles = await ecosystem.getArticleList();
-        const docs = articleTitles.map((title) => {
-          return {
-            title,
-            href: `?name=${title}`,
-          };
-        });
-        setSearchData(docs);
+      if (!storage) {
+        return;
       }
+      setIsFetchingList(true);
+      const articleTitles = await storage.getArticleList();
+      const docs = articleTitles.map((title) => {
+        return {
+          title,
+          href: `?name=${title}`,
+        };
+      });
+      setSearchData(docs);
       setIsFetchingList(false);
     };
     fetchArticles();
-  }, [ecosystem]);
+  }, [storage]);
 
   const debouncedSearch = useMemo(
     () =>
-      debounce((input) => {
+      debounce(async (input) => {
         setIsLoading(true);
-        const results = advanceSearch(input.trim(), searchData);
-        setFilteredResults(results);
+        setFilteredResults(simpleSearch(input.trim(), searchData));
         setIsLoading(false);
-      }, 200),
+      }, 300),
     [searchData],
   );
 
@@ -85,11 +86,14 @@ export default function Search() {
   }, [isOpen, filteredResults, isESLoading]);
 
   useEffect(() => {
-    if (searchedInput.length >= 3) {
-      debouncedSearch(searchedInput);
-    } else {
-      setFilteredResults([]);
-    }
+    const processInput = async () => {
+      if (searchedInput.length >= 3) {
+        debouncedSearch(searchedInput);
+      } else {
+        setFilteredResults([]);
+      }
+    };
+    processInput();
   }, [searchedInput, debouncedSearch]);
 
   function renderDocuments(
@@ -187,7 +191,7 @@ export default function Search() {
           <ScrollArea className="max-h-[350px]">
             <div className="flex flex-col items-start overflow-y-auto px-1 pb-4 pt-1 sm:px-3">
               {searchedInput
-                ? filteredResults.map((item, index) => {
+                ? filteredResults.map((item) => {
                     if ("href" in item) {
                       return (
                         <DialogClose key={item.href} asChild>
@@ -201,17 +205,6 @@ export default function Search() {
                               <LuFileText className="h-[1.1rem] w-[1.1rem]" />{" "}
                               {item.title}
                             </div>
-                            {"snippet" in item && item.snippet && (
-                              <p
-                                className="w-full truncate text-xs text-neutral-500 dark:text-neutral-400"
-                                dangerouslySetInnerHTML={{
-                                  __html: highlight(
-                                    item.snippet,
-                                    searchedInput,
-                                  ),
-                                }}
-                              />
-                            )}
                           </Anchor>
                         </DialogClose>
                       );

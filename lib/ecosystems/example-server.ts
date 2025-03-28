@@ -1,77 +1,95 @@
 import axios, { HttpStatusCode } from "axios";
-import { Article, Patch, Ecosystem } from "./ecosystem";
-import dotenv from "dotenv";
+import { Ecosystem, OptIn } from "./ecosystem";
+import { Article } from "../articles/article";
+import { Version } from "../articles/version";
+import env from "dotenv";
 
-dotenv.config();
+env.config();
 
 const PORT = process.env.PORT ? process.env.PORT : 3001;
 const URL =
-  process.env.ENV === "prod" ? process.env.URL : `http://localhost:${PORT}`;
+  process.env.NEXT_PUBLIC_RUN_ENV === "prod"
+    ? process.env.NEXT_PUBLIC_EXAMPLE_SERVER_URL
+    : `http://localhost:${PORT}`;
 
 type ArticleResponse = {
-  patches: string;
+  versions: string;
 };
 
 export default class ExampleServer implements Ecosystem {
+  optIn?: OptIn = {
+    createWithContent: true,
+    optimizedSearch: true,
+  };
+
   async init() {
     console.log("Initializing");
-    const delay = (ms: number) =>
-      new Promise((resolve) => setTimeout(resolve, ms));
-    await delay(5000);
   }
 
   async fetchArticle(name: string): Promise<Article> {
     if (name.length === 0) {
-      return Promise.reject("Name cannot be empty");
+      throw Error("No name given");
     }
 
     const { data, status } = await axios.get<ArticleResponse>(
       `${URL}/articles/${name}`,
     );
     if (status === HttpStatusCode.NotFound) {
-      return Promise.reject("Article not found");
+      throw Error("Article not found in ecosystem");
     } else if (status !== HttpStatusCode.Ok) {
-      return Promise.reject("Server error");
+      throw Error("Server error");
     }
-    const newArticle: Article = {
-      name,
-      patches: JSON.parse(data.patches),
-    };
-    return Promise.resolve(newArticle);
+    return new Article(name, JSON.parse(data.versions));
   }
 
-  async createArticle(name: string): Promise<null> {
+  async createArticle(name: string, version?: Version): Promise<void> {
     if (name.length === 0) {
-      console.log("Name cannot be empty");
-      return Promise.reject("Name cannot be empty");
+      throw Error("Name cannot be empty");
     }
 
     console.log(`Name: ${name}`);
-    const { status } = await axios.post(`${URL}/articles/`, { name });
+    const { status } = version
+      ? await axios.post(`${URL}/articles/`, { name, version })
+      : await axios.post(`${URL}/articles/`, { name });
+
     if (status === HttpStatusCode.Conflict) {
-      console.log("Article already exists");
-      return Promise.reject("Article already exists");
+      throw Error("Article already exists");
+    } else if (status !== HttpStatusCode.Created) {
+      throw Error(`Server error: ${status}`);
     }
 
     console.log("Article posted succesfully");
-    return Promise.resolve(null);
   }
 
-  async editArticle(name: string, patch: Patch): Promise<null> {
+  async editArticle(name: string, version: Version): Promise<void> {
     if (name.length === 0) {
-      return Promise.reject("Name cannot be empty");
+      throw Error("No name given");
     }
-    const { status } = await axios.patch(`${URL}/articles/${name}`, patch);
+    const { status } = await axios.patch(`${URL}/articles/${name}`, version);
     if (status === HttpStatusCode.BadRequest) {
-      return Promise.reject("Bad request");
+      throw Error("Bad request while editing article");
     } else if (status === HttpStatusCode.NotFound) {
-      return Promise.reject("Article not found");
+      throw Error("Article to edit not found");
     }
-    return Promise.resolve(null);
   }
 
   async getArticleList(): Promise<string[]> {
     const { data } = await axios.get<string[]>(`${URL}/articles`);
-    return Promise.resolve(data);
+    return data;
+  }
+
+  async searchArticles(
+    query: string,
+    limit: number = 10,
+    offset: number = 0,
+  ): Promise<string[]> {
+    const { data } = await axios.get<string[]>(`${URL}/articles`, {
+      params: {
+        query,
+        limit,
+        offset,
+      },
+    });
+    return data;
   }
 }

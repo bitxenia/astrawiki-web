@@ -1,5 +1,10 @@
 "use client";
-import { EcosystemContext, EcosystemContextProps } from "@/lib/contexts";
+import {
+  EcosystemContext,
+  EcosystemContextProps,
+  StorageContext,
+  StorageContextProps,
+} from "@/lib/contexts";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,12 +14,12 @@ import {
 import { useContext, useEffect } from "react";
 import ExampleServer from "@/lib/ecosystems/example-server";
 import EthEcosystem from "@/lib/ecosystems/eth-ecosystem";
-import { invalidateCache } from "@/lib/markdown";
-import IPFSEcosystem from "@/lib/ecosystems/ipfs-ecosystem";
+import { Storage } from "@/lib/articles/storage";
 
 export default function EcosystemPicker() {
-  const { setEcosystem, setIsESLoading, esName, setESName } =
+  const { setIsESLoading, esName, setESName } =
     useContext<EcosystemContextProps>(EcosystemContext);
+  const { setStorage } = useContext<StorageContextProps>(StorageContext);
 
   useEffect(() => {
     const storedEcosystem = localStorage.getItem("ecosystem");
@@ -38,9 +43,8 @@ export default function EcosystemPicker() {
     setESName("Loading...");
     const es = new ExampleServer();
     await es.init();
-    setEcosystem(es);
+    setStorage(new Storage(es));
     setESName("Example Server");
-    invalidateCache();
     localStorage.setItem("ecosystem", "Example Server");
     setIsESLoading(false);
   };
@@ -50,7 +54,7 @@ export default function EcosystemPicker() {
     setESName("Loading...");
     const es = new EthEcosystem();
     await es.init();
-    setEcosystem(es);
+    setStorage(new Storage(es));
     setESName("Blockchain");
     localStorage.setItem("ecosystem", "Blockchain");
     setIsESLoading(false);

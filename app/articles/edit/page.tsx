@@ -5,20 +5,14 @@ import notFound from "@/app/not-found";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import {
-  ArticleContext,
-  ArticleContextProps,
-  EcosystemContext,
-  EcosystemContextProps,
-} from "@/lib/contexts";
-import { getPatchFromTwoTexts } from "@/lib/diff";
-import { Ecosystem } from "@/lib/ecosystems/ecosystem";
-import { getRawArticle, invalidateCache } from "@/lib/markdown";
+import { EcosystemContext, StorageContext } from "@/lib/contexts";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
-import { BarLoader } from "react-spinners";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeKatex from "rehype-katex";
+import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 
 export default function Pages() {
@@ -31,11 +25,9 @@ export default function Pages() {
 
   const [newArticle, setNewArticle] = useState<string | null>(null);
   const [error, setError] = useState<boolean>(false);
-  const { ecosystem, esName } = useContext<EcosystemContextProps>(
-    EcosystemContext,
-  ) as { ecosystem: Ecosystem; esName: string };
-  const { article, setArticle } =
-    useContext<ArticleContextProps>(ArticleContext);
+  const { esName } = useContext(EcosystemContext);
+  const { storage } = useContext(StorageContext);
+  const [article, setArticle] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isPublishing, setIsPublishing] = useState(false);
 
@@ -43,7 +35,7 @@ export default function Pages() {
     async function fetchDocument() {
       setIsLoading(true);
       try {
-        const rawArticle = await getRawArticle(pathName, ecosystem);
+        const rawArticle = await storage!.getArticle(pathName);
         setArticle(rawArticle);
         setNewArticle(rawArticle);
       } catch {
@@ -57,15 +49,10 @@ export default function Pages() {
   if (error) notFound();
 
   const saveChanges = async () => {
-    const patch = getPatchFromTwoTexts(article as string, newArticle as string);
-    if (patch.patch.length == 0) {
-      toast("No changes were made");
-      return;
-    }
+    if (!newArticle) return;
     setIsPublishing(true);
-    await ecosystem.editArticle(pathName, patch);
+    storage!.editArticle(pathName, article, newArticle);
     setArticle(newArticle);
-    invalidateCache(pathName);
     toast.success("Edited successfully!");
     setIsPublishing(false);
     router.push(`/articles?name=${pathName}`);
@@ -106,7 +93,14 @@ export default function Pages() {
                 onChange={(e) => setNewArticle(e.target.value)}
               />
               <div className="markdown-preview rounded-md border p-4">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[
+                    rehypeSlug,
+                    rehypeAutolinkHeadings,
+                    rehypeKatex,
+                  ]}
+                >
                   {newArticle}
                 </ReactMarkdown>
               </div>

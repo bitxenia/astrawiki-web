@@ -1,15 +1,15 @@
 import express from "express";
-import path from "path";
 import cors from "cors";
-import { readFile, writeFile, access, readdir } from "node:fs/promises";
-import { setTimeout } from "timers/promises";
 import dotenv from "dotenv";
-import { dirname } from "node:path"; // For Node 16
-import { fileURLToPath } from "node:url"; // For Node 16
+import {
+  openDB,
+  createArticle,
+  getArticle,
+  updateArticle as updateArticle,
+  getArticles,
+} from "./sqlite.js";
 
-const __dirname = import.meta.dirname
-  ? import.meta.dirname
-  : dirname(fileURLToPath(import.meta.url));
+openDB();
 
 dotenv.config();
 
@@ -21,51 +21,48 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/articles/:name", async (req, res) => {
-  await setTimeout(5000);
   const { name } = req.params;
   try {
-    const patchesPath = path.join(__dirname, "content", `${name}.json`);
-
-    const patches = await readFile(patchesPath, "utf-8");
-
-    res.status(200).json({ patches });
-  } catch (err) {
-    if (err.code === "ENOENT") {
-      res.status(404).json({ error: "Document not found" });
-    } else {
-      console.log(err);
-      res.status(500).json({ error: "Internal Server Error" });
+    const versions = await getArticle(name);
+    if (!versions) {
+      console.log("Article not found");
+      return res.status(404).json({ error: "Article not found" });
     }
+    console.log("Versions fetched! ", versions);
+    return res.status(200).json({ versions });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
 app.post("/articles", async (req, res) => {
-  await setTimeout(5000);
-  const { name } = req.body;
+  const { name, version } = req.body;
   if (!name) {
     console.log("Name is required");
     return res.status(400).json({ error: "Name is required" });
   }
 
-  const patchesPath = path.join(__dirname, "content", `${name}.json`);
+  const content = version ? [version] : null;
 
-  try {
-    await access(patchesPath);
+  const versions = await getArticle(name);
+
+  if (versions) {
     console.log("Article with this name already exists");
     return res
       .status(409)
       .json({ error: "Article with this name already exists" });
-  } catch (err) {
-    if (err.code != "ENOENT") {
-      console.log(err);
-      return res.status(500).json({ error: "Internal Server Error" });
-    }
   }
 
   try {
-    await writeFile(patchesPath, "[]", "utf-8");
-    console.log("Empty article created successfully");
-    res.status(201).json({ message: "Empty article created successfully" });
+    const success = await createArticle(name, content);
+
+    if (!success) {
+      throw new Error("Could not create article");
+    }
+
+    console.log("Article created successfully");
+    res.status(201).json({ message: "Article created successfully" });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Internal Server Error" });
@@ -73,41 +70,55 @@ app.post("/articles", async (req, res) => {
 });
 
 app.patch("/articles/:name", async (req, res) => {
-  await setTimeout(5000);
   const { name } = req.params;
-  const { date, patch } = req.body;
-  if (!date) {
+  const version = req.body;
+  console.log(`Editing "${name} with version: ${JSON.stringify(version)}`);
+
+  if (!version.date) {
+    console.log("Date is required");
     return res.status(400).json({ error: "Date is required" });
-  } else if (!patch) {
+  } else if (!version.patch) {
+    console.log("Patch is required");
     return res.status(400).json({ error: "Patch is required" });
+  } else if (!version.id) {
+    console.log("ID is required");
+    return res.status(400).json({ error: "ID is required" });
+  } else if (!version.parent) {
+    console.log("Parent is required");
+    return res.status(400).json({ error: "Parent is required" });
   }
-  const patchesPath = path.join(__dirname, "content", `${name}.json`);
-  let patches = [];
+
+  let versions = [];
+
   try {
-    patches = JSON.parse(await readFile(patchesPath, "utf-8"));
-  } catch (err) {
-    if (err.code !== "ENOENT") {
-      return res.status(404).json({ error: `File "${patchesPath}" not found` });
+    const ret = await getArticle(name);
+    if (!ret) {
+      console.log("Article not found");
+      return res.status(409).json({ error: "Article not found" });
     }
-  }
-
-  patches.push({ date, patch });
-
-  try {
-    await writeFile(patchesPath, JSON.stringify(patches), "utf-8");
-    res.status(200).json({ message: "Article updated successfully" });
+    versions = JSON.parse(ret);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+
+  versions.push(version);
+  console.log("New versions: ", versions);
+
+  try {
+    const ret = await updateArticle(name, JSON.stringify(versions));
+    if (!ret) return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(200).json({ message: "Article updated successfully" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-app.get("/articles", async (_req, res) => {
-  const contentPath = path.join(__dirname, "content");
-  const articles = (await readdir(contentPath)).map((filename) =>
-    filename.replace(".json", ""),
-  );
-  await setTimeout(5000);
+app.get("/articles", async (req, res) => {
+  const articles = (
+    await getArticles(req.query.query, req.query.offset, req.query.limit)
+  ).map((article) => article.name);
   return res.status(200).json(articles);
 });
 
