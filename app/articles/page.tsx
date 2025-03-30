@@ -33,7 +33,9 @@ export default function Pages() {
     async function fetchDocument() {
       setIsLoading(true);
       try {
+        console.time("getArticle");
         const rawArticle = await storage!.getArticle(pathName, articleVersion);
+        console.timeEnd("getArticle");
         setArticle(rawArticle);
         if (rawArticle) {
           setTableOfContents(await getTableOfContents(rawArticle));
