@@ -1,26 +1,50 @@
 import { Storage, VersionInfo } from "./storage";
+import {
+  createAstrawikiNode,
+  AstrawikiNode,
+  AstrawikiNodeInit,
+} from "@bitxenia/astrawiki";
+import { LevelBlockstore } from "blockstore-level";
+import { LevelDatastore } from "datastore-level";
 
 // TODO: Integrate wiki-node package to handle these methods
 export default class IPFSStorage implements Storage {
-  constructor() {
-    throw new Error("Class not implemented.");
+  node: AstrawikiNode;
+
+  private constructor(node: AstrawikiNode) {
+    this.node = node;
   }
 
-  getArticle(name: string, version?: string): Promise<string> {
-    throw new Error("Method not implemented.");
+  static async create(): Promise<IPFSStorage> {
+    const opts: AstrawikiNodeInit = {
+      blockstore: new LevelBlockstore(`data/ipfs/blocks`),
+      datastore: new LevelDatastore(`data/ipfs/datastore`),
+    };
+    const node = await createAstrawikiNode(opts);
+    return new IPFSStorage(node);
   }
-  createArticle(articleName: string, rawMarkdown: string): Promise<void> {
-    throw new Error("Method not implemented.");
+
+  async getArticle(name: string, version?: string): Promise<string> {
+    return (await this.node.getArticle(name, version)).content;
   }
-  editArticle(articleName: string, newPlainText: string): Promise<void> {
-    throw new Error("Method not implemented.");
+
+  async createArticle(articleName: string, rawMarkdown: string): Promise<void> {
+    return await this.node.newArticle(articleName, rawMarkdown);
   }
-  getArticleVersions(name: string): Promise<VersionInfo[]> {
-    throw new Error("Method not implemented.");
+
+  async editArticle(articleName: string, newPlainText: string): Promise<void> {
+    await this.node.editArticle(articleName, newPlainText);
   }
-  getArticleList(): Promise<string[]> {
-    throw new Error("Method not implemented.");
+
+  async getArticleVersions(name: string): Promise<VersionInfo[]> {
+    // TODO: Optimize to avoid calling getArticle twice
+    return (await this.node.getArticle(name)).versionsInfo;
   }
+
+  async getArticleList(): Promise<string[]> {
+    return await this.node.getArticleList();
+  }
+
   searchArticles(
     _query: string,
     _limit: number,

@@ -64,7 +64,7 @@ export default function EcosystemPicker() {
   const setIPFS = async () => {
     setIsESLoading(true);
     setESName("Loading...");
-    setStorage(new IPFSStorage());
+    setStorage(await IPFSStorage.create());
     setESName("IPFS");
     localStorage.setItem("ecosystem", "IPFS");
     setIsESLoading(false);
