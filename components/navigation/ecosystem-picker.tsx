@@ -15,6 +15,7 @@ import { useContext, useEffect } from "react";
 import ExampleServer from "@/lib/ecosystems/example-server";
 import EthEcosystem from "@/lib/ecosystems/eth-ecosystem";
 import { Storage } from "@/lib/articles/storage";
+import IPFSEcosystem from "@/lib/ecosystems/ipfs-ecosystem";
 
 export default function EcosystemPicker() {
   const { setIsESLoading, esName, setESName } =
@@ -60,6 +61,17 @@ export default function EcosystemPicker() {
     setIsESLoading(false);
   };
 
+  const setIPFS = async () => {
+    setIsESLoading(true);
+    setESName("Loading...");
+    const es = new IPFSEcosystem();
+    await es.init();
+    setStorage(new Storage(es));
+    setESName("IPFS");
+    localStorage.setItem("ecosystem", "IPFS");
+    setIsESLoading(false);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="button">
@@ -71,7 +83,7 @@ export default function EcosystemPicker() {
         <DropdownMenuItem onClick={setExampleServer}>
           Example Server
         </DropdownMenuItem>
-        <DropdownMenuItem>IPFS</DropdownMenuItem>
+        <DropdownMenuItem onClick={setIPFS}>IPFS</DropdownMenuItem>
         <DropdownMenuItem onClick={setBlockchain}>Blockchain</DropdownMenuItem>
         <DropdownMenuItem>Freenet</DropdownMenuItem>
       </DropdownMenuContent>

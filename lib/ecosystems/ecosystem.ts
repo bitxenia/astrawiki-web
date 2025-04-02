@@ -51,3 +51,5 @@ export interface Ecosystem {
     offset: number,
   ): Promise<string[]>;
 }
+
+export { Article };
