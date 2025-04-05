@@ -1,5 +1,9 @@
 import { Storage } from "./storage";
-import { createEthImplNode, EthImpl, VersionInfo } from "@bitxenia/eth-impl";
+import {
+  createEthImplNode,
+  EthImpl,
+  VersionInfo,
+} from "@bitxenia/astrawiki-eth";
 
 export default class EthStorage implements Storage {
   node: EthImpl;
