@@ -27,7 +27,6 @@ export default function Pages() {
   const [error, setError] = useState<boolean>(false);
   const { esName } = useContext(EcosystemContext);
   const { storage } = useContext(StorageContext);
-  const [article, setArticle] = useState("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isPublishing, setIsPublishing] = useState(false);
 
@@ -36,7 +35,6 @@ export default function Pages() {
       setIsLoading(true);
       try {
         const rawArticle = await storage!.getArticle(pathName);
-        setArticle(rawArticle);
         setNewArticle(rawArticle);
       } catch {
         setError(true);
@@ -51,8 +49,7 @@ export default function Pages() {
   const saveChanges = async () => {
     if (!newArticle) return;
     setIsPublishing(true);
-    storage!.editArticle(pathName, article, newArticle);
-    setArticle(newArticle);
+    storage!.editArticle(pathName, newArticle);
     toast.success("Edited successfully!");
     setIsPublishing(false);
     router.push(`/articles?name=${pathName}`);

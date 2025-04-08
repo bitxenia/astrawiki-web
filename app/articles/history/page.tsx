@@ -2,7 +2,7 @@
 import Loading from "@/app/loading";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { Typography } from "@/components/ui/typography";
-import { Version, VersionID } from "@/lib/articles/version";
+import { VersionInfo } from "@/lib/articles/storage";
 import { EcosystemContext, StorageContext } from "@/lib/contexts";
 import { formatTime } from "@/lib/time";
 import Link from "next/link";
@@ -10,8 +10,7 @@ import { notFound, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 
 export default function Pages() {
-  const [versions, setVersions] = useState<Version[]>([]);
-  const [mainBranch, setMainBranch] = useState<Set<VersionID>>(new Set());
+  const [versions, setVersions] = useState<VersionInfo[]>([]);
   const [error, setError] = useState<boolean>(false);
   const { esName } = useContext(EcosystemContext);
   const { storage } = useContext(StorageContext);
@@ -24,9 +23,7 @@ export default function Pages() {
     async function fetchDocument() {
       try {
         const allVersions = await storage!.getArticleVersions(articleName);
-        const mainBranch = await storage!.getMainBranchVersionIds(articleName);
         setVersions(allVersions);
-        setMainBranch(mainBranch);
       } catch {
         setError(true);
       }
@@ -82,7 +79,7 @@ export default function Pages() {
                       <p className="text-sm font-medium text-gray-500">
                         {version.parent ? `Parent: ${version.parent}` : "Root"}
                       </p>
-                      {mainBranch.has(version.id) && (
+                      {version.mainBranch && (
                         <p className="font-medium">Main Branch</p>
                       )}
                     </div>
