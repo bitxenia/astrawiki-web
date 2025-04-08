@@ -59,7 +59,7 @@ export default function Pages() {
                 value={markdown}
                 onChange={(e) => setMarkdown(e.target.value)}
               />
-              <span className="pt-4 pb-2 font-semibold">Preview</span>
+              <span className="pb-2 pt-4 font-semibold">Preview</span>
               <div className="markdown-preview rounded-md border p-4">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {markdown}

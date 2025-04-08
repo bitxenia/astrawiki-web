@@ -68,7 +68,7 @@ export default function Pages() {
                     }}
                   >
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg leading-6 font-medium">
+                      <h3 className="text-lg font-medium leading-6">
                         {version.id}
                       </h3>
                       <p className="mt-1 max-w-2xl text-sm text-gray-500">

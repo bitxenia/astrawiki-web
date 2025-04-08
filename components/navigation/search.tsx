@@ -119,7 +119,7 @@ export default function Search() {
             )}
             href={href}
           >
-            <div className="flex h-full w-fit items-center gap-1.5 py-3 whitespace-nowrap">
+            <div className="flex h-full w-fit items-center gap-1.5 whitespace-nowrap py-3">
               <LuFileText className="h-[1.1rem] w-[1.1rem]" /> {doc.title}
             </div>
           </Anchor>
@@ -141,13 +141,13 @@ export default function Search() {
       >
         <DialogTrigger asChild>
           <div className="relative max-w-md flex-1 cursor-pointer">
-            <LuSearch className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-neutral-500 dark:text-neutral-400" />
+            <LuSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500 dark:text-neutral-400" />
             <Input
-              className="bg-muted h-9 w-full rounded-md border pr-4 pl-10 shadow-sm md:w-full"
+              className="h-9 w-full rounded-md border bg-muted pl-10 pr-4 shadow-sm md:w-full"
               placeholder="Search articles..."
               type="search"
             />
-            <div className="absolute top-1/2 right-2 hidden -translate-y-1/2 items-center gap-0.5 rounded-sm bg-zinc-200 p-1 font-mono text-xs font-medium sm:flex dark:bg-neutral-700">
+            <div className="absolute right-2 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 rounded-sm bg-zinc-200 p-1 font-mono text-xs font-medium dark:bg-neutral-700 sm:flex">
               <LuCommand className="h-3 w-3" />
               <span>k</span>
             </div>
@@ -170,12 +170,12 @@ export default function Search() {
             </p>
           )}
           {isLoading && (
-            <p className="text-muted-foreground mx-auto mt-2 text-sm">
+            <p className="mx-auto mt-2 text-sm text-muted-foreground">
               Searching...
             </p>
           )}
           {isFetchingList && (
-            <p className="text-muted-foreground mx-auto mt-2 text-sm">
+            <p className="mx-auto mt-2 text-sm text-muted-foreground">
               Fetching articles...
             </p>
           )}
@@ -183,13 +183,13 @@ export default function Search() {
             !isLoading &&
             filteredResults.length === 0 &&
             searchedInput.length >= 3 && (
-              <p className="text-muted-foreground mx-auto mt-2 text-sm">
+              <p className="mx-auto mt-2 text-sm text-muted-foreground">
                 No results found for{" "}
                 <span className="text-primary">{`"${searchedInput}"`}</span>
               </p>
             )}
           <ScrollArea className="max-h-[350px]">
-            <div className="flex flex-col items-start overflow-y-auto px-1 pt-1 pb-4 sm:px-3">
+            <div className="flex flex-col items-start overflow-y-auto px-1 pb-4 pt-1 sm:px-3">
               {searchedInput
                 ? filteredResults.map((item) => {
                     if ("href" in item) {
