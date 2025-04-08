@@ -54,7 +54,7 @@ export default function RootLayout({
               {!hideNavbar && <Navbar />}
               <main className="h-auto px-5 sm:px-8">
                 {isESLoading && (
-                  <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
+                  <div className="bg-opacity-50 fixed top-0 left-0 z-50 flex h-full w-full items-center justify-center bg-black">
                     <p className="text-2xl text-white">
                       Initializing ecosystem...
                     </p>
