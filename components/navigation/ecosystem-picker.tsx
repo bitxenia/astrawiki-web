@@ -13,9 +13,9 @@ import {
 } from "../ui/dropdown-menu";
 import { useContext, useEffect } from "react";
 import ExampleServer from "@/lib/ecosystems/example-server";
-import EthEcosystem from "@/lib/ecosystems/eth-ecosystem";
 import { EcosystemBasedStorage } from "@/lib/articles/ecosystem-based-storage";
 import IPFSStorage from "@/lib/articles/ipfs-storage";
+import EthStorage from "@/lib/articles/eth-storage";
 
 export default function EcosystemPicker() {
   const { setIsESLoading, esName, setESName } =
@@ -53,9 +53,7 @@ export default function EcosystemPicker() {
   const setBlockchain = async () => {
     setIsESLoading(true);
     setESName("Loading...");
-    const es = new EthEcosystem();
-    await es.init();
-    setStorage(new EcosystemBasedStorage(es));
+    setStorage(await EthStorage.create());
     setESName("Blockchain");
     localStorage.setItem("ecosystem", "Blockchain");
     setIsESLoading(false);
