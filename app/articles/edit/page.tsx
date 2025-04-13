@@ -49,7 +49,7 @@ export default function Pages() {
   const saveChanges = async () => {
     if (!newArticle) return;
     setIsPublishing(true);
-    storage!.editArticle(pathName, newArticle);
+    await storage!.editArticle(pathName, newArticle);
     toast.success("Edited successfully!");
     setIsPublishing(false);
     router.push(`/articles?name=${pathName}`);

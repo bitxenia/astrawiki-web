@@ -11,12 +11,11 @@
     "lint": "next lint",
     "generate-content-json": "ts-node scripts/content.ts",
     "prepare": "husky",
-    "compile-contracts": "npx solc contracts/Articulo.sol contracts/ArticuloFactory.sol --bin --abi -o contracts/out && mv contracts/out/contracts_Articulo_sol_Articulo.abi contracts/out/Articulo.json && mv contracts/out/contracts_ArticuloFactory_sol_ArticuloFactory.abi contracts/out/ArticuloFactory.json && mv contracts/out/contracts_Articulo_sol_Articulo.bin contracts/out/Articulo.bin && mv contracts/out/contracts_ArticuloFactory_sol_ArticuloFactory.bin contracts/out/ArticuloFactory.bin",
-    "deploy-contracts": "node ./contracts/utils/deploy.js",
     "test": "jest"
   },
   "dependencies": {
     "@bitxenia/astrawiki": "^0.0.15",
+    "@bitxenia/astrawiki-eth": "^0.0.2",
     "@next/third-parties": "^15.2.4",
     "@radix-ui/react-dialog": "^1.1.7",
     "@radix-ui/react-dropdown-menu": "^2.1.7",
