@@ -1,3 +1,4 @@
+import { ChatMessage } from "@bitxenia/astrachat-eth";
 import { Ecosystem } from "../ecosystems/ecosystem";
 import { ArticleCache } from "./cache";
 import { Storage, VersionInfo } from "./storage";
@@ -10,6 +11,12 @@ export class EcosystemBasedStorage implements Storage {
   constructor(ecosystem: Ecosystem) {
     this.cache = new ArticleCache();
     this.ecosystem = ecosystem;
+  }
+  getChatMessages(chatName: string): Promise<ChatMessage[]> {
+    throw new Error("Method not implemented.");
+  }
+  sendChatMessage(chatName: string, message: string): Promise<void> {
+    throw new Error("Method not implemented.");
   }
 
   /**
