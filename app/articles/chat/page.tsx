@@ -1,17 +1,17 @@
 "use client";
-import Loading from "@/app/loading";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
+import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { VersionInfo } from "@/lib/articles/storage";
 import { EcosystemContext, StorageContext } from "@/lib/contexts";
 import { formatTime } from "@/lib/time";
 import { ChatMessage } from "@bitxenia/astrachat-eth";
-import Link from "next/link";
 import { notFound, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [newMessage, setNewMessage] = useState<string>("");
+  const [isSending, setIsSending] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const { esName } = useContext(EcosystemContext);
   const { storage } = useContext(StorageContext);
@@ -37,13 +37,6 @@ export default function ChatPage() {
 
   if (error) notFound();
 
-  if (messages.length === 0)
-    return (
-      <Loading
-        title="Loading messages..."
-        desc={`Fetching ${articleName} chat from ${esName}`}
-      />
-    );
   return (
     <div className="flex items-start gap-14">
       <div className="flex-[3] pt-10">
@@ -54,7 +47,7 @@ export default function ChatPage() {
         <ul className="mb-4 shadow">
           {messages
             .sort((a, b) => {
-              return a.timestamp > b.timestamp ? -1 : 1;
+              return a.timestamp < b.timestamp ? -1 : 1;
             })
             .map((message) => {
               return (
@@ -62,15 +55,37 @@ export default function ChatPage() {
                   className="border-x border-t px-3 py-3 hover:shadow-lg"
                   key={message.timestamp} // TODO: modify to something more unique
                 >
-                  Sender: {message.sender}
+                  {formatTime(message.timestamp * 1000)} | {message.sender}:{" "}
+                  {message.message}
                   <br />
-                  Message: {message.message}
-                  <br />
-                  Timestamp: {formatTime(message.timestamp)}
                 </li>
               );
             })}
         </ul>
+        {/* Message input */}
+        <textarea
+          className="h-40 w-full rounded-md border p-4"
+          placeholder="Message"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+        />
+        <div className="justify-right flex gap-2 pb-4">
+          <button
+            className={buttonVariants({
+              variant: "default",
+              size: "default",
+            })}
+            onClick={async () => {
+              setIsSending(true);
+              await storage!.sendChatMessage(articleName, newMessage);
+              setNewMessage("");
+              setIsSending(false);
+            }}
+            disabled={isSending}
+          >
+            {isSending ? "Sending..." : "Send"}
+          </button>
+        </div>
       </div>
     </div>
   );
