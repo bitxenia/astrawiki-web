@@ -1,3 +1,5 @@
+import { ChatMessage } from "@bitxenia/astrachat-eth";
+
 export type VersionInfo = {
   id: string;
   date: string;
@@ -23,4 +25,14 @@ export interface Storage {
   ): Promise<string[]>;
 
   isSearchOptimized(): boolean;
+
+  /* CHAT */
+  listenToNewMessages(
+    chatName: string,
+    callback: (message: ChatMessage) => void,
+  ): Promise<void>;
+
+  getChatMessages(chatName: string): Promise<ChatMessage[]>;
+
+  sendChatMessage(chatName: string, message: string): Promise<void>;
 }

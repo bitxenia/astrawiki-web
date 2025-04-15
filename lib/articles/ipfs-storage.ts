@@ -1,3 +1,4 @@
+import { ChatMessage } from "@bitxenia/astrachat-eth";
 import { Storage, VersionInfo } from "./storage";
 import {
   createAstrawikiNode,
@@ -13,6 +14,18 @@ export default class IPFSStorage implements Storage {
 
   private constructor(node: AstrawikiNode) {
     this.node = node;
+  }
+  listenToNewMessages(
+    chatName: string,
+    callback: (message: ChatMessage) => void,
+  ): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  getChatMessages(chatName: string): Promise<ChatMessage[]> {
+    throw new Error("Method not implemented.");
+  }
+  sendChatMessage(chatName: string, message: string): Promise<void> {
+    throw new Error("Method not implemented.");
   }
 
   static async create(): Promise<IPFSStorage> {
