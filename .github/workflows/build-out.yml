@@ -1,9 +1,10 @@
-name: Format and build check
+name: Build
 
 on:
-  pull_request:
+  push:
     branches:
       - main
+
 
 jobs:
   build:
@@ -23,3 +24,9 @@ jobs:
 
     - name: Run build
       run: npm run build
+
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@v4.7.3
+      with:
+        folder: out
+        branch: build
