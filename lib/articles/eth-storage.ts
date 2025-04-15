@@ -59,6 +59,13 @@ export default class EthStorage implements Storage {
 
   /* CHAT */
 
+  listenToNewMessages(
+    chatName: string,
+    callback: (message: ChatMessage) => void,
+  ): Promise<void> {
+    return this.chatNode.listenToNewMessages(chatName, callback);
+  }
+
   getChatMessages(chatName: string): Promise<ChatMessage[]> {
     return this.chatNode.getMessages(chatName);
   }

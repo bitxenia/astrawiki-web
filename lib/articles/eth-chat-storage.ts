@@ -7,6 +7,12 @@ export default class EthStorage implements Storage {
   constructor(node: ChatManager) {
     this.node = node;
   }
+  listenToNewMessages(
+    chatName: string,
+    callback: (message: ChatMessage) => void,
+  ): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
   getArticle(name: string, version?: string): Promise<string> {
     throw new Error("Method not implemented.");
   }

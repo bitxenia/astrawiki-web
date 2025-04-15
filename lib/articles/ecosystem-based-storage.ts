@@ -12,6 +12,12 @@ export class EcosystemBasedStorage implements Storage {
     this.cache = new ArticleCache();
     this.ecosystem = ecosystem;
   }
+  listenToNewMessages(
+    chatName: string,
+    callback: (message: ChatMessage) => void,
+  ): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
   getChatMessages(chatName: string): Promise<ChatMessage[]> {
     throw new Error("Method not implemented.");
   }

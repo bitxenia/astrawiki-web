@@ -21,8 +21,21 @@ export default function ChatPage() {
   const articleName = searchParams.get("name")!;
 
   useEffect(() => {
+    console.log("Listening to new messages...");
+    const listenToNewMessages = async () => {
+      await storage!.listenToNewMessages(
+        articleName,
+        (message: ChatMessage) => {
+          setMessages((prevMessages) => [...prevMessages, message]);
+        },
+      );
+    };
+    listenToNewMessages();
+  }, [articleName, storage]);
+
+  useEffect(() => {
     console.log("Dasdaws");
-    async function fetchDocument() {
+    async function fetchMessages() {
       try {
         const allMessages = await storage!.getChatMessages(articleName);
         console.log(allMessages);
@@ -32,7 +45,7 @@ export default function ChatPage() {
         setError(true);
       }
     }
-    fetchDocument();
+    fetchMessages();
   }, [articleName, storage]);
 
   if (error) notFound();
@@ -57,7 +70,6 @@ export default function ChatPage() {
                 >
                   {formatTime(message.timestamp * 1000)} | {message.sender}:{" "}
                   {message.message}
-                  <br />
                 </li>
               );
             })}

@@ -27,6 +27,11 @@ export interface Storage {
   isSearchOptimized(): boolean;
 
   /* CHAT */
+  listenToNewMessages(
+    chatName: string,
+    callback: (message: ChatMessage) => void,
+  ): Promise<void>;
+
   getChatMessages(chatName: string): Promise<ChatMessage[]>;
 
   sendChatMessage(chatName: string, message: string): Promise<void>;

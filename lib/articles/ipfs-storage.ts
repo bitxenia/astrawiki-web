@@ -15,6 +15,12 @@ export default class IPFSStorage implements Storage {
   private constructor(node: AstrawikiNode) {
     this.node = node;
   }
+  listenToNewMessages(
+    chatName: string,
+    callback: (message: ChatMessage) => void,
+  ): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
   getChatMessages(chatName: string): Promise<ChatMessage[]> {
     throw new Error("Method not implemented.");
   }
