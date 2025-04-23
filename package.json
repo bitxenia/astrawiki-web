@@ -14,7 +14,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@bitxenia/astrawiki": "^0.0.20",
+    "@bitxenia/astrawiki": "^0.0.21",
     "@bitxenia/astrawiki-eth": "^0.0.2",
     "@bitxenia/astrawiki-example-server": "^0.0.1",
     "@next/third-parties": "^15.2.4",
