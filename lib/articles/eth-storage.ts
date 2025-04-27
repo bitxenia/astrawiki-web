@@ -70,7 +70,11 @@ export default class EthStorage implements Storage {
     return this.chatNode.getMessages(chatName);
   }
 
-  sendChatMessage(chatName: string, message: string): Promise<void> {
-    return this.chatNode.sendMessage(chatName, message);
+  sendChatMessage(
+    chatName: string,
+    message: string,
+    parentId?: string,
+  ): Promise<void> {
+    return this.chatNode.sendMessage(chatName, message, parentId);
   }
 }

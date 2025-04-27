@@ -34,11 +34,9 @@ export default function ChatPage() {
   }, [articleName, storage]);
 
   useEffect(() => {
-    console.log("Dasdaws");
     async function fetchMessages() {
       try {
         const allMessages = await storage!.getChatMessages(articleName);
-        console.log(allMessages);
         setMessages(allMessages);
       } catch (err) {
         console.log("csancaskl", err);
@@ -47,6 +45,8 @@ export default function ChatPage() {
     }
     fetchMessages();
   }, [articleName, storage]);
+
+  console.log(messages);
 
   if (error) notFound();
 
@@ -66,8 +66,16 @@ export default function ChatPage() {
               return (
                 <li
                   className="border-x border-t px-3 py-3 hover:shadow-lg"
-                  key={message.timestamp} // TODO: modify to something more unique
+                  key={message.id}
                 >
+                  {message.parentId && (
+                    <>
+                      <span className="text-gray-500">
+                        Replying to {message.parentId}
+                      </span>
+                      <br />
+                    </>
+                  )}
                   {formatTime(message.timestamp * 1000)} | {message.sender}:{" "}
                   {message.message}
                 </li>
@@ -89,7 +97,11 @@ export default function ChatPage() {
             })}
             onClick={async () => {
               setIsSending(true);
-              await storage!.sendChatMessage(articleName, newMessage);
+              await storage!.sendChatMessage(
+                articleName,
+                newMessage,
+                undefined, // TODO: modify this to be the parentId of the message being replied to
+              );
               setNewMessage("");
               setIsSending(false);
             }}

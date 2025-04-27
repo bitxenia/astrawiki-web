@@ -34,5 +34,9 @@ export interface Storage {
 
   getChatMessages(chatName: string): Promise<ChatMessage[]>;
 
-  sendChatMessage(chatName: string, message: string): Promise<void>;
+  sendChatMessage(
+    chatName: string,
+    message: string,
+    parentId?: string,
+  ): Promise<void>;
 }
