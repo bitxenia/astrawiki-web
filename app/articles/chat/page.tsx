@@ -13,6 +13,9 @@ export default function ChatPage() {
   const [newMessage, setNewMessage] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
+  const [replyingMessage, setReplyingMessage] = useState<ChatMessage | null>(
+    null,
+  );
   const { esName } = useContext(EcosystemContext);
   const { storage } = useContext(StorageContext);
 
@@ -63,10 +66,43 @@ export default function ChatPage() {
               return a.timestamp < b.timestamp ? -1 : 1;
             })
             .map((message) => {
-              return <Message key={message.id} message={message} />;
+              return (
+                <Message
+                  key={message.id}
+                  message={message}
+                  setReplyingMessage={setReplyingMessage}
+                />
+              );
             })}
         </ul>
         {/* Message input */}
+        {messages.length === 0 && (
+          <div className="text-center text-gray-500">
+            No messages yet. Be the first to send a message!
+          </div>
+        )}
+        {messages.length > 0 && (
+          <div className="text-center text-gray-500">
+            Click on a message to reply to it.
+          </div>
+        )}
+        <div className="pb-2 pt-4 font-semibold">Message</div>
+        {replyingMessage && (
+          <div className="text-gray-500">
+            {/* Add a button to cancel the reply */}
+            <button
+              onClick={() => {
+                setReplyingMessage(null);
+              }}
+            >
+              Cancel reply
+            </button>
+            {/* Show the message being replied to */}
+            Replying to: {replyingMessage.sender}
+            <br />
+            {replyingMessage.message}
+          </div>
+        )}
         <textarea
           className="h-40 w-full rounded-md border p-4"
           placeholder="Message"
@@ -84,7 +120,7 @@ export default function ChatPage() {
               await storage!.sendChatMessage(
                 articleName,
                 newMessage,
-                undefined, // TODO: modify this to be the parentId of the message being replied to
+                replyingMessage?.id, // TODO: modify this to be the parentId of the message being replied to
               );
               setNewMessage("");
               setIsSending(false);
@@ -99,9 +135,20 @@ export default function ChatPage() {
   );
 }
 
-const Message = ({ message }: { message: ChatMessage }) => {
+const Message = ({
+  message,
+  setReplyingMessage,
+}: {
+  message: ChatMessage;
+  setReplyingMessage: any;
+}) => {
   return (
-    <li className="border-x border-t px-3 py-3" key={message.id}>
+    <li
+      className="border-x border-t px-3 py-3"
+      onClick={() => {
+        setReplyingMessage(message);
+      }}
+    >
       {message.parentId && (
         <>
           <span className="text-gray-500">Replying to {message.parentId}</span>
