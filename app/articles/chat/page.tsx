@@ -63,23 +63,7 @@ export default function ChatPage() {
               return a.timestamp < b.timestamp ? -1 : 1;
             })
             .map((message) => {
-              return (
-                <li
-                  className="border-x border-t px-3 py-3 hover:shadow-lg"
-                  key={message.id}
-                >
-                  {message.parentId && (
-                    <>
-                      <span className="text-gray-500">
-                        Replying to {message.parentId}
-                      </span>
-                      <br />
-                    </>
-                  )}
-                  {formatTime(message.timestamp * 1000)} | {message.sender}:{" "}
-                  {message.message}
-                </li>
-              );
+              return <Message key={message.id} message={message} />;
             })}
         </ul>
         {/* Message input */}
@@ -114,3 +98,18 @@ export default function ChatPage() {
     </div>
   );
 }
+
+const Message = ({ message }: { message: ChatMessage }) => {
+  return (
+    <li className="border-x border-t px-3 py-3" key={message.id}>
+      {message.parentId && (
+        <>
+          <span className="text-gray-500">Replying to {message.parentId}</span>
+          <br />
+        </>
+      )}
+      {formatTime(message.timestamp * 1000)} | {message.sender}:{" "}
+      {message.message}
+    </li>
+  );
+};
