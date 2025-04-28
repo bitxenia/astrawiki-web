@@ -74,7 +74,7 @@ export default function ChatPage() {
                   parentMessage={
                     message.parentId
                       ? messages.find((msg) => msg.id === message.parentId)
-                      : null
+                      : undefined
                   }
                   setReplyingMessage={setReplyingMessage}
                 />
@@ -133,7 +133,7 @@ const Message = ({
   setReplyingMessage,
 }: {
   message: ChatMessage;
-  parentMessage: ChatMessage | null;
+  parentMessage?: ChatMessage;
   setReplyingMessage: any;
 }) => {
   return (
