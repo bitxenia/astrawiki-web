@@ -168,6 +168,11 @@ const MessageTextArea = ({
 }) => {
   const [newMessage, setNewMessage] = useState<string>("");
 
+  const handleSendMessage = async () => {
+    await sendMessage(newMessage);
+    setNewMessage("");
+  };
+
   return (
     <div className="flex items-end gap-2">
       <div
@@ -182,8 +187,7 @@ const MessageTextArea = ({
           onKeyDown={async (e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-              await sendMessage(newMessage);
-              setNewMessage("");
+              await handleSendMessage();
             }
           }}
         />
@@ -199,10 +203,7 @@ const MessageTextArea = ({
           variant: "default",
           size: "default",
         })}
-        onClick={async () => {
-          await sendMessage(newMessage);
-          setNewMessage("");
-        }}
+        onClick={handleSendMessage}
         disabled={isSending}
       >
         {isSending ? (
