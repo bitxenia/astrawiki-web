@@ -2,7 +2,7 @@
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { EcosystemContext, StorageContext } from "@/lib/contexts";
+import { StorageContext } from "@/lib/contexts";
 import { formatTime } from "@/lib/time";
 import { ChatMessage } from "@bitxenia/astrachat-eth";
 import { notFound, useSearchParams } from "next/navigation";
@@ -11,13 +11,11 @@ import { LuSend, LuX } from "react-icons/lu";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [newMessage, setNewMessage] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [replyingMessage, setReplyingMessage] = useState<ChatMessage | null>(
     null,
   );
-  const { esName } = useContext(EcosystemContext);
   const { storage } = useContext(StorageContext);
 
   const searchParams = useSearchParams();
@@ -50,23 +48,20 @@ export default function ChatPage() {
     fetchMessages();
   }, [articleName, storage]);
 
-  async function sendMessage() {
+  async function sendMessage(newMessage: string) {
     setIsSending(true);
     await storage!.sendChatMessage(
       articleName,
       newMessage,
       replyingMessage?.id,
     );
-    setNewMessage("");
     setIsSending(false);
   }
-
-  console.log(messages);
 
   if (error) notFound();
 
   return (
-    <div className="flex items-start gap-14">
+    <div className="mb-5 flex items-start gap-14">
       <div className="flex-[3] pt-10">
         <PageBreadcrumb paths={[articleName, "chat"]} />
         <Typography>
@@ -105,47 +100,7 @@ export default function ChatPage() {
             setReplyingMessage={setReplyingMessage}
           />
         )}
-        <div className="flex items-end gap-2">
-          <div
-            className="relative grid grow"
-            data-replicated-value={newMessage + " "}
-          >
-            <textarea
-              className="font-inherit absolute inset-0 resize-none overflow-hidden whitespace-pre-wrap rounded-md border border-black px-4 py-2"
-              placeholder="Message"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={async (e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  await sendMessage();
-                }
-              }}
-            />
-            <div
-              className="font-inherit invisible whitespace-pre-wrap rounded-md border border-black px-4 py-2"
-              aria-hidden="true"
-            >
-              {newMessage + " "}
-            </div>
-          </div>
-          <button
-            className={buttonVariants({
-              variant: "default",
-              size: "default",
-            })}
-            onClick={async () => {
-              await sendMessage();
-            }}
-            disabled={isSending}
-          >
-            {isSending ? (
-              <span className="text-sm">...</span>
-            ) : (
-              <LuSend className="h-5 w-5" />
-            )}
-          </button>
-        </div>
+        <MessageTextArea sendMessage={sendMessage} isSending={isSending} />
       </div>
     </div>
   );
@@ -199,6 +154,62 @@ const ReplyingMessagePreview = ({
         <br />
         {message.message}
       </span>
+    </div>
+  );
+};
+
+const MessageTextArea = ({
+  sendMessage,
+  isSending,
+}: {
+  sendMessage: (newMessage: string) => Promise<void>;
+  isSending: boolean;
+}) => {
+  const [newMessage, setNewMessage] = useState<string>("");
+
+  return (
+    <div className="flex items-end gap-2">
+      <div
+        className="relative grid grow"
+        data-replicated-value={newMessage + " "}
+      >
+        <textarea
+          className="font-inherit absolute inset-0 resize-none overflow-hidden whitespace-pre-wrap rounded-md border border-black px-4 py-2"
+          placeholder="Message"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown={async (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              await sendMessage(newMessage);
+              setNewMessage("");
+            }
+          }}
+        />
+        <div
+          className="font-inherit invisible whitespace-pre-wrap rounded-md border border-black px-4 py-2"
+          aria-hidden="true"
+        >
+          {newMessage + " "}
+        </div>
+      </div>
+      <button
+        className={buttonVariants({
+          variant: "default",
+          size: "default",
+        })}
+        onClick={async () => {
+          await sendMessage(newMessage);
+          setNewMessage("");
+        }}
+        disabled={isSending}
+      >
+        {isSending ? (
+          <span className="text-sm">...</span>
+        ) : (
+          <LuSend className="h-5 w-5" />
+        )}
+      </button>
     </div>
   );
 };
