@@ -71,6 +71,11 @@ export default function ChatPage() {
                 <Message
                   key={message.id}
                   message={message}
+                  parentMessage={
+                    message.parentId
+                      ? messages.find((msg) => msg.id === message.parentId)
+                      : null
+                  }
                   setReplyingMessage={setReplyingMessage}
                 />
               );
@@ -124,25 +129,27 @@ export default function ChatPage() {
 
 const Message = ({
   message,
+  parentMessage,
   setReplyingMessage,
 }: {
   message: ChatMessage;
+  parentMessage: ChatMessage | null;
   setReplyingMessage: any;
 }) => {
   return (
     <li
-      className="border-x border-t px-3 py-3"
+      className="flex cursor-pointer flex-col gap-2 border-x border-t px-3 py-3 hover:bg-gray-100"
       onClick={() => {
         setReplyingMessage(message);
       }}
     >
-      {message.parentId && (
-        <>
-          <span className="text-gray-500">Replying to {message.parentId}</span>
-          <br />
-        </>
-      )}
-      {formatTime(message.timestamp * 1000)} | {message.sender}:{" "}
+      <div className="flex items-center gap-2">
+        <strong>{message.sender}</strong>
+        <span className="text-sm text-gray-500">
+          {formatTime(message.timestamp * 1000)}
+        </span>
+      </div>
+      {parentMessage && <ReplyingMessagePreview message={parentMessage} />}
       {message.message}
     </li>
   );
@@ -153,14 +160,16 @@ const ReplyingMessagePreview = ({
   setReplyingMessage,
 }: {
   message: ChatMessage;
-  setReplyingMessage: any;
+  setReplyingMessage?: any;
 }) => {
   return (
     <div className="flex items-center gap-2 border border-gray-300 bg-gray-100 p-2">
-      <LuX
-        className="h-8 w-8 cursor-pointer rounded-full p-1 text-red-500 hover:bg-red-200"
-        onClick={() => setReplyingMessage(null)}
-      />
+      {setReplyingMessage && (
+        <LuX
+          className="h-8 w-8 cursor-pointer rounded-full p-1 text-red-500 hover:bg-red-200"
+          onClick={() => setReplyingMessage(null)}
+        />
+      )}
       <span className="text-gray-500">
         Reply to <strong>{message.sender}</strong>
         <br />
