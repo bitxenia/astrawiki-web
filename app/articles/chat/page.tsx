@@ -81,26 +81,19 @@ export default function ChatPage() {
             No messages yet. Be the first to send a message!
           </div>
         )}
-        {messages.length > 0 && (
-          <div className="text-center text-gray-500">
-            Click on a message to reply to it.
-          </div>
-        )}
         <div className="pb-2 pt-4 font-semibold">Message</div>
+        {/* Show message being replied to next to a cancel button with an x */}
         {replyingMessage && (
-          <div className="text-gray-500">
-            {/* Add a button to cancel the reply */}
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => {
-                setReplyingMessage(null);
-              }}
+              className="text-red-500"
+              onClick={() => setReplyingMessage(null)}
             >
-              Cancel reply
+              X
             </button>
-            {/* Show the message being replied to */}
-            Replying to: {replyingMessage.sender}
-            <br />
-            {replyingMessage.message}
+            <span className="text-gray-500">
+              Replying to {replyingMessage.sender}: {replyingMessage.message}
+            </span>
           </div>
         )}
         <textarea
