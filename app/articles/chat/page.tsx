@@ -56,6 +56,7 @@ export default function ChatPage() {
       replyingMessage?.id,
     );
     setIsSending(false);
+    setReplyingMessage(null);
   }
 
   if (error) notFound();
