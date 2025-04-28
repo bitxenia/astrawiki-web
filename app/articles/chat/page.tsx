@@ -7,6 +7,7 @@ import { formatTime } from "@/lib/time";
 import { ChatMessage } from "@bitxenia/astrachat-eth";
 import { notFound, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
+import { LuX } from "react-icons/lu";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -84,17 +85,10 @@ export default function ChatPage() {
         <div className="pb-2 pt-4 font-semibold">Message</div>
         {/* Show message being replied to next to a cancel button with an x */}
         {replyingMessage && (
-          <div className="flex items-center gap-2">
-            <button
-              className="text-red-500"
-              onClick={() => setReplyingMessage(null)}
-            >
-              X
-            </button>
-            <span className="text-gray-500">
-              Replying to {replyingMessage.sender}: {replyingMessage.message}
-            </span>
-          </div>
+          <ReplyingMessagePreview
+            message={replyingMessage}
+            setReplyingMessage={setReplyingMessage}
+          />
         )}
         <textarea
           className="h-40 w-full rounded-md border p-4"
@@ -151,5 +145,27 @@ const Message = ({
       {formatTime(message.timestamp * 1000)} | {message.sender}:{" "}
       {message.message}
     </li>
+  );
+};
+
+const ReplyingMessagePreview = ({
+  message,
+  setReplyingMessage,
+}: {
+  message: ChatMessage;
+  setReplyingMessage: any;
+}) => {
+  return (
+    <div className="flex items-center gap-2 border border-gray-300 bg-gray-100 p-2">
+      <LuX
+        className="h-8 w-8 cursor-pointer rounded-full p-1 text-red-500 hover:bg-red-200"
+        onClick={() => setReplyingMessage(null)}
+      />
+      <span className="text-gray-500">
+        Reply to <strong>{message.sender}</strong>
+        <br />
+        {message.message}
+      </span>
+    </div>
   );
 };
