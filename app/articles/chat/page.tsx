@@ -50,6 +50,17 @@ export default function ChatPage() {
     fetchMessages();
   }, [articleName, storage]);
 
+  async function sendMessage() {
+    setIsSending(true);
+    await storage!.sendChatMessage(
+      articleName,
+      newMessage,
+      replyingMessage?.id,
+    );
+    setNewMessage("");
+    setIsSending(false);
+  }
+
   console.log(messages);
 
   if (error) notFound();
@@ -87,7 +98,6 @@ export default function ChatPage() {
             No messages yet. Be the first to send a message!
           </div>
         )}
-        <div className="pb-2 pt-4 font-semibold">Message</div>
         {/* Show message being replied to next to a cancel button with an x */}
         {replyingMessage && (
           <ReplyingMessagePreview
@@ -95,27 +105,37 @@ export default function ChatPage() {
             setReplyingMessage={setReplyingMessage}
           />
         )}
-        <textarea
-          className="h-40 w-full rounded-md border p-4"
-          placeholder="Message"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-        />
-        <div className="justify-right flex gap-2 pb-4">
+        <div className="flex items-end gap-2">
+          <div
+            className="relative grid grow"
+            data-replicated-value={newMessage + " "}
+          >
+            <textarea
+              className="font-inherit absolute inset-0 resize-none overflow-hidden whitespace-pre-wrap rounded-md border border-black px-4 py-2"
+              placeholder="Message"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={async (e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  await sendMessage();
+                }
+              }}
+            />
+            <div
+              className="font-inherit invisible whitespace-pre-wrap rounded-md border border-black px-4 py-2"
+              aria-hidden="true"
+            >
+              {newMessage + " "}
+            </div>
+          </div>
           <button
             className={buttonVariants({
               variant: "default",
               size: "default",
             })}
             onClick={async () => {
-              setIsSending(true);
-              await storage!.sendChatMessage(
-                articleName,
-                newMessage,
-                replyingMessage?.id, // TODO: modify this to be the parentId of the message being replied to
-              );
-              setNewMessage("");
-              setIsSending(false);
+              await sendMessage();
             }}
             disabled={isSending}
           >
