@@ -6,7 +6,7 @@ import { StorageContext } from "@/lib/contexts";
 import { formatTime } from "@/lib/time";
 import { ChatMessage } from "@bitxenia/astrachat-eth";
 import { notFound, useSearchParams } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { LuSend, LuX } from "react-icons/lu";
 
 export default function ChatPage() {
@@ -21,6 +21,16 @@ export default function ChatPage() {
   const searchParams = useSearchParams();
 
   const articleName = searchParams.get("name")!;
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     console.log("Listening to new messages...");
@@ -68,39 +78,39 @@ export default function ChatPage() {
         <Typography>
           <h1 className="-mt-2 text-3xl">{articleName}</h1>
         </Typography>
-        <ul className="mb-4 shadow">
+        {/* Chat messages */}
+        <ul className="mb-4 flex-grow overflow-y-auto shadow">
           {messages
-            .sort((a, b) => {
-              return a.timestamp < b.timestamp ? -1 : 1;
-            })
-            .map((message) => {
-              return (
-                <Message
-                  key={message.id}
-                  message={message}
-                  parentMessage={
-                    message.parentId
-                      ? messages.find((msg) => msg.id === message.parentId)
-                      : undefined
-                  }
-                  setReplyingMessage={setReplyingMessage}
-                />
-              );
-            })}
+            .sort((a, b) => (a.timestamp < b.timestamp ? -1 : 1))
+            .map((message) => (
+              <Message
+                key={message.id}
+                message={message}
+                parentMessage={
+                  message.parentId
+                    ? messages.find((msg) => msg.id === message.parentId)
+                    : undefined
+                }
+                setReplyingMessage={setReplyingMessage}
+              />
+            ))}
+          {/* Invisible div to ensure scrolling */}
+          <div ref={messagesEndRef} />
         </ul>
-        {/* Message input */}
+        {/* No messages yet */}
         {messages.length === 0 && (
           <div className="text-center text-gray-500">
             No messages yet. Be the first to send a message!
           </div>
         )}
-        {/* Show message being replied to next to a cancel button with an x */}
+        {/* Replying message preview */}
         {replyingMessage && (
           <ReplyingMessagePreview
             message={replyingMessage}
             setReplyingMessage={setReplyingMessage}
           />
         )}
+        {/* Message input */}
         <MessageTextArea sendMessage={sendMessage} isSending={isSending} />
       </div>
     </div>
