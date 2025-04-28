@@ -7,7 +7,7 @@ import { formatTime } from "@/lib/time";
 import { ChatMessage } from "@bitxenia/astrachat-eth";
 import { notFound, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
-import { LuX } from "react-icons/lu";
+import { LuSend, LuX } from "react-icons/lu";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -139,7 +139,11 @@ export default function ChatPage() {
             }}
             disabled={isSending}
           >
-            {isSending ? "Sending..." : "Send"}
+            {isSending ? (
+              <span className="text-sm">...</span>
+            ) : (
+              <LuSend className="h-5 w-5" />
+            )}
           </button>
         </div>
       </div>
