@@ -1,5 +1,6 @@
 import { createContext } from "react";
 import { Storage } from "./articles/storage";
+import { ChatStorage } from "./chat/chat-storage";
 
 export type EcosystemContextProps = {
   isESLoading: Readonly<boolean>;
@@ -23,4 +24,14 @@ export type StorageContextProps = {
 export const StorageContext = createContext<StorageContextProps>({
   storage: null,
   setStorage: () => {},
+});
+
+export type ChatStorageContextProps = {
+  chatStorage: ChatStorage | null;
+  setChatStorage: (storage: ChatStorage | null) => void;
+};
+
+export const ChatStorageContext = createContext<ChatStorageContextProps>({
+  chatStorage: null,
+  setChatStorage: () => {},
 });

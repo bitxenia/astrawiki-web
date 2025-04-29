@@ -2,7 +2,7 @@ export const url = "https://github.com/bitxenia/rc";
 export const siteicon = "/icon.png";
 
 export const gtm = "GTM-XXXXXXX";
-export const gtmconnected = true;
+export const gtmconnected = false;
 
 export const sitename = "Bitxenia Knowledge Repository";
 export const urlimage = "/images/og-image.png";

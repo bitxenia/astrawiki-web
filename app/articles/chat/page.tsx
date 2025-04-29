@@ -2,7 +2,7 @@
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { StorageContext } from "@/lib/contexts";
+import { ChatStorageContext } from "@/lib/contexts";
 import { formatTime } from "@/lib/time";
 import { ChatMessage } from "@bitxenia/astrachat-eth";
 import { notFound, useSearchParams } from "next/navigation";
@@ -16,7 +16,7 @@ export default function ChatPage() {
   const [replyingMessage, setReplyingMessage] = useState<ChatMessage | null>(
     null,
   );
-  const { storage } = useContext(StorageContext);
+  const { chatStorage } = useContext(ChatStorageContext);
 
   const searchParams = useSearchParams();
 
@@ -35,7 +35,7 @@ export default function ChatPage() {
   useEffect(() => {
     console.log("Listening to new messages...");
     const listenToNewMessages = async () => {
-      await storage!.listenToNewMessages(
+      await chatStorage!.listenToNewMessages(
         articleName,
         (message: ChatMessage) => {
           setMessages((prevMessages) => [...prevMessages, message]);
@@ -43,12 +43,12 @@ export default function ChatPage() {
       );
     };
     listenToNewMessages();
-  }, [articleName, storage]);
+  }, [articleName, chatStorage]);
 
   useEffect(() => {
     async function fetchMessages() {
       try {
-        const allMessages = await storage!.getChatMessages(articleName);
+        const allMessages = await chatStorage!.getChatMessages(articleName);
         setMessages(allMessages);
       } catch (err) {
         console.log("csancaskl", err);
@@ -56,11 +56,11 @@ export default function ChatPage() {
       }
     }
     fetchMessages();
-  }, [articleName, storage]);
+  }, [articleName, chatStorage]);
 
   async function sendMessage(newMessage: string) {
     setIsSending(true);
-    await storage!.sendChatMessage(
+    await chatStorage!.sendChatMessage(
       articleName,
       newMessage,
       replyingMessage?.id,
