@@ -1,4 +1,4 @@
-export const url = "https://github.com/bitxenia/rc";
+export const url = "https://github.com/bitxenia";
 export const siteicon = "/icon.png";
 
 export const gtm = "GTM-XXXXXXX";
@@ -6,7 +6,7 @@ export const gtmconnected = false;
 
 export const sitename = "Bitxenia Knowledge Repository";
 export const urlimage = "/images/og-image.png";
-export const imagealt = "Rubix Studios Documentation";
+export const imagealt = "Bitxenia Knowledge Repository";
 export const twitterhandle = "@bitxenia";
 
 export const companyname = "Bitxenia";
