@@ -33,14 +33,12 @@ export default function ChatPage() {
   }, [articleName, chatStorage]);
 
   useEffect(() => {
-    console.log("Dasdaws");
     async function fetchMessages() {
       try {
         const allMessages = await chatStorage!.getChatMessages(articleName);
         console.log(allMessages);
         setMessages(allMessages);
       } catch (err) {
-        console.log("csancaskl", err);
         setError(true);
       }
     }
