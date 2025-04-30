@@ -1,26 +1,22 @@
 import { Storage, VersionInfo } from "./storage";
-import {
-  createAstrawikiNode,
-  AstrawikiNode,
-  AstrawikiNodeInit,
-} from "@bitxenia/astrawiki";
+import { createAstrawiki, Astrawiki, AstrawikiInit } from "@bitxenia/astrawiki";
 import { LevelBlockstore } from "blockstore-level";
 import { LevelDatastore } from "datastore-level";
 
 // TODO: Integrate wiki-node package to handle these methods
 export default class IPFSStorage implements Storage {
-  node: AstrawikiNode;
+  node: Astrawiki;
 
-  private constructor(node: AstrawikiNode) {
+  private constructor(node: Astrawiki) {
     this.node = node;
   }
 
   static async create(): Promise<IPFSStorage> {
-    const opts: AstrawikiNodeInit = {
+    const opts: AstrawikiInit = {
       blockstore: new LevelBlockstore(`data/ipfs/blocks`),
       datastore: new LevelDatastore(`data/ipfs/datastore`),
     };
-    const node = await createAstrawikiNode(opts);
+    const node = await createAstrawiki(opts);
     return new IPFSStorage(node);
   }
 
