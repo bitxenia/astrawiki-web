@@ -8,11 +8,16 @@ import { Footer } from "@/components/navigation/footer";
 import { Settings } from "@/lib/meta";
 import "./globals.css";
 import { useState } from "react";
-import { EcosystemContext, StorageContext } from "@/lib/contexts";
+import {
+  ChatStorageContext,
+  EcosystemContext,
+  StorageContext,
+} from "@/lib/contexts";
 import { usePathname } from "next/navigation";
 import NoEcosystem from "./no-ecosystem";
 import { Toaster } from "react-hot-toast";
 import { Storage } from "@/lib/articles/storage";
+import { ChatStorage } from "@/lib/chat/chat-storage";
 
 export default function RootLayout({
   children,
@@ -20,6 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [storage, setStorage] = useState<Storage | null>(null);
+  const [chatStorage, setChatStorage] = useState<ChatStorage | null>(null);
   const [isESLoading, setIsESLoading] = useState<boolean>(false);
   const [esName, setESName] = useState<string>("Pick an ecosystem");
 
@@ -51,17 +57,21 @@ export default function RootLayout({
             }}
           >
             <StorageContext.Provider value={{ storage, setStorage }}>
-              {!hideNavbar && <Navbar />}
-              <main className="h-auto px-5 sm:px-8">
-                {isESLoading && (
-                  <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
-                    <p className="text-2xl text-white">
-                      Initializing ecosystem...
-                    </p>
-                  </div>
-                )}
-                {storage || hideNavbar ? children : <NoEcosystem />}
-              </main>
+              <ChatStorageContext.Provider
+                value={{ chatStorage, setChatStorage }}
+              >
+                {!hideNavbar && <Navbar />}
+                <main className="h-auto px-5 sm:px-8">
+                  {isESLoading && (
+                    <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
+                      <p className="text-2xl text-white">
+                        Initializing ecosystem...
+                      </p>
+                    </div>
+                  )}
+                  {storage || hideNavbar ? children : <NoEcosystem />}
+                </main>
+              </ChatStorageContext.Provider>
             </StorageContext.Provider>
           </EcosystemContext.Provider>
           <Footer />
