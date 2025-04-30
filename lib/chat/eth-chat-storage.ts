@@ -14,7 +14,6 @@ export default class EthChatStorage implements ChatStorage {
 
   static async create(): Promise<EthChatStorage> {
     const chatNode = await createChatManager();
-    console.log("DASSDA");
     return new EthChatStorage(chatNode);
   }
 
