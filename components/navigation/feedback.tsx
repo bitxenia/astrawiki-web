@@ -10,6 +10,7 @@ type SideBarEdit = {
 export default function RightSideBar({ slug, title }: SideBarEdit) {
   const editUrl = `/articles/edit?name=${title}`;
   const historyUrl = `/articles/history?name=${title}`;
+  const chatUrl = `/articles/chat?name=${title}`;
 
   return (
     <div className="flex flex-col gap-3 pl-2">
@@ -32,6 +33,15 @@ export default function RightSideBar({ slug, title }: SideBarEdit) {
           )}
         >
           History
+        </Link>
+        <Link
+          href={chatUrl}
+          rel="noopener noreferrer"
+          className={cn(
+            "flex items-center text-sm text-neutral-800 no-underline dark:text-neutral-300/85",
+          )}
+        >
+          Chat
         </Link>
       </div>
     </div>

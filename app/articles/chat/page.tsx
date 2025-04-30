@@ -2,7 +2,7 @@
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { EcosystemContext, StorageContext } from "@/lib/contexts";
+import { ChatStorageContext } from "@/lib/contexts";
 import { formatTime } from "@/lib/time";
 import { ChatMessage } from "@bitxenia/astrachat-eth";
 import { notFound, useSearchParams } from "next/navigation";
@@ -13,8 +13,7 @@ export default function ChatPage() {
   const [newMessage, setNewMessage] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
-  const { esName } = useContext(EcosystemContext);
-  const { storage } = useContext(StorageContext);
+  const { chatStorage } = useContext(ChatStorageContext);
 
   const searchParams = useSearchParams();
 
@@ -23,7 +22,7 @@ export default function ChatPage() {
   useEffect(() => {
     console.log("Listening to new messages...");
     const listenToNewMessages = async () => {
-      await storage!.listenToNewMessages(
+      await chatStorage!.listenToNewMessages(
         articleName,
         (message: ChatMessage) => {
           setMessages((prevMessages) => [...prevMessages, message]);
@@ -31,13 +30,13 @@ export default function ChatPage() {
       );
     };
     listenToNewMessages();
-  }, [articleName, storage]);
+  }, [articleName, chatStorage]);
 
   useEffect(() => {
     console.log("Dasdaws");
     async function fetchMessages() {
       try {
-        const allMessages = await storage!.getChatMessages(articleName);
+        const allMessages = await chatStorage!.getChatMessages(articleName);
         console.log(allMessages);
         setMessages(allMessages);
       } catch (err) {
@@ -46,7 +45,7 @@ export default function ChatPage() {
       }
     }
     fetchMessages();
-  }, [articleName, storage]);
+  }, [articleName, chatStorage]);
 
   if (error) notFound();
 
@@ -89,7 +88,7 @@ export default function ChatPage() {
             })}
             onClick={async () => {
               setIsSending(true);
-              await storage!.sendChatMessage(articleName, newMessage);
+              await chatStorage!.sendChatMessage(articleName, newMessage);
               setNewMessage("");
               setIsSending(false);
             }}

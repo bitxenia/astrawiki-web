@@ -1,5 +1,7 @@
 "use client";
 import {
+  ChatStorageContext,
+  ChatStorageContextProps,
   EcosystemContext,
   EcosystemContextProps,
   StorageContext,
@@ -15,11 +17,14 @@ import { useContext, useEffect } from "react";
 import IPFSStorage from "@/lib/articles/ipfs-storage";
 import EthStorage from "@/lib/articles/eth-storage";
 import ExampleServerStorage from "@/lib/articles/example-server-storage";
+import EthChatStorage from "@/lib/chat/eth-chat-storage";
 
 export default function EcosystemPicker() {
   const { setIsESLoading, esName, setESName } =
     useContext<EcosystemContextProps>(EcosystemContext);
   const { setStorage } = useContext<StorageContextProps>(StorageContext);
+  const { setChatStorage } =
+    useContext<ChatStorageContextProps>(ChatStorageContext);
 
   useEffect(() => {
     const storedEcosystem = localStorage.getItem("ecosystem");
@@ -51,6 +56,7 @@ export default function EcosystemPicker() {
     setIsESLoading(true);
     setESName("Loading...");
     setStorage(await EthStorage.create());
+    setChatStorage(await EthChatStorage.create());
     setESName("Blockchain");
     localStorage.setItem("ecosystem", "Blockchain");
     setIsESLoading(false);

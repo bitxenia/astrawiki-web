@@ -1,8 +1,3 @@
-import {
-  ChatManager,
-  ChatMessage,
-  createChatManager,
-} from "@bitxenia/astrachat-eth";
 import { Storage } from "./storage";
 import {
   createEthImplNode,
@@ -12,17 +7,14 @@ import {
 
 export default class EthStorage implements Storage {
   node: EthImpl;
-  chatNode: ChatManager;
 
-  constructor(node: EthImpl, chatNode: ChatManager) {
+  constructor(node: EthImpl) {
     this.node = node;
-    this.chatNode = chatNode;
   }
 
   static async create(): Promise<EthStorage> {
     const node = await createEthImplNode();
-    const chatNode = await createChatManager();
-    return new EthStorage(node, chatNode);
+    return new EthStorage(node);
   }
 
   async getArticle(name: string, version?: string): Promise<string> {
@@ -55,22 +47,5 @@ export default class EthStorage implements Storage {
   }
   isSearchOptimized(): boolean {
     return false;
-  }
-
-  /* CHAT */
-
-  listenToNewMessages(
-    chatName: string,
-    callback: (message: ChatMessage) => void,
-  ): Promise<void> {
-    return this.chatNode.listenToNewMessages(chatName, callback);
-  }
-
-  getChatMessages(chatName: string): Promise<ChatMessage[]> {
-    return this.chatNode.getMessages(chatName);
-  }
-
-  sendChatMessage(chatName: string, message: string): Promise<void> {
-    return this.chatNode.sendMessage(chatName, message);
   }
 }
