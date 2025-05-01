@@ -51,7 +51,6 @@ export default function ChatPage() {
         const allMessages = await chatStorage!.getChatMessages(articleName);
         setMessages(allMessages);
       } catch (err) {
-        console.log("csancaskl", err);
         setError(true);
       }
     }
