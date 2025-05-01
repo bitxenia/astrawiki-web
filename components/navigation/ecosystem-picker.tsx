@@ -1,12 +1,5 @@
 "use client";
-import {
-  ChatStorageContext,
-  ChatStorageContextProps,
-  EcosystemContext,
-  EcosystemContextProps,
-  StorageContext,
-  StorageContextProps,
-} from "@/lib/contexts";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +11,18 @@ import IPFSStorage from "@/lib/articles/ipfs-storage";
 import EthStorage from "@/lib/articles/eth-storage";
 import ExampleServerStorage from "@/lib/articles/example-server-storage";
 import EthChatStorage from "@/lib/chat/eth-chat-storage";
+import {
+  EcosystemContext,
+  EcosystemContextProps,
+} from "@/components/providers/ecosystem-provider";
+import {
+  StorageContext,
+  StorageContextProps,
+} from "@/components/providers/storage-provider";
+import {
+  ChatStorageContextProps,
+  ChatStorageContext,
+} from "@/components/providers/chat-storage-provider";
 
 export default function EcosystemPicker() {
   const { setIsESLoading, esName, setESName } =
@@ -28,6 +33,7 @@ export default function EcosystemPicker() {
 
   useEffect(() => {
     const storedEcosystem = localStorage.getItem("ecosystem");
+    console.log("storedEcosystem", storedEcosystem);
     const setStoredEcosystem = async () => {
       switch (storedEcosystem) {
         case "Example Server":

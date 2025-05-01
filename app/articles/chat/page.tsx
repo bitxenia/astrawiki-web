@@ -1,8 +1,8 @@
 "use client";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
+import { ChatStorageContext } from "@/components/providers/chat-storage-provider";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { ChatStorageContext } from "@/lib/contexts";
 import { formatTime } from "@/lib/time";
 import { ChatMessage } from "@bitxenia/astrachat-eth";
 import { notFound, useSearchParams } from "next/navigation";
