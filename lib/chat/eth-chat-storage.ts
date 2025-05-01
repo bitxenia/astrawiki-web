@@ -28,7 +28,11 @@ export default class EthChatStorage implements ChatStorage {
     return this.chatNode.getMessages(chatName);
   }
 
-  async sendChatMessage(chatName: string, message: string): Promise<void> {
-    return this.chatNode.sendMessage(chatName, message);
+  async sendChatMessage(
+    chatName: string,
+    message: string,
+    parentId?: string,
+  ): Promise<void> {
+    return this.chatNode.sendMessage(chatName, message, parentId);
   }
 }
