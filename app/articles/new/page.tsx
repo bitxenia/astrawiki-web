@@ -4,7 +4,11 @@ import Loading from "@/app/loading";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { EcosystemContext, StorageContext } from "@/lib/contexts";
+import {
+  ChatStorageContext,
+  EcosystemContext,
+  StorageContext,
+} from "@/lib/contexts";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
@@ -16,15 +20,23 @@ export default function Pages() {
   const router = useRouter();
   const { esName } = useContext(EcosystemContext);
   const { storage } = useContext(StorageContext);
+  const { chatStorage } = useContext(ChatStorageContext);
   const [title, setTitle] = useState("");
   const [markdown, setMarkdown] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
+
+  const createChat = async (name: string) => {
+    console.time("createChat");
+    await chatStorage!.createChat(name);
+    console.timeEnd("createChat");
+  };
 
   const publishArticle = async (name: string) => {
     setIsPublishing(true);
     console.time("createArticle");
     await storage!.createArticle(name, markdown);
     console.timeEnd("createArticle");
+    await createChat(name);
     toast.success("Article published successfully!");
     setIsPublishing(false);
     router.push(`/articles?name=${title}`);
