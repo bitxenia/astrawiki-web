@@ -146,6 +146,7 @@ const Message = ({
   parentMessage?: ChatMessage;
   setReplyingMessage: any;
 }) => {
+  const alias = message.senderAlias || message.sender;
   return (
     <li
       className="flex cursor-pointer flex-col gap-2 border-x border-t px-3 py-3 hover:bg-gray-100"
@@ -154,7 +155,7 @@ const Message = ({
       }}
     >
       <div className="flex items-center gap-2">
-        <strong>{message.senderAlias}</strong>
+        <strong>{alias}</strong>
         <span className="text-sm text-gray-500">
           {formatTime(message.timestamp * 1000)}
         </span>
@@ -172,6 +173,7 @@ const ReplyingMessagePreview = ({
   message: ChatMessage;
   setReplyingMessage?: any;
 }) => {
+  const alias = message.senderAlias || message.sender;
   return (
     <div className="flex items-center gap-2 border border-gray-300 bg-gray-100 p-2">
       {setReplyingMessage && (
@@ -181,7 +183,7 @@ const ReplyingMessagePreview = ({
         />
       )}
       <span className="text-gray-500">
-        Reply to <strong>{message.senderAlias}</strong>
+        Reply to <strong>{alias}</strong>
         <br />
         {message.message}
       </span>
