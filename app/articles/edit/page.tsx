@@ -3,9 +3,10 @@
 import Loading from "@/app/loading";
 import notFound from "@/app/not-found";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
+import { EcosystemContext } from "@/components/providers/ecosystem-provider";
+import { StorageContext } from "@/components/providers/storage-provider";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { EcosystemContext, StorageContext } from "@/lib/contexts";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";

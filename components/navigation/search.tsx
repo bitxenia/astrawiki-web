@@ -17,7 +17,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import Anchor from "./anchor";
 import { simpleSearch, debounce, search } from "@/lib/search";
 import { cn } from "@/lib/utils";
-import { EcosystemContext, StorageContext } from "@/lib/contexts";
+import { EcosystemContext } from "@/components/providers/ecosystem-provider";
+import { StorageContext } from "@/components/providers/storage-provider";
 
 export default function Search() {
   const [searchedInput, setSearchedInput] = useState("");

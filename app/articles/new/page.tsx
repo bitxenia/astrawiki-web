@@ -2,13 +2,11 @@
 
 import Loading from "@/app/loading";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
+import { ChatStorageContext } from "@/components/providers/chat-storage-provider";
+import { EcosystemContext } from "@/components/providers/ecosystem-provider";
+import { StorageContext } from "@/components/providers/storage-provider";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import {
-  ChatStorageContext,
-  EcosystemContext,
-  StorageContext,
-} from "@/lib/contexts";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";

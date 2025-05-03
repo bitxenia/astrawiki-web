@@ -8,7 +8,6 @@ import Feedback from "@/components/navigation/feedback";
 import { BackToTop } from "@/components/navigation/backtotop";
 import { Typography } from "@/components/ui/typography";
 import { useContext, useEffect, useState } from "react";
-import { EcosystemContext, StorageContext } from "@/lib/contexts";
 import Loading from "@/app/loading";
 import ReactMarkdown from "react-markdown";
 import rehypeSlug from "rehype-slug";
@@ -17,6 +16,8 @@ import rehypeKatex from "rehype-katex";
 import rehypePrism from "rehype-prism-plus";
 import remarkGfm from "remark-gfm";
 import { getTableOfContents, TocItem } from "@/lib/toc";
+import { EcosystemContext } from "@/components/providers/ecosystem-provider";
+import { StorageContext } from "@/components/providers/storage-provider";
 
 export default function Pages() {
   const [error, setError] = useState<boolean>(false);

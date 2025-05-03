@@ -1,37 +1,26 @@
-"use client";
+import { Toaster } from "react-hot-toast";
 import { GoogleTagManager } from "@next/third-parties/google";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Navbar } from "@/components/navigation/navbar";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Footer } from "@/components/navigation/footer";
 import { Settings } from "@/lib/meta";
 import "./globals.css";
-import { useState } from "react";
-import {
-  ChatStorageContext,
-  EcosystemContext,
-  StorageContext,
-} from "@/lib/contexts";
-import { usePathname } from "next/navigation";
-import NoEcosystem from "./no-ecosystem";
-import { Toaster } from "react-hot-toast";
-import { Storage } from "@/lib/articles/storage";
-import { ChatStorage } from "@/lib/chat/chat-storage";
+import HideNavbarWrapper from "@/components/navigation/hide-navbar-wrapper";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { EcosystemProvider } from "@/components/providers/ecosystem-provider";
+import { StorageProvider } from "@/components/providers/storage-provider";
+import { ChatStorageProvider } from "@/components/providers/chat-storage-provider";
+
+export const metadata = {
+  title: "Bitxenia",
+  description: "Knowledge Repository",
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [storage, setStorage] = useState<Storage | null>(null);
-  const [chatStorage, setChatStorage] = useState<ChatStorage | null>(null);
-  const [isESLoading, setIsESLoading] = useState<boolean>(false);
-  const [esName, setESName] = useState<string>("Pick an ecosystem");
-
-  const hideNavbarRoutes = ["/"];
-  const hideNavbar = hideNavbarRoutes.includes(usePathname());
-
   return (
     <html lang="en" suppressHydrationWarning>
       {Settings.gtmconnected && <GoogleTagManager gtmId={Settings.gtm} />}
@@ -48,32 +37,15 @@ export default function RootLayout({
           <div>
             <Toaster position="bottom-center" reverseOrder={false} />
           </div>
-          <EcosystemContext.Provider
-            value={{
-              isESLoading,
-              setIsESLoading,
-              esName,
-              setESName,
-            }}
-          >
-            <StorageContext.Provider value={{ storage, setStorage }}>
-              <ChatStorageContext.Provider
-                value={{ chatStorage, setChatStorage }}
-              >
-                {!hideNavbar && <Navbar />}
-                <main className="h-auto px-5 sm:px-8">
-                  {isESLoading && (
-                    <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
-                      <p className="text-2xl text-white">
-                        Initializing ecosystem...
-                      </p>
-                    </div>
-                  )}
-                  {storage || hideNavbar ? children : <NoEcosystem />}
-                </main>
-              </ChatStorageContext.Provider>
-            </StorageContext.Provider>
-          </EcosystemContext.Provider>
+          <EcosystemProvider>
+            <StorageProvider>
+              <ChatStorageProvider>
+                <HideNavbarWrapper>
+                  <main className="h-auto px-5 sm:px-8">{children}</main>
+                </HideNavbarWrapper>
+              </ChatStorageProvider>
+            </StorageProvider>
+          </EcosystemProvider>
           <Footer />
         </ThemeProvider>
       </body>

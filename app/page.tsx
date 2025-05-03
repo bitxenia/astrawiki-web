@@ -5,8 +5,8 @@ import { buttonVariants } from "@/components/ui/button";
 import Search from "@/components/navigation/search";
 import EcosystemPicker from "@/components/navigation/ecosystem-picker";
 import { useContext } from "react";
-import { StorageContext } from "@/lib/contexts";
 import OptimizedSearch from "@/components/navigation/optimized-search";
+import { StorageContext } from "@/components/providers/storage-provider";
 
 export default function Home() {
   const { storage } = useContext(StorageContext);
