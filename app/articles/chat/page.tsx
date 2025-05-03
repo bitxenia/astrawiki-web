@@ -15,7 +15,7 @@ export default function ChatPage() {
   const { esName } = useContext(EcosystemContext);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isSending, setIsSending] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   const [replyingMessage, setReplyingMessage] = useState<ChatMessage | null>(
     null,
@@ -82,6 +82,17 @@ export default function ChatPage() {
     setReplyingMessage(null);
   }
 
+  async function changeAlias(alias: string) {
+    await chatStorage!.setChatAlias(alias);
+  }
+
+  async function getAlias(): Promise<string> {
+    if (chatStorage) {
+      return (await chatStorage!.getAlias()) || "";
+    }
+    return "";
+  }
+
   if (error) notFound();
   else if (isLoading)
     return (
@@ -131,7 +142,12 @@ export default function ChatPage() {
           />
         )}
         {/* Message input */}
-        <MessageTextArea sendMessage={sendMessage} isSending={isSending} />
+        <MessageTextArea
+          sendMessage={sendMessage}
+          changeAlias={changeAlias}
+          getAlias={getAlias}
+          isSending={isSending}
+        />
       </div>
     </div>
   );
@@ -193,20 +209,54 @@ const ReplyingMessagePreview = ({
 
 const MessageTextArea = ({
   sendMessage,
+  changeAlias,
+  getAlias,
   isSending,
 }: {
   sendMessage: (newMessage: string) => Promise<void>;
+  changeAlias: (alias: string) => Promise<void>;
+  getAlias: () => Promise<string>;
   isSending: boolean;
 }) => {
   const [newMessage, setNewMessage] = useState<string>("");
+  const [alias, setAlias] = useState<string>("");
+
+  useEffect(() => {
+    const fetchAlias = async () => {
+      const alias = await getAlias();
+      setAlias(alias);
+    };
+    fetchAlias();
+  }, [getAlias]);
 
   const handleSendMessage = async () => {
     await sendMessage(newMessage);
     setNewMessage("");
   };
 
+  const handleSetAlias = async () => {
+    if (!alias.trim()) {
+      alert("Alias cannot be empty");
+      return;
+    }
+    await changeAlias(alias);
+  };
+
   return (
     <div className="flex items-end gap-2">
+      <input
+        type="text"
+        className="w-1/6 rounded-md border border-black px-4 py-2"
+        placeholder="Alias"
+        value={alias}
+        onChange={(e) => setAlias(e.target.value)}
+        onKeyDown={async (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            await handleSetAlias();
+          }
+        }}
+      />
       <div
         className="relative grid grow"
         data-replicated-value={newMessage + " "}

@@ -15,4 +15,8 @@ export interface ChatStorage {
     message: string,
     parentId?: string,
   ): Promise<void>;
+
+  getAlias(): Promise<string>;
+
+  setChatAlias(alias: string): unknown;
 }
