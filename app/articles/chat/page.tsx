@@ -1,6 +1,8 @@
 "use client";
+import Loading from "@/app/loading";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { ChatStorageContext } from "@/components/providers/chat-storage-provider";
+import { EcosystemContext } from "@/components/providers/ecosystem-provider";
 import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import { formatTime } from "@/lib/time";
@@ -10,8 +12,10 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { LuSend, LuX } from "react-icons/lu";
 
 export default function ChatPage() {
+  const { esName } = useContext(EcosystemContext);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isSending, setIsSending] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
   const [replyingMessage, setReplyingMessage] = useState<ChatMessage | null>(
     null,
@@ -33,6 +37,10 @@ export default function ChatPage() {
   }, [messages]);
 
   useEffect(() => {
+    if (!chatStorage) {
+      return;
+    }
+
     console.log("Listening to new messages...");
     const listenToNewMessages = async () => {
       await chatStorage!.listenToNewMessages(
@@ -46,10 +54,16 @@ export default function ChatPage() {
   }, [articleName, chatStorage]);
 
   useEffect(() => {
+    if (!chatStorage) {
+      setIsLoading(true);
+      return;
+    }
+
     async function fetchMessages() {
       try {
         const allMessages = await chatStorage!.getChatMessages(articleName);
         setMessages(allMessages);
+        setIsLoading(false);
       } catch (err) {
         setError(true);
       }
@@ -69,6 +83,13 @@ export default function ChatPage() {
   }
 
   if (error) notFound();
+  else if (isLoading)
+    return (
+      <Loading
+        title="Loading chat..."
+        desc={`Fetching ${articleName} from ${esName}`}
+      />
+    );
 
   return (
     <div className="mb-5 flex items-start gap-14">
@@ -133,7 +154,7 @@ const Message = ({
       }}
     >
       <div className="flex items-center gap-2">
-        <strong>{message.sender}</strong>
+        <strong>{message.senderAlias}</strong>
         <span className="text-sm text-gray-500">
           {formatTime(message.timestamp * 1000)}
         </span>
@@ -160,7 +181,7 @@ const ReplyingMessagePreview = ({
         />
       )}
       <span className="text-gray-500">
-        Reply to <strong>{message.sender}</strong>
+        Reply to <strong>{message.senderAlias}</strong>
         <br />
         {message.message}
       </span>

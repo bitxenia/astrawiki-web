@@ -31,6 +31,11 @@ export default function Pages() {
   const articleVersion = searchParams.get("version") || undefined;
 
   useEffect(() => {
+    if (!storage) {
+      setIsLoading(true);
+      return;
+    }
+
     async function fetchDocument() {
       setIsLoading(true);
       try {
