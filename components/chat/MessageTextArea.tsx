@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { LuSend } from "react-icons/lu";
+import toast from "react-hot-toast";
 import { buttonVariants } from "@/components/ui/button";
 
 const MessageTextArea = ({
@@ -32,7 +33,7 @@ const MessageTextArea = ({
 
   const handleSetAlias = async () => {
     if (!alias.trim()) {
-      alert("Alias cannot be empty");
+      toast.error("Alias cannot be empty");
       return;
     }
     await changeAlias(alias);
