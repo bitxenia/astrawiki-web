@@ -1,15 +1,15 @@
 "use client";
+import { useContext, useEffect, useRef, useState } from "react";
+import { notFound, useSearchParams } from "next/navigation";
+import { ChatMessage } from "@bitxenia/astrachat-eth";
 import Loading from "@/app/loading";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { ChatStorageContext } from "@/components/providers/chat-storage-provider";
 import { EcosystemContext } from "@/components/providers/ecosystem-provider";
-import { buttonVariants } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
-import { formatTime } from "@/lib/time";
-import { ChatMessage } from "@bitxenia/astrachat-eth";
-import { notFound, useSearchParams } from "next/navigation";
-import { useContext, useEffect, useRef, useState } from "react";
-import { LuSend, LuX } from "react-icons/lu";
+import Message from "@/components/chat/Message";
+import ReplyingMessagePreview from "@/components/chat/ReplyingMessagePreview";
+import MessageTextArea from "@/components/chat/MessageTextArea";
 
 export default function ChatPage() {
   const { esName } = useContext(EcosystemContext);
@@ -152,148 +152,3 @@ export default function ChatPage() {
     </div>
   );
 }
-
-const Message = ({
-  message,
-  parentMessage,
-  setReplyingMessage,
-}: {
-  message: ChatMessage;
-  parentMessage?: ChatMessage;
-  setReplyingMessage: any;
-}) => {
-  const alias = message.senderAlias || message.sender;
-  return (
-    <li
-      className="flex cursor-pointer flex-col gap-2 border-x border-t px-3 py-3 hover:bg-gray-100 dark:hover:bg-gray-800"
-      onClick={() => {
-        setReplyingMessage(message);
-      }}
-    >
-      <div className="flex items-center gap-2">
-        <strong>{alias}</strong>
-        <span className="text-sm text-gray-500">
-          {formatTime(message.timestamp * 1000)}
-        </span>
-      </div>
-      {parentMessage && <ReplyingMessagePreview message={parentMessage} />}
-      {message.message}
-    </li>
-  );
-};
-
-const ReplyingMessagePreview = ({
-  message,
-  setReplyingMessage,
-}: {
-  message: ChatMessage;
-  setReplyingMessage?: any;
-}) => {
-  const alias = message.senderAlias || message.sender;
-  return (
-    <div className="flex items-center gap-2 border border-gray-300 bg-gray-100 p-2">
-      {setReplyingMessage && (
-        <LuX
-          className="h-8 w-8 cursor-pointer rounded-full p-1 text-red-500 hover:bg-red-200"
-          onClick={() => setReplyingMessage(null)}
-        />
-      )}
-      <span className="text-gray-500">
-        Reply to <strong>{alias}</strong>
-        <br />
-        {message.message}
-      </span>
-    </div>
-  );
-};
-
-const MessageTextArea = ({
-  sendMessage,
-  changeAlias,
-  getAlias,
-  isSending,
-}: {
-  sendMessage: (newMessage: string) => Promise<void>;
-  changeAlias: (alias: string) => Promise<void>;
-  getAlias: () => Promise<string>;
-  isSending: boolean;
-}) => {
-  const [newMessage, setNewMessage] = useState<string>("");
-  const [alias, setAlias] = useState<string>("");
-
-  useEffect(() => {
-    const fetchAlias = async () => {
-      const alias = await getAlias();
-      setAlias(alias);
-    };
-    fetchAlias();
-  }, [getAlias]);
-
-  const handleSendMessage = async () => {
-    await sendMessage(newMessage);
-    setNewMessage("");
-  };
-
-  const handleSetAlias = async () => {
-    if (!alias.trim()) {
-      alert("Alias cannot be empty");
-      return;
-    }
-    await changeAlias(alias);
-  };
-
-  return (
-    <div className="flex items-end gap-2">
-      <input
-        type="text"
-        className="w-1/6 rounded-md border border-black px-4 py-2"
-        placeholder="Alias"
-        value={alias}
-        onChange={(e) => setAlias(e.target.value)}
-        onKeyDown={async (e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            await handleSetAlias();
-          }
-        }}
-      />
-      <div
-        className="relative grid grow"
-        data-replicated-value={newMessage + " "}
-      >
-        <textarea
-          className="font-inherit absolute inset-0 resize-none overflow-hidden whitespace-pre-wrap rounded-md border border-black px-4 py-2"
-          placeholder="Message"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={async (e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              await handleSendMessage();
-            }
-          }}
-        />
-        <div
-          className="font-inherit invisible whitespace-pre-wrap rounded-md border border-black px-4 py-2"
-          aria-hidden="true"
-        >
-          {newMessage + " "}
-        </div>
-      </div>
-      <button
-        className={buttonVariants({
-          variant: "default",
-          size: "default",
-        })}
-        onClick={handleSendMessage}
-        disabled={isSending}
-      >
-        {isSending ? (
-          <span className="text-sm">...</span>
-        ) : (
-          <LuSend className="h-5 w-5" />
-        )}
-      </button>
-    </div>
-  );
-};
