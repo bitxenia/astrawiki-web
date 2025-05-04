@@ -165,7 +165,7 @@ const Message = ({
   const alias = message.senderAlias || message.sender;
   return (
     <li
-      className="flex cursor-pointer flex-col gap-2 border-x border-t px-3 py-3 hover:bg-gray-100"
+      className="flex cursor-pointer flex-col gap-2 border-x border-t px-3 py-3 hover:bg-gray-100 dark:hover:bg-gray-800"
       onClick={() => {
         setReplyingMessage(message);
       }}
