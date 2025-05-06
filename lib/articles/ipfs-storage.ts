@@ -13,8 +13,8 @@ export default class IPFSStorage implements Storage {
 
   static async create(): Promise<IPFSStorage> {
     const opts: AstrawikiInit = {
-      blockstore: new LevelBlockstore(`data/ipfs/blocks`),
-      datastore: new LevelDatastore(`data/ipfs/datastore`),
+      blockstore: new LevelBlockstore(`data/astrawiki/blocks`),
+      datastore: new LevelDatastore(`data/astrawiki/datastore`),
     };
     const node = await createAstrawiki(opts);
     return new IPFSStorage(node);
