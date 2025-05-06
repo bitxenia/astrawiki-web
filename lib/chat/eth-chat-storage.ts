@@ -39,4 +39,12 @@ export default class EthChatStorage implements ChatStorage {
   ): Promise<void> {
     return this.chatNode.sendMessage(chatName, message, parentId);
   }
+
+  async getAlias(): Promise<string> {
+    return this.chatNode.getAlias();
+  }
+
+  async setChatAlias(alias: string): Promise<void> {
+    this.chatNode.setAlias(alias);
+  }
 }

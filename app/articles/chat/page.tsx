@@ -1,17 +1,21 @@
 "use client";
+import { useContext, useEffect, useRef, useState } from "react";
+import { notFound, useSearchParams } from "next/navigation";
+import { ChatMessage } from "@bitxenia/astrachat-eth";
+import Loading from "@/app/loading";
 import PageBreadcrumb from "@/components/navigation/pagebreadcrumb";
 import { ChatStorageContext } from "@/components/providers/chat-storage-provider";
-import { buttonVariants } from "@/components/ui/button";
+import { EcosystemContext } from "@/components/providers/ecosystem-provider";
 import { Typography } from "@/components/ui/typography";
-import { formatTime } from "@/lib/time";
-import { ChatMessage } from "@bitxenia/astrachat-eth";
-import { notFound, useSearchParams } from "next/navigation";
-import { useContext, useEffect, useRef, useState } from "react";
-import { LuSend, LuX } from "react-icons/lu";
+import Message from "@/components/chat/Message";
+import ReplyingMessagePreview from "@/components/chat/ReplyingMessagePreview";
+import MessageTextArea from "@/components/chat/MessageTextArea";
 
 export default function ChatPage() {
+  const { esName } = useContext(EcosystemContext);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isSending, setIsSending] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   const [replyingMessage, setReplyingMessage] = useState<ChatMessage | null>(
     null,
@@ -33,6 +37,10 @@ export default function ChatPage() {
   }, [messages]);
 
   useEffect(() => {
+    if (!chatStorage) {
+      return;
+    }
+
     console.log("Listening to new messages...");
     const listenToNewMessages = async () => {
       await chatStorage!.listenToNewMessages(
@@ -46,10 +54,16 @@ export default function ChatPage() {
   }, [articleName, chatStorage]);
 
   useEffect(() => {
+    if (!chatStorage) {
+      setIsLoading(true);
+      return;
+    }
+
     async function fetchMessages() {
       try {
         const allMessages = await chatStorage!.getChatMessages(articleName);
         setMessages(allMessages);
+        setIsLoading(false);
       } catch (err) {
         setError(true);
       }
@@ -68,7 +82,25 @@ export default function ChatPage() {
     setReplyingMessage(null);
   }
 
+  async function changeAlias(alias: string) {
+    await chatStorage!.setChatAlias(alias);
+  }
+
+  async function getAlias(): Promise<string> {
+    if (chatStorage) {
+      return (await chatStorage!.getAlias()) || "";
+    }
+    return "";
+  }
+
   if (error) notFound();
+  else if (isLoading)
+    return (
+      <Loading
+        title="Loading chat..."
+        desc={`Fetching ${articleName} from ${esName}`}
+      />
+    );
 
   return (
     <div className="mb-5 flex items-start gap-14">
@@ -110,117 +142,13 @@ export default function ChatPage() {
           />
         )}
         {/* Message input */}
-        <MessageTextArea sendMessage={sendMessage} isSending={isSending} />
+        <MessageTextArea
+          sendMessage={sendMessage}
+          changeAlias={changeAlias}
+          getAlias={getAlias}
+          isSending={isSending}
+        />
       </div>
     </div>
   );
 }
-
-const Message = ({
-  message,
-  parentMessage,
-  setReplyingMessage,
-}: {
-  message: ChatMessage;
-  parentMessage?: ChatMessage;
-  setReplyingMessage: any;
-}) => {
-  return (
-    <li
-      className="flex cursor-pointer flex-col gap-2 border-x border-t px-3 py-3 hover:bg-gray-100"
-      onClick={() => {
-        setReplyingMessage(message);
-      }}
-    >
-      <div className="flex items-center gap-2">
-        <strong>{message.sender}</strong>
-        <span className="text-sm text-gray-500">
-          {formatTime(message.timestamp * 1000)}
-        </span>
-      </div>
-      {parentMessage && <ReplyingMessagePreview message={parentMessage} />}
-      {message.message}
-    </li>
-  );
-};
-
-const ReplyingMessagePreview = ({
-  message,
-  setReplyingMessage,
-}: {
-  message: ChatMessage;
-  setReplyingMessage?: any;
-}) => {
-  return (
-    <div className="flex items-center gap-2 border border-gray-300 bg-gray-100 p-2">
-      {setReplyingMessage && (
-        <LuX
-          className="h-8 w-8 cursor-pointer rounded-full p-1 text-red-500 hover:bg-red-200"
-          onClick={() => setReplyingMessage(null)}
-        />
-      )}
-      <span className="text-gray-500">
-        Reply to <strong>{message.sender}</strong>
-        <br />
-        {message.message}
-      </span>
-    </div>
-  );
-};
-
-const MessageTextArea = ({
-  sendMessage,
-  isSending,
-}: {
-  sendMessage: (newMessage: string) => Promise<void>;
-  isSending: boolean;
-}) => {
-  const [newMessage, setNewMessage] = useState<string>("");
-
-  const handleSendMessage = async () => {
-    await sendMessage(newMessage);
-    setNewMessage("");
-  };
-
-  return (
-    <div className="flex items-end gap-2">
-      <div
-        className="relative grid grow"
-        data-replicated-value={newMessage + " "}
-      >
-        <textarea
-          className="font-inherit absolute inset-0 resize-none overflow-hidden whitespace-pre-wrap rounded-md border border-black px-4 py-2"
-          placeholder="Message"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={async (e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              await handleSendMessage();
-            }
-          }}
-        />
-        <div
-          className="font-inherit invisible whitespace-pre-wrap rounded-md border border-black px-4 py-2"
-          aria-hidden="true"
-        >
-          {newMessage + " "}
-        </div>
-      </div>
-      <button
-        className={buttonVariants({
-          variant: "default",
-          size: "default",
-        })}
-        onClick={handleSendMessage}
-        disabled={isSending}
-      >
-        {isSending ? (
-          <span className="text-sm">...</span>
-        ) : (
-          <LuSend className="h-5 w-5" />
-        )}
-      </button>
-    </div>
-  );
-};
