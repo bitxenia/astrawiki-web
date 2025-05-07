@@ -19,6 +19,7 @@ export default class IpfsChatStorage implements ChatStorage {
     const opts: AstrachatInit = {
       blockstore: new LevelBlockstore(`data/astrachat/blocks`),
       datastore: new LevelDatastore(`data/astrachat/datastore`),
+      logLevel: "debug",
     };
     const chatNode = await createAstrachat(opts);
     return new IpfsChatStorage(chatNode);

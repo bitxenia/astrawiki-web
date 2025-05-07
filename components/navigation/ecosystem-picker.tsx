@@ -34,7 +34,6 @@ export default function EcosystemPicker() {
 
   useEffect(() => {
     const storedEcosystem = localStorage.getItem("ecosystem");
-    console.log("storedEcosystem", storedEcosystem);
     const setStoredEcosystem = async () => {
       switch (storedEcosystem) {
         case "Example Server":
@@ -42,6 +41,9 @@ export default function EcosystemPicker() {
           break;
         case "Blockchain":
           setBlockchain();
+          break;
+        case "IPFS":
+          setIPFS();
           break;
       }
     };
