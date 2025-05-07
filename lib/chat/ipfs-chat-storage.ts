@@ -33,8 +33,6 @@ export default class IpfsChatStorage implements ChatStorage {
     chatName: string,
     callback: (message: ChatMessage) => void,
   ): Promise<void> {
-    // TODO: note: there is a race condition here when using callback,
-    //             if astradb is not thread safe it breaks because it creates 2 dbs.
     await this.chatNode.getMessages(chatName, callback);
     return;
   }
