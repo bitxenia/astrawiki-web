@@ -14,7 +14,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@bitxenia/astrachat": "^0.0.12",
+    "@bitxenia/astrachat": "^0.0.13",
     "@bitxenia/astrachat-eth": "^0.0.4",
     "@bitxenia/astrawiki": "^0.1.4",
     "@bitxenia/astrawiki-eth": "^0.0.4",
