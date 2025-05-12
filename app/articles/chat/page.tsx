@@ -65,6 +65,7 @@ export default function ChatPage() {
         setMessages(allMessages);
         setIsLoading(false);
       } catch (err) {
+        console.error("Error fetching messages:", err);
         setError(true);
       }
     }

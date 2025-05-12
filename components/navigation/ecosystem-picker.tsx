@@ -8,6 +8,7 @@ import {
 } from "../ui/dropdown-menu";
 import { useContext, useEffect } from "react";
 import IPFSStorage from "@/lib/articles/ipfs-storage";
+import IpfsChatStorage from "@/lib/chat/ipfs-chat-storage";
 import EthStorage from "@/lib/articles/eth-storage";
 import ExampleServerStorage from "@/lib/articles/example-server-storage";
 import EthChatStorage from "@/lib/chat/eth-chat-storage";
@@ -33,7 +34,6 @@ export default function EcosystemPicker() {
 
   useEffect(() => {
     const storedEcosystem = localStorage.getItem("ecosystem");
-    console.log("storedEcosystem", storedEcosystem);
     const setStoredEcosystem = async () => {
       switch (storedEcosystem) {
         case "Example Server":
@@ -41,6 +41,9 @@ export default function EcosystemPicker() {
           break;
         case "Blockchain":
           setBlockchain();
+          break;
+        case "IPFS":
+          setIPFS();
           break;
       }
     };
@@ -72,6 +75,7 @@ export default function EcosystemPicker() {
     setIsESLoading(true);
     setESName("Loading...");
     setStorage(await IPFSStorage.create());
+    setChatStorage(await IpfsChatStorage.create());
     setESName("IPFS");
     localStorage.setItem("ecosystem", "IPFS");
     setIsESLoading(false);
