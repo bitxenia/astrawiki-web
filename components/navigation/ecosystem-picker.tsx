@@ -47,7 +47,8 @@ export default function EcosystemPicker() {
           break;
       }
     };
-    if (storedEcosystem != esName) {
+    // Set ecosystem to the stored one if it exists and if we are not in the main page
+    if (storedEcosystem != esName && window.location.pathname !== "/") {
       setStoredEcosystem();
     }
   }, []);
