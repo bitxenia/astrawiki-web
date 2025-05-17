@@ -15,11 +15,12 @@ export default class IpfsChatStorage implements ChatStorage {
     this.chatNode = chatNode;
   }
 
-  static async create(): Promise<IpfsChatStorage> {
+  static async create(loginKey?: string): Promise<IpfsChatStorage> {
     const opts: AstrachatInit = {
       blockstore: new LevelBlockstore(`data/astrachat/blocks`),
       datastore: new LevelDatastore(`data/astrachat/datastore`),
       logLevel: "debug",
+      loginKey,
     };
     const chatNode = await createAstrachat(opts);
     return new IpfsChatStorage(chatNode);
@@ -55,5 +56,13 @@ export default class IpfsChatStorage implements ChatStorage {
 
   async setChatAlias(alias: string): Promise<void> {
     this.chatNode.setChatAlias(alias);
+  }
+
+  async getLoginKey(): Promise<string> {
+    return await this.chatNode.getLoginKey();
+  }
+
+  getUserId(): string {
+    return this.chatNode.getUserId();
   }
 }

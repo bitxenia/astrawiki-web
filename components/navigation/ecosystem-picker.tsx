@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import IPFSStorage from "@/lib/articles/ipfs-storage";
 import IpfsChatStorage from "@/lib/chat/ipfs-chat-storage";
 import EthStorage from "@/lib/articles/eth-storage";
@@ -24,6 +24,9 @@ import {
   ChatStorageContextProps,
   ChatStorageContext,
 } from "@/components/providers/chat-storage-provider";
+import { Login } from "./login";
+import toast from "react-hot-toast";
+import { LuCopy } from "react-icons/lu";
 
 export default function EcosystemPicker() {
   const { setIsESLoading, esName, setESName } =
@@ -31,6 +34,9 @@ export default function EcosystemPicker() {
   const { setStorage } = useContext<StorageContextProps>(StorageContext);
   const { setChatStorage } =
     useContext<ChatStorageContextProps>(ChatStorageContext);
+  const [showLogin, setShowLogin] = useState(false);
+  const [loginKey, setLoginKey] = useState<string | undefined>(undefined);
+  const [isLoginDone, setIsLoginDone] = useState(false);
 
   useEffect(() => {
     const storedEcosystem = localStorage.getItem("ecosystem");
@@ -52,6 +58,53 @@ export default function EcosystemPicker() {
       setStoredEcosystem();
     }
   }, []);
+
+  useEffect(() => {
+    if (!isLoginDone) return;
+    const setLoginKeyAsync = async () => {
+      const localChatStorage = await IpfsChatStorage.create(loginKey);
+      setChatStorage(localChatStorage);
+      // NOTE: Login key will be generated if one isn't provided
+      setLoginKey(await localChatStorage.getLoginKey());
+      const userId = localChatStorage.getUserId();
+      setESName("IPFS");
+      localStorage.setItem("ecosystem", "IPFS");
+      setIsESLoading(false);
+      toast(
+        (t) => (
+          <span>
+            UserID: {userId}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(userId);
+                toast.dismiss(t.id);
+              }}
+            >
+              <LuCopy />
+            </button>
+          </span>
+        ),
+        { duration: Infinity },
+      );
+      toast(
+        (t) => (
+          <span>
+            Copy your login key
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(loginKey || "");
+                toast.dismiss(t.id);
+              }}
+            >
+              <LuCopy />
+            </button>
+          </span>
+        ),
+        { duration: Infinity },
+      );
+    };
+    setLoginKeyAsync();
+  }, [isLoginDone]);
 
   const setExampleServer = async () => {
     setIsESLoading(true);
@@ -76,26 +129,33 @@ export default function EcosystemPicker() {
     setIsESLoading(true);
     setESName("Loading...");
     setStorage(await IPFSStorage.create());
-    setChatStorage(await IpfsChatStorage.create());
-    setESName("IPFS");
-    localStorage.setItem("ecosystem", "IPFS");
-    setIsESLoading(false);
+    setShowLogin(true);
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="button">
-        <div className="flex w-full items-center gap-2.5 rounded-sm border px-3 py-2 text-[15px] hover:bg-neutral-100 dark:hover:bg-neutral-900">
-          {esName}
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem onClick={setExampleServer}>
-          Example Server
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={setIPFS}>IPFS</DropdownMenuItem>
-        <DropdownMenuItem onClick={setBlockchain}>Blockchain</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div>
+      <DropdownMenu>
+        <DropdownMenuTrigger className="button">
+          <div className="flex w-full items-center gap-2.5 rounded-sm border px-3 py-2 text-[15px] hover:bg-neutral-100 dark:hover:bg-neutral-900">
+            {esName}
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={setExampleServer}>
+            Example Server
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={setIPFS}>IPFS</DropdownMenuItem>
+          <DropdownMenuItem onClick={setBlockchain}>
+            Blockchain
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <Login
+        open={showLogin}
+        setOpen={setShowLogin}
+        setLoginDone={setIsLoginDone}
+        setLoginKey={setLoginKey}
+      />
+    </div>
   );
 }
