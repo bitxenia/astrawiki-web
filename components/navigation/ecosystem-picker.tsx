@@ -59,49 +59,47 @@ export default function EcosystemPicker() {
     }
   }, []);
 
+  const showToastCopy = (message: string, valueToCopy: string) => {
+    toast(
+      (t) => (
+        <span>
+          {message}{" "}
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(valueToCopy);
+              toast.dismiss(t.id);
+            }}
+          >
+            <LuCopy />
+          </button>
+        </span>
+      ),
+      // 1000 is a magic number for showing UserID in a single line
+      { duration: Infinity, style: { maxWidth: 1000 } },
+    );
+  };
+
   useEffect(() => {
     if (!isLoginDone) return;
     const setLoginKeyAsync = async () => {
+      console.log(`Login Key provided: ${loginKey}`);
       const localChatStorage = await IpfsChatStorage.create(loginKey);
       setChatStorage(localChatStorage);
       // NOTE: Login key will be generated if one isn't provided
-      setLoginKey(await localChatStorage.getLoginKey());
+      const newLoginKey = loginKey
+        ? loginKey
+        : await localChatStorage.getLoginKey();
+      setLoginKey(newLoginKey);
       const userId = localChatStorage.getUserId();
       setESName("IPFS");
       localStorage.setItem("ecosystem", "IPFS");
       setIsESLoading(false);
-      toast(
-        (t) => (
-          <span>
-            UserID: {userId}
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(userId);
-                toast.dismiss(t.id);
-              }}
-            >
-              <LuCopy />
-            </button>
-          </span>
-        ),
-        { duration: Infinity },
-      );
-      toast(
-        (t) => (
-          <span>
-            Copy your login key
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(loginKey || "");
-                toast.dismiss(t.id);
-              }}
-            >
-              <LuCopy />
-            </button>
-          </span>
-        ),
-        { duration: Infinity },
-      );
+
+      const userIdMsg = `UserID ${userId}`;
+      showToastCopy(userIdMsg, userId);
+
+      const loginKeyMsg = `Copy your login key`;
+      showToastCopy(loginKeyMsg, newLoginKey);
     };
     setLoginKeyAsync();
   }, [isLoginDone]);
