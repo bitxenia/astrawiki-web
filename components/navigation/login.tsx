@@ -40,7 +40,7 @@ export function Login({
 
   return (
     <Dialog open={open}>
-      <DialogContent className="fixed left-1/2 top-1/2 min-w-[600px] max-w-[650px] -translate-x-1/2 -translate-y-1/2 transform rounded-lg border bg-white px-4 pb-4 pt-1 dark:bg-black">
+      <DialogContent className="fixed left-1/2 top-1/2 z-[9999] min-w-[600px] max-w-[650px] -translate-x-1/2 -translate-y-1/2 transform rounded-lg border bg-white px-4 pb-4 pt-1 dark:bg-black">
         <DialogTitle className="sr-only">Login</DialogTitle>
         <div className="flex flex-col gap-3">
           <input
