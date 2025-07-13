@@ -94,7 +94,7 @@ export default function Pages() {
         )}
       </div>
       {Settings.rightbar && (
-        <div className="toc sticky top-16 hidden min-w-[230px] gap-3 py-8 xl:flex xl:flex-col">
+        <div className="toc sticky top-16 flex min-w-[230px] flex-col gap-3 py-8">
           {Settings.totop && (
             <BackToTop className="mt-6 self-start text-sm text-neutral-800 dark:text-neutral-300/85" />
           )}
