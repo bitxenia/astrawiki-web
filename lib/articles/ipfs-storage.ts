@@ -15,6 +15,9 @@ export default class IPFSStorage implements Storage {
     const opts: AstrawikiInit = {
       blockstore: new LevelBlockstore(`data/astrawiki/blocks`),
       datastore: new LevelDatastore(`data/astrawiki/datastore`),
+      bootstrapProviderPeers: [
+        "/ip4/181.167.193.209/udp/40001/webrtc-direct/certhash/uEiCuuW2KJhA9CPThwnpbWOwz4hpCQRhhKd3McX6Iy6Xdog/p2p/12D3KooWBRk9RC9imoLYB3C6A18RNjyFhvKcpQNLJodgT3NEZ7VZ",
+      ],
     };
     const node = await createAstrawiki(opts);
     return new IPFSStorage(node);

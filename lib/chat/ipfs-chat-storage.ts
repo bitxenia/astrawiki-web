@@ -21,6 +21,9 @@ export default class IpfsChatStorage implements ChatStorage {
       datastore: new LevelDatastore(`data/astrachat/datastore`),
       logLevel: "debug",
       loginKey,
+      bootstrapProviderPeers: [
+        "/ip4/181.167.193.209/udp/50001/webrtc-direct/certhash/uEiD5NmjXWbohsPBCt8TzfeawpelfoMPYTohcjScghY-gfg/p2p/12D3KooWMeL4aq9QAx5LFFgdQB3Hxy74x3af1fi1R6atGhmzDwFK",
+      ],
     };
     const chatNode = await createAstrachat(opts);
     return new IpfsChatStorage(chatNode);
